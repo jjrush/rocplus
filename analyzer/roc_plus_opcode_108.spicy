@@ -1,0 +1,35 @@
+module ROC_PLUS_OPCODE_108;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type RequestHistoryTagAndPeriodicIndex_HistoricalPoints = unit {
+    historicalPoint : uint8 &convert=ROC_PLUS_FUNCTIONS::uintToHexString($$);
+};
+
+type RequestHistoryTagAndPeriodicIndex = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestHistoryTagAndPeriodicIndex_Request();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestHistoryTagAndPeriodicIndex_Response();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestHistoryTagAndPeriodicIndex_Unknown();
+    };
+};
+
+type RequestHistoryTagAndPeriodicIndex_Request = unit {
+    historySegment   : uint8;
+    numPoints        : uint8;
+    historicalPoints : RequestHistoryTagAndPeriodicIndex_HistoricalPoints[self.numPoints];
+};
+
+type RequestHistoryTagAndPeriodicIndex_Response = unit {
+    historySegment   : uint8;
+    numPoints        : uint8;
+    periodicIndex    : uint16;
+    historicalPoints : RequestHistoryTagAndPeriodicIndex_HistoricalPoints[self.numPoints];
+    tag              : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+};
+
+type RequestHistoryTagAndPeriodicIndex_Unknown = unit {
+    # If data length field is less than 23 but greater than 15 we are UNKNOWN 
+};

@@ -1,0 +1,116 @@
+module ROC_PLUS;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+# import ROC_PLUS_TYPES;
+import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_OPCODE_006;
+import ROC_PLUS_OPCODE_007;
+import ROC_PLUS_OPCODE_008;
+import ROC_PLUS_OPCODE_010;
+import ROC_PLUS_OPCODE_011;
+import ROC_PLUS_OPCODE_017;
+import ROC_PLUS_OPCODE_024;
+import ROC_PLUS_OPCODE_050;
+import ROC_PLUS_OPCODE_100;
+import ROC_PLUS_OPCODE_105;
+import ROC_PLUS_OPCODE_108;
+import ROC_PLUS_OPCODE_118;
+import ROC_PLUS_OPCODE_119;
+# import ROC_PLUS_OPCODE_135;
+# import ROC_PLUS_OPCODE_136;
+import ROC_PLUS_OPCODE_137;
+import ROC_PLUS_OPCODE_138;
+# import ROC_PLUS_OPCODE_139;
+import ROC_PLUS_OPCODE_166;
+import ROC_PLUS_OPCODE_167;
+# import ROC_PLUS_OPCODE_180;
+# import ROC_PLUS_OPCODE_181;
+import ROC_PLUS_OPCODE_203;
+# import ROC_PLUS_OPCODE_205;
+import ROC_PLUS_OPCODE_206;
+# import ROC_PLUS_OPCODE_224;
+# import ROC_PLUS_OPCODE_225;
+import ROC_PLUS_OPCODE_255;
+
+public type UDP_Messages = unit {
+    rocMessage : ROC_Message[];
+};
+
+# public type TCP_Messages = unit {
+#     rocMessageTCP : ROC_Message_TCP[];
+# };
+
+public type ROC_Message = unit {
+    var rocPlusLinkId : string;
+
+    destinationUnit   : uint8;
+    destinationGroup  : uint8;
+    sourceUnit        : uint8;
+    sourceGroup       : uint8;
+    opcode            : uint8 &convert=ROC_PLUS_ENUMS::Opcode($$);
+    dataLength        : uint8;
+    dataBytes         : DataBytes(self);
+
+    lsbCRC            : uint8; # least significant byte
+    msbCRC            : uint8; # most signfiicant byte
+
+    on %init {
+        self.rocPlusLinkId = ROC_PLUS_FUNCTIONS::generateId();
+    }
+    
+    on %done { 
+#        print self; 
+    }
+
+    on %error(msg: string) {
+        print "ERROR: %s" % msg;
+    }
+};
+
+# public type ROC_Message_TCP = unit {
+#     # TODO: fill this out
+# };
+
+public type DataBytes = unit(rocMessage: ROC_Message) {
+    # var opcode     : ROC_PLUS_ENUMS::Opcode;
+    var dataLength : uint8;
+    var packetType : ROC_PLUS_ENUMS::PacketType;
+    
+    switch(rocMessage.opcode) {
+        ROC_PLUS_ENUMS::Opcode::SYSTEM_CONFIG                            -> systemConfiguration                  : ROC_PLUS_OPCODE_006::SystemConfiguration(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::READ_REALTIME_CLOCK                      -> readRealtimeClock                    : ROC_PLUS_OPCODE_007::ReadRealtimeClock(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::SET_REALTIME_CLOCK                       -> setRealtimeClock                     : ROC_PLUS_OPCODE_008::SetRealtimeClock(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::READ_CONFIGURABLE_OPCODE_POINT_DATA      -> readConfigurableOpcodePointData      : ROC_PLUS_OPCODE_010::ReadConfigurableOpcodePointData(self.packetType, self.dataLength);
+        ROC_PLUS_ENUMS::Opcode::WRITE_CONFIGURABLE_OPCODE_POINT_DATA     -> writeConfigurableOpcodePointData     : ROC_PLUS_OPCODE_011::WriteConfigurableOpcodePointData(self.packetType, self.dataLength);
+        ROC_PLUS_ENUMS::Opcode::LOGIN_REQUEST                            -> login                                : ROC_PLUS_OPCODE_017::Login(self.packetType, ROC_PLUS_FUNCTIONS::determineOpcode17Type(self.dataLength));  
+        ROC_PLUS_ENUMS::Opcode::STORE_AND_FORWARD                        -> storeAndForward                      : ROC_PLUS_OPCODE_024::StoreAndForward(self.packetType, self.dataLength);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_IO_POINT_POSITION                -> ioPointPosition                      : ROC_PLUS_OPCODE_050::IOPointPosition(self.packetType, self.dataLength);
+        ROC_PLUS_ENUMS::Opcode::ACCESS_USER_DEFINED_INFORMATION          -> accessUserDefinedInfo                : ROC_PLUS_OPCODE_100::AccessUserDefinedInformation(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_TODAY_YESTERDAY_MIN_MAX_VALUES   -> requestTodayYesterdayMinMaxVals      : ROC_PLUS_OPCODE_105::RequestTodayYesterdayMinMaxValues(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_HISTORY_TAG_AND_PERIODIC_INDEX   -> requestHistoryTagAndPeriodicIndex    : ROC_PLUS_OPCODE_108::RequestHistoryTagAndPeriodicIndex(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_ALARM_DATA                       -> requestAlarmData                     : ROC_PLUS_OPCODE_118::RequestAlarmData(self.packetType, self.dataLength);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_EVENT_DATA                       -> requestEventData                     : ROC_PLUS_OPCODE_119::RequestEventData(self.packetType, self.dataLength);
+        # ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_HISTORY_POINT_DATA        -> requestSingleHIstoryPointData        : ROC_PLUS_OPCODE_135::RequestSingleHistoryPointData(self.packetType);
+        # ROC_PLUS_ENUMS::Opcode::REQUEST_MULTIPLE_HISTORY_POINT_DATA      -> requestMultipleHistoryPointData      : ROC_PLUS_OPCODE_136::RequestMultipleHistoryPointData(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_HISTORY_INDEX                    -> requestHistoryIndex                  : ROC_PLUS_OPCODE_137::RequestHistoryIndex(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_DAILY_AND_PERIODIC_HISTORY       -> requestDailyAndPeriodicHistory       : ROC_PLUS_OPCODE_138::RequestDailyAndPeriodicHistory(self.packetType);
+        # ROC_PLUS_ENUMS::Opcode::HISTORY_INFORMATION_DATA                 -> historyInformationData               : ROC_PLUS_OPCODE_139::HistoryInformationData(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::SET_SINGLE_POINT_PARAMETERS              -> setSinglePointParameters             : ROC_PLUS_OPCODE_166::SetSinglePointParameters(self.packetType, self.dataLength);
+        ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_POINT_PARAMETERS          -> requestSinglePointParameters         : ROC_PLUS_OPCODE_167::RequestSinglePointParameters(self.packetType, self.dataLength);
+        # ROC_PLUS_ENUMS::Opcode::REQUEST_PARAMETERS                       -> requestParameters                    : ROC_PLUS_OPCODE_180::RequestParameters(self.packetType);
+        # ROC_PLUS_ENUMS::Opcode::WRITE_PARAMETERS                         -> writeParameters                      : ROC_PLUS_OPCODE_181::WriteParameters(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::GENERAL_FILE_TRANSFER                    -> generalFileTransfer                  : ROC_PLUS_OPCODE_203::GeneralFileTransfer(self.packetType, self.dataLength);
+        # ROC_PLUS_ENUMS::Opcode::PEER_TO_PEER_NETWORK_MESSAGES            -> peerToPeerNetworkMessages            : ROC_PLUS_OPCODE_205::PeerToPeerNetworkMessages(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA            -> readTransactionHistory               : ROC_PLUS_OPCODE_206::ReadTransactionHistory(self.packetType);
+        # ROC_PLUS_ENUMS::Opcode::SRBX_SIGNAL                              -> srbxSignal                           : ROC_PLUS_OPCODE_224::SRBXSignal(self.packetType);
+        # ROC_PLUS_ENUMS::Opcode::ACKNOWLEDGE_SRBX                         -> ackSRBX                              : ROC_PLUS_OPCODE_225::AcknowledgeSRBX(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR                          -> errorIndicator                       : ROC_PLUS_OPCODE_255::ErrorIndicator(self.packetType, self.dataLength); 
+    };
+
+    on %init {
+        # self.opcode = ;
+        self.dataLength = rocMessage.dataLength;
+        self.packetType = ROC_PLUS_FUNCTIONS::determinePacketType(rocMessage.opcode, rocMessage.dataLength);
+    }
+};

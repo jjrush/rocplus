@@ -1,0 +1,31 @@
+module ROC_PLUS_OPCODE_010;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type ReadConfigurableOpcodePointData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadConfigurableOpcodePointData_Request();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadConfigurableOpcodePointData_Response(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadConfigurableOpcodePointData_Unknown();
+    };
+};
+
+type ReadConfigurableOpcodePointData_Unknown = unit {
+    # This opcode should always be a request or a response
+};
+
+type ReadConfigurableOpcodePointData_Request = unit {
+    tableNumber           : uint8;
+    startingTableLocation : uint8;
+    numTableLocations     : uint8;
+};
+
+type ReadConfigurableOpcodePointData_Response = unit(dataLength : uint8) {
+    tableNumber           : uint8;
+    startingTableLocation : uint8;
+    numTableLocations     : uint8;
+    tableVersionNumber    : uint32;
+    data                  : bytes &size=(dataLength - 7); # Subtract previous fields
+};

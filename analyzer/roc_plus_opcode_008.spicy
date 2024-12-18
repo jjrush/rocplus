@@ -1,0 +1,34 @@
+module ROC_PLUS_OPCODE_008;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type SetRealtimeClock = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SetRealtimeClock_Request();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SetRealtimeClock_Response();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SetRealtimeClock_Unknown();
+    };
+};
+
+type SetRealtimeClock_Unknown = unit {
+    # This opcode should always be a request or a response
+};
+
+type SetRealtimeClock_Request = unit {
+    currentSecond    : uint8;
+    currentMinute    : uint8;
+    currentHour      : uint8;
+    currentDay       : uint8;
+    currentMonth     : uint8;
+    currentYear      : uint16;
+
+    # on %done {
+    #     print self;
+    # }
+};
+
+type SetRealtimeClock_Response = unit {
+    # SetRealtimeClock request does not contain any data
+};

@@ -1,0 +1,36 @@
+module ROC_PLUS_OPCODE_100;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+# Wrapper for response PointType object
+type AccessUserDefinedInformation_PointType = unit {
+    pointType : uint8 &convert=ROC_PLUS_ENUMS::PointType($$);
+};
+
+type AccessUserDefinedInformation = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : AccessUserDefinedInformation_Request();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : AccessUserDefinedInformation_Response();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : AccessUserDefinedInformation_Unknown();
+    };
+};
+
+type AccessUserDefinedInformation_Request = unit {
+    command      : uint8;
+    startPoint   : uint8;
+    numPoints    : uint8;
+};
+
+type AccessUserDefinedInformation_Response = unit {
+    command    : uint8;
+    startPoint : uint8;
+    numPoints  : uint8;
+    pointTypes : AccessUserDefinedInformation_PointType[self.numPoints];
+};
+
+type AccessUserDefinedInformation_Unknown = unit {
+    # This opcode should always be a request or a response
+};
+

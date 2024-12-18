@@ -1,0 +1,37 @@
+module ROC_PLUS_OPCODE_181;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type Parameter = unit {
+    pointType        : uint8;
+    pointLogicNumber : uint8;
+    parameterNumber  : uint8;
+};
+
+type ParameterWithData = unit {
+    parameter : Parameter;
+    data      : bytes &eod; # TODO: figure out if it is possible to know how large this is for a given parameter
+};
+
+type RequestParameters = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestParameters_Request();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestParameters_Response();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestParameters_Unknown();
+    };
+};
+
+type RequestParameters_Unknown = unit {
+    # This opcode should always be a request or a response
+};
+
+type RequestParameters_Request = unit {
+    numParameters : uint8;
+    parameters    : ParameterWithData[self.numParameters];
+};
+
+type RequestParameters_Response = unit {
+
+};

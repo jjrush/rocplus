@@ -1,0 +1,38 @@
+module ROC_PLUS_OPCODE_255;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+#
+# Opcode 255 - Error Indicator
+#
+type Error = unit() {
+    errorCode   : uint8 &convert=ROC_PLUS_ENUMS::ErrorCode($$);
+    errorOffset : uint8;
+};
+
+type ErrorIndicator = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ErrorIndicator_Request(dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ErrorIndicator_Response(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ErrorIndicator_Unknown();
+    };
+};
+
+type ErrorIndicator_Unknown = unit {
+    # This opcode should always be a response
+};
+
+type ErrorIndicator_Request = unit(dataLength: uint8) {
+    # The spec says this is reserved for ROC use but if there ends up being data in this response we have to parse it because of how spicy works
+    data : bytes &size=(dataLength);
+};
+
+type ErrorIndicator_Response = unit(dataLength: uint8) {
+    errors : Error[(dataLength / 2)];
+
+    # on %done {
+    #     print self;
+    # }
+};

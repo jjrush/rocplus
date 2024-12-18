@@ -1,0 +1,33 @@
+module ROC_PLUS_OPCODE_119;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type RequestEventData_EventData = unit {
+    data : bytes &size=22 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+};
+
+type RequestEventData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestEventData_Request();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestEventData_Response(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestEventData_Unknown();
+    };
+};
+
+type RequestEventData_Unknown = unit {
+    # This opcode should always be a request or a response
+};
+
+type RequestEventData_Request = unit {
+    numEventsRequested        : uint8;
+    startingEventLogIndexReq  : uint16;
+};
+
+type RequestEventData_Response = unit(dataLength: uint8) {
+    numEventsSent             : uint8;
+    startingEventLogIndexRes  : uint16;
+    currentEventLogIndex      : uint16;
+    eventDataRes              : RequestEventData_EventData[(dataLength - 5)];
+};

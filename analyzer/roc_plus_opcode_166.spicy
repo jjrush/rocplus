@@ -1,0 +1,29 @@
+module ROC_PLUS_OPCODE_166;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type SetSinglePointParameters = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SetSinglePointParameters_Request(dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SetSinglePointParameters_Response();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SetSinglePointParameters_Unknown();
+    };
+};
+
+type SetSinglePointParameters_Unknown = unit {
+    # This opcode should always be a request or a response
+};
+
+type SetSinglePointParameters_Request = unit(dataLength : uint8) {
+    pointType           : uint8;
+    pointLogicNumber    : uint8;
+    numParameters       : uint8;
+    startParameterNum   : uint8;
+    parameterData       : bytes &size=(dataLength - 4) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+};
+
+type SetSinglePointParameters_Response = unit {
+    # Response is empty - just acknowledgment
+};

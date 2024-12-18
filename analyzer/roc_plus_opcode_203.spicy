@@ -1,0 +1,101 @@
+module ROC_PLUS_OPCODE_203;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type OpenRequest = unit {
+    options  : uint8 &convert=ROC_PLUS_ENUMS::FileOpenOptions($$);
+    path     : bytes &size=100;
+    filename : bytes &size=25;
+};
+
+type OpenResponse = unit {
+    fileDescriptor : uint32;
+};
+
+type ReadRequest = unit {
+    fileDescriptor : uint32;
+    offset         : uint32;
+};
+
+type ReadResponse = unit(dataLength: uint8) {
+    fileDescriptor : uint32;
+    fileSize       : uint32;
+    offset         : uint32;
+    numBytes       : uint8;
+    data           : bytes &size=(self.numBytes);
+};
+
+type WriteRequest = unit(dataLength: uint8) {
+    fileDescriptor : uint32;
+    fileSize       : uint32;
+    offset         : uint32;
+    numBytes       : uint8;
+    data           : bytes &size=(self.numBytes);
+};
+
+type WriteResponse = unit {
+    fileDescriptor : uint32;
+    offset         : uint32;
+};
+
+type CloseRequest = unit {
+    fileDescriptor : uint32;
+};
+
+type DeleteRequest = unit {
+    path     : bytes &size=100;
+    filename : bytes &size=25;
+};
+
+type ReadDirRequest = unit {
+    path          : bytes &size=100;
+    totalNumFiles : uint8 &optional;
+    versionCheck  : uint8 &optional;
+};
+
+type ReadDirResponse = unit(dataLength: uint8) {
+    additionalFiles : uint8;
+    totalNumFiles   : uint8;
+    fileNames       : bytes &size=(dataLength - 3); # Command byte + additionalFiles + totalNumFiles
+};
+
+type GeneralFileTransfer = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength: uint8) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : GeneralFileTransfer_Request(dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : GeneralFileTransfer_Response(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : GeneralFileTransfer_Unknown;
+    };
+};
+
+type GeneralFileTransfer_Unknown = unit {
+    # For ambiguous packets
+};
+
+type GeneralFileTransfer_Request = unit(dataLength: uint8) {
+    command : uint8 &convert=ROC_PLUS_ENUMS::FileTransfer($$);
+
+    switch(self.command) {
+        ROC_PLUS_ENUMS::FileTransfer::OPEN           -> open    : OpenRequest;
+        ROC_PLUS_ENUMS::FileTransfer::READ           -> read    : ReadRequest;
+        ROC_PLUS_ENUMS::FileTransfer::WRITE          -> write   : WriteRequest(dataLength);
+        ROC_PLUS_ENUMS::FileTransfer::CLOSE          -> close   : CloseRequest;
+        ROC_PLUS_ENUMS::FileTransfer::DELETE         -> del     : DeleteRequest; # Delete is a reserved word so using "del"
+        ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY -> readDir : ReadDirRequest;
+    };
+};
+
+type GeneralFileTransfer_Response = unit(dataLength: uint8) {
+    command : uint8 &convert=ROC_PLUS_ENUMS::FileTransfer($$);
+
+    switch(self.command) {
+        ROC_PLUS_ENUMS::FileTransfer::OPEN  -> openResp  : OpenResponse;
+        ROC_PLUS_ENUMS::FileTransfer::READ  -> readResp  : ReadResponse(dataLength);
+        ROC_PLUS_ENUMS::FileTransfer::WRITE -> writeResp : WriteResponse;
+        ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY,
+        ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY_64 -> readDirResp : ReadDirResponse(dataLength);
+        *  -> : bytes &size=(dataLength - 1);  # For CLOSE and DELETE, consume remaining data
+    };
+};
+

@@ -1,0 +1,37 @@
+module ROC_PLUS_OPCODE_024;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type StoreAndForward = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : StoreAndForward_Request(dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : StoreAndForward_Response();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : StoreAndForward_Unknown();
+    };
+};
+
+type StoreAndForward_Request = unit(dataLength : uint8) {
+    hostAddress     : uint8;
+    hostGroup       : uint8;
+    dest1Address    : uint8;
+    dest1Group      : uint8;
+    dest2Address    : uint8;
+    dest2Group      : uint8;
+    dest3Address    : uint8;
+    dest3Group      : uint8;
+    dest4Address    : uint8;
+    dest4Group      : uint8;
+    desiredOpcode   : uint8;
+    numDataBytes    : uint8;
+    opcodeData      : bytes &size=(dataLength - 12); # Subtract previous fields in bytes
+};
+
+type StoreAndForward_Response = unit {
+    # Response is empty
+};
+
+type StoreAndForward_Unknown = unit {
+    # This opcode should always be a request or a response
+};

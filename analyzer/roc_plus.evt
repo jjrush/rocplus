@@ -1,0 +1,20 @@
+import ROC_PLUS;
+import Zeek_roc_plus;
+
+protocol analyzer ROC_PLUS_UDP over UDP:
+    parse with ROC_PLUS::UDP_Messages;
+
+export ROC_PLUS::UDP_Messages;
+export ROC_PLUS::ROC_Message;
+
+
+export ROC_PLUS::DataBytes;
+
+on ROC_PLUS::UDP_Messages -> event ROC_PLUS::UDP_MessagesEvt (
+    $conn,
+    $is_orig,
+    self
+);
+
+
+

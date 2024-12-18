@@ -1,0 +1,232 @@
+module ROC_PLUS_ENUMS;
+
+import spicy;
+
+# ROC Plus does not provide a packet-level indication if something is a REQUEST or a RESPONSE.
+# As a result, there exist edge cases where a given packet's REQ size and RES size can be equivalent. 
+# (See Opcode 206's Read Transaction Command. The request is 6 bytes. If the response Data Type at offset 9 is a U16 or S16 then the response will also be 6 bytes.)
+# Without more information it is impossible to know how to treat the given packet.
+# Such packets are UNKNOWN and will be dropped instead of parsed.
+#
+# Section 1.2 General Message Format Details
+#
+#
+public type PacketType = enum {
+    REQUEST,
+    RESPONSE,
+    UNKNOWN
+};
+
+#
+# Chapter 2 - Table 2-1 - Summary of Opcodes
+#
+public type Opcode = enum {
+    SYSTEM_CONFIG                                = 6,
+    READ_REALTIME_CLOCK                          = 7,
+    SET_REALTIME_CLOCK                           = 8,
+    READ_CONFIGURABLE_OPCODE_POINT_DATA          = 10,
+    WRITE_CONFIGURABLE_OPCODE_POINT_DATA         = 11,
+    LOGIN_REQUEST                                = 17,
+    STORE_AND_FORWARD                            = 24,
+    REQUEST_IO_POINT_POSITION                    = 50,
+    ACCESS_USER_DEFINED_INFORMATION              = 100,
+    REQUEST_TODAY_YESTERDAY_MIN_MAX_VALUES       = 105,
+    REQUEST_HISTORY_TAG_AND_PERIODIC_INDEX       = 108,
+    REQUEST_ALARM_DATA                           = 118,
+    REQUEST_EVENT_DATA                           = 119,
+    REQUEST_SINGLE_HISTORY_POINT_DATA            = 135,
+    REQUEST_MULTIPLE_HISTORY_POINT_DATA          = 136,
+    REQUEST_HISTORY_INDEX                        = 137,
+    REQUEST_DAILY_AND_PERIODIC_HISTORY           = 138,
+    HISTORY_INFORMATION_DATA                     = 139,
+    SET_SINGLE_POINT_PARAMETERS                  = 166,
+    REQUEST_SINGLE_POINT_PARAMETERS              = 167,
+    REQUEST_PARAMETERS                           = 180,
+    WRITE_PARAMETERS                             = 181,
+    GENERAL_FILE_TRANSFER                        = 203,
+    PEER_TO_PEER_NETWORK_MESSAGES                = 205,
+    READ_TRANSACTION_HISTORY_DATA                = 206,
+    SRBX_SIGNAL                                  = 224,
+    ACKNOWLEDGE_SRBX                             = 225,
+    ERROR_INDICATOR                              = 255
+};
+
+public type SystemMode = enum {
+    FIRMWARE_UPDATE = 0,
+    RUN_MODE        = 1
+};
+
+public type LogicalCompatabilityStatus = enum {
+    NINE_MAX_MODULE_SLOTS         = 0,
+    FOURTEEN_MAX_MODULE_SLOTS     = 1,
+    TWENTY_SEVEN_MAX_MODULE_SLOTS = 2
+};
+
+public type Revision = enum {
+    ORIGINAL = 0,
+    EXTENDED = 1
+};
+
+public type Subtype = enum {
+    SERIES_ONE = 0,
+    SERIES_TWO = 1
+};
+
+public type TypeOfROC = enum {
+    ROCPAC_ROC300   =  1, # 0-index is not used
+    FLOBOSS_407     =  2,
+    FLASHPAC_ROC300 =  3,
+    FLOBOSS_503     =  4,
+    FLOBOSS_504     =  5,
+    ROC800          =  6,
+    DL8000          =  11,
+    FB100           =  1000
+};
+
+#
+# Chapter 2 - Table 2-3 - Read Real-time Clock
+#
+public type DayOfWeek = enum {
+    SUNDAY    = 1, # 0-index not used
+    MONDAY    = 2,
+    TUESDAY   = 3,
+    WEDNESDAY = 4,
+    THURSDAY  = 5,
+    FRIDAY    = 6,
+    SATURDAY  = 7
+};
+
+#
+# Chapter 2 - Table 2-7 - Opcode 17, Login Request
+#
+public type Opcode17Type = enum {
+    STANDARD_LOGIN      = 0,
+    STANDARD_LOGOUT     = 1,
+    SESSION_KEY_REQ     = 2,
+    ENHANCED_LOGIN      = 3,
+    ENHANCED_LOGOUT     = 4,
+    WRAPPED_SESSION_KEY = 5,
+};
+
+#
+# Chapter 2 - Table 2-12 - Opcode 50, Request I/O Point Position
+#
+public type IODataType = enum {
+    POINT_TYPE     = 0,
+    LOGICAL_NUMBER = 1
+};
+
+#
+# Chapter 2 - Table 2-13 - Opcode 100, Access User-defined Information
+#
+public type PointType = enum {
+    USER_PROGRAM_0 = 0,
+    USER_PROGRAM_1 = 1,
+    USER_PROGRAM_2 = 2,
+    USER_PROGRAM_3 = 3,
+    USER_PROGRAM_4 = 4,
+    USER_PROGRAM_5 = 5,
+    USER_PROGRAM_6 = 6,
+    USER_PROGRAM_7 = 7,
+    USER_DEFINED   = 253,
+    ROC_POINT_TYPE = 254,
+    NO_POINT_TYPE  = 255
+};
+
+# Chapter 2 - Table 2-27 - Opcode 203, General File Transfer
+public type FileTransfer = enum {
+    OPEN              = 1,
+    READ              = 2,
+    WRITE             = 3,
+    CLOSE             = 4,
+    DELETE            = 5,
+    READ_DIRECTORY    = 6,
+    READ_DIRECTORY_64 = 64  # Version 3.10 or greater response
+};
+
+public type FileOpenOptions = enum {
+    OPEN_READ      = 0,
+    OPEN_WRITE     = 1,
+    CREATE_WRITE   = 2,
+    OPEN_UPDATE    = 3,
+    TRUNCATE_WRITE = 4
+};
+
+#
+# Chapter 2 - Table 2-29 - Opcode 206, Read Transaction History Data
+# Note: offsets are re-used for different 
+public type Opcode206Type = enum {
+    LIST_REQ = 0,
+    LIST_RES = 1, # always 21 bytes but READ_RES could also be 21 bytes rendering this unparse-able
+    READ_REQ = 2, # always 6 bytes but the response could also be 6 bytes rendering this unparse-able
+    READ_RES = 3  # unparse-able if between 6 bytes and 21 bytes 
+};
+
+#
+# Chapter 2 - Table 2-29 - Opcode 206, Read Transaction History Data
+#
+public type DataType = enum {
+    U8         = 1,
+    S8         = 2,
+    U16        = 3,
+    S16        = 4,
+    U32        = 5,
+    S32        = 6,
+    FLOAT      = 7,
+    DOUBLE     = 8,
+    STRING3    = 9,
+    STRING7    = 10,
+    STRING10   = 11,
+    STRING20   = 12,
+    STRING30   = 14,
+    T_STRING40 = 15,
+    BINARY     = 17, # 1 byte
+    TLP        = 18, # 3 bytes
+    TIME       = 20  # 4 bytes
+};
+
+#
+# Chapter 2 - Table 2-29 - Opcode 206, Read Transaction History Data
+#
+public type TransactionHistoryCommand = enum {
+    LIST_TRANSACTION = 1,
+    READ_TRANSACTION = 2
+};
+
+#
+# Chapter 2 - Table 2-32 - Opcode 255 Error Codes
+#
+public type ErrorCode = enum {
+    INVALID_OPCODE_REQUEST              = 1,
+    INVALID_PARAMETER_NUMBER            = 2,
+    INVALID_LOGICAL_NUMBER              = 3,
+    INVALID_POINT_TYPE                  = 4,
+    RECEIVED_TOO_MANY_DATA_BYTES        = 5,
+    RECEIVED_TOO_FEW_DATA_BYTES         = 6,
+    OBSOLETE_RESERVED                   = 12,
+    OUTSIDE_VALID_ADDRESS_RANGE         = 13,
+    INVALID_HISTORY_REQUEST             = 14,
+    INVALID_FST_REQUEST                 = 15,
+    INVALID_EVENT_ENTRY                 = 16,
+    REQUESTED_TOO_MANY_ALARMS           = 17,
+    REQUESTED_TOO_MANY_EVENTS           = 18,
+    WRITE_TO_READ_ONLY_PARAMETER        = 19,
+    SECURITY_ERROR                      = 20,
+    INVALID_SECURITY_LOGON              = 21,
+    INVALID_STORE_AND_FORWARD_PATH      = 22,
+    HISTORY_CONFIGURATION_IN_PROGRESS   = 24,
+    INVALID_PARAMETER_RANGE             = 25,
+    INVALID_1_DAY_HISTORY_INDEX_REQUEST = 29,
+    INVALID_HISTORY_POINT               = 30,
+    INVALID_MIN_MAX_REQUEST             = 31,
+    INVALID_TLP                         = 32,
+    INVALID_TIME                        = 33,
+    ILLEGAL_MODBUS_RANGE                = 34,
+    GENERAL_ERROR                       = 50,
+    INVALID_STATE_FOR_WRITE             = 51,
+    INVALID_CONFIGURABLE_OPCODE_REQUEST = 52,
+    HART_PASSTHROUGH_COMM_DISABLED      = 61,
+    HART_PASSTHROUGH_NOT_LICENSED       = 62,
+    REQUEST_ACCESS_LEVEL_TOO_HIGH       = 63,
+    INVALID_LOGOFF_STRING               = 77
+};
