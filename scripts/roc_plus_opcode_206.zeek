@@ -30,13 +30,13 @@ function process_transaction_history(c: connection, data: ROC_PLUS::DataBytes, l
             log$more_data        = (data$readTransactionHistory$response$listt$moreData == 1) ? "Yes" : "No";
             log$description      = data$readTransactionHistory$response$listt$description;
 
-            # if (data$readTransactionHistory$response$listt?$listTransactions) {
-            #     for (i, transaction in data$readTransactionHistory$response$listt$listTransactions) {
-            #         log$payload_size[i]    = transaction$payloadSize;
-            #         log$transaction_num[i] = transaction$transactionNumber;
-            #         log$date_created[i]    = transaction$dateCreated;
-            #     }
-            # }
+            if (data$readTransactionHistory$response$listt?$listTransactions) {
+                for (i, listTran in data$readTransactionHistory$response$listt$listTransactions) {
+                    log$payload_size[i]    = listTran$payloadSize;
+                    log$transaction_num[i] = listTran$transactionNumber;
+                    log$date_created[i]    = listTran$dateCreated;
+                }
+            }
         }
         else if (data$readTransactionHistory$response$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION) {
             # Read Transaction Response
@@ -44,9 +44,9 @@ function process_transaction_history(c: connection, data: ROC_PLUS::DataBytes, l
             log$more_data     = (data$readTransactionHistory$response$read$moreData == 1) ? "Yes" : "No";
 
             if (data$readTransactionHistory$response$read?$readTransactions) {
-                for (i, transaction in data$readTransactionHistory$response$read$readTransactions) {
-                    log$data_type[i] = ROC_PLUS_ENUMS::DATA_TYPE[transaction$dataType];
-                    log$data[i]      = transaction$data;
+                for (i, readTran in data$readTransactionHistory$response$read$readTransactions) {
+                    log$data_type[i] = ROC_PLUS_ENUMS::DATA_TYPE[readTran$dataType];
+                    log$data[i]      = readTran$data;
                 }
             }
         }
