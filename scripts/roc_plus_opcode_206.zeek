@@ -31,10 +31,10 @@ function process_transaction_history(c: connection, data: ROC_PLUS::DataBytes, l
             log$description      = data$readTransactionHistory$response$listt$description;
 
             if (data$readTransactionHistory$response$listt?$listTransactions) {
-                for (i, listTran in data$readTransactionHistory$response$listt$listTransactions) {
-                    log$payload_size[i]    = listTran$payloadSize;
-                    log$transaction_num[i] = listTran$transactionNumber;
-                    log$date_created[i]    = listTran$dateCreated;
+                for (listIndex, listTran in data$readTransactionHistory$response$listt$listTransactions) {
+                    log$payload_size[listIndex]    = listTran$payloadSize;
+                    log$transaction_num[listIndex] = listTran$transactionNumber;
+                    log$date_created[listIndex]    = listTran$dateCreated;
                 }
             }
         }
@@ -44,9 +44,9 @@ function process_transaction_history(c: connection, data: ROC_PLUS::DataBytes, l
             log$more_data     = (data$readTransactionHistory$response$read$moreData == 1) ? "Yes" : "No";
 
             if (data$readTransactionHistory$response$read?$readTransactions) {
-                for (i, readTran in data$readTransactionHistory$response$read$readTransactions) {
-                    log$data_type[i] = ROC_PLUS_ENUMS::DATA_TYPE[readTran$dataType];
-                    log$data[i]      = readTran$data;
+                for (readIndex, readTran in data$readTransactionHistory$response$read$readTransactions) {
+                    log$data_type[readIndex] = ROC_PLUS_ENUMS::DATA_TYPE[readTran$dataType];
+                    log$data[readIndex]      = readTran$data;
                 }
             }
         }
