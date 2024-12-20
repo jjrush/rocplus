@@ -87,34 +87,57 @@ module ROC_PLUS;
         }
     }
 
-    function process_message_udp(c: connection, info_roc_plus_log: roc_plus_log, rocMessage: ROC_PLUS::ROC_Message) : connection {
+    function process_message(c: connection, log: roc_plus_log, rocMessage: ROC_PLUS::ROC_Message) : connection {
         local opcode : ROC_PLUS_ENUMS::Opcode;
         opcode = rocMessage$opcode;
 
-        info_roc_plus_log$roc_plus_link_id  = rocMessage$rocPlusLinkId;
+        log$roc_plus_link_id  = rocMessage$rocPlusLinkId;
 
-        info_roc_plus_log$packet_type       = ROC_PLUS_ENUMS::PACKET_TYPE[rocMessage$dataBytes$packetType];
-        info_roc_plus_log$destination_unit  = rocMessage$destinationUnit;
-        info_roc_plus_log$destination_group = rocMessage$destinationGroup;
-        info_roc_plus_log$source_unit       = rocMessage$sourceUnit;
-        info_roc_plus_log$source_group      = rocMessage$sourceGroup;
-        info_roc_plus_log$opcode            = ROC_PLUS_ENUMS::OPCODE[opcode];
-        info_roc_plus_log$data_length       = rocMessage$dataLength;
+        log$packet_type       = ROC_PLUS_ENUMS::PACKET_TYPE[rocMessage$dataBytes$packetType];
+        log$destination_unit  = rocMessage$destinationUnit;
+        log$destination_group = rocMessage$destinationGroup;
+        log$source_unit       = rocMessage$sourceUnit;
+        log$source_group      = rocMessage$sourceGroup;
+        log$opcode            = ROC_PLUS_ENUMS::OPCODE[opcode];
+        log$data_length       = rocMessage$dataLength;
 
-        info_roc_plus_log$lsb_crc           = rocMessage$lsbCRC; # least significant byte
-        info_roc_plus_log$msb_crc           = rocMessage$msbCRC; # most signfiicant byte
+        log$lsb_crc           = rocMessage$lsbCRC; # least significant byte
+        log$msb_crc           = rocMessage$msbCRC; # most signfiicant byte
 
         # Process the command details
-        process_message_data(c, opcode, rocMessage$dataBytes, info_roc_plus_log$roc_plus_link_id);
+        process_message_data(c, opcode, rocMessage$dataBytes, log$roc_plus_link_id);
 
         # Return the connection
         return c;
     }
 
-    # function process_message_tcp(c: connection, info_roc_plus_log: roc_plus_log, rocMessage: ROC_PLUS::ROC_Message) : connection {
+    function process_message_tcp(c: connection, log: roc_plus_log, rocMessageTCP: ROC_PLUS::ROC_Message_TCP) : connection {
+        # IP Header
+        log$version_and_header_length = rocMessageTCP$ipHeader$versionAndHeaderLength;
+        log$type_of_service           = rocMessageTCP$ipHeader$typeOfService;
+        log$total_length              = rocMessageTCP$ipHeader$totalLength;
+        log$identification            = rocMessageTCP$ipHeader$identification;
+        log$flags_and_fragment_offset = rocMessageTCP$ipHeader$flagsAndFragmentOffset;
+        log$ttl                       = rocMessageTCP$ipHeader$ttl;
+        log$ip_header_protocol        = rocMessageTCP$ipHeader$protocol;
+        log$header_checksum           = rocMessageTCP$ipHeader$headerChecksum;
+        log$source_ip                 = rocMessageTCP$ipHeader$sourceIP;
+        log$dest_ip                   = rocMessageTCP$ipHeader$destIP;
 
-    #     # TODO: figure this out
+        # TCP header
+        log$source_port              = rocMessageTCP$tcpHeader$sourcePort;
+        log$dest_port                = rocMessageTCP$tcpHeader$destPort;
+        log$sequence_num             = rocMessageTCP$tcpHeader$sequenceNum;
+        log$ack_num                  = rocMessageTCP$tcpHeader$ackNum;
+        log$data_offset_and_reserved = rocMessageTCP$tcpHeader$dataOffsetAndReserved;
+        log$flags                    = rocMessageTCP$tcpHeader$flags;
+        log$window_size              = rocMessageTCP$tcpHeader$windowSize;
+        log$checksum                 = rocMessageTCP$tcpHeader$checksum;
+        log$urgent_pointer           = rocMessageTCP$tcpHeader$urgentPointer;
 
-    #     # Return the connection
-    #     return c;
-    # }
+        # Process the UDP msg
+        c = process_message(c, c$roc_plus_log, rocMessageTCP$rocMessage);
+
+        # Return the connection
+        return c;
+    }

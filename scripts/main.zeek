@@ -10,7 +10,7 @@ module ROC_PLUS;
 
 export {
     const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
-    # const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
+    const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
 
     redef enum Log::ID += { LOG_ROC_PLUS_LOG, 
                             LOG_ROC_PLUS_SYS_CFG_LOG,
@@ -86,7 +86,7 @@ redef record connection += {
     roc_plus_transaction_history_log: roc_plus_transaction_history_log &optional;
 };
 
-redef likely_server_ports += { roc_plus_ports_udp };
+redef likely_server_ports += { roc_plus_ports_tcp, roc_plus_ports_udp };
 
 #Put protocol detection information here
 event zeek_init() &priority=5 {
@@ -94,11 +94,11 @@ event zeek_init() &priority=5 {
     # register with the file analysis framework
     Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_UDP,
                             [$get_file_handle = ROC_PLUS::get_file_handle]);
-    # Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_TCP,
-    #                         [$get_file_handle = ROC_PLUS::get_file_handle]);
+    Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_TCP,
+                            [$get_file_handle = ROC_PLUS::get_file_handle]);
 
     Analyzer::register_for_ports(Analyzer::ANALYZER_ROC_PLUS_UDP, roc_plus_ports_udp);
-    # Analyzer::register_for_ports(Analyzer::ANALYZER_ROC_PLUS_TCP, roc_plus_ports_tcp);
+    Analyzer::register_for_ports(Analyzer::ANALYZER_ROC_PLUS_TCP, roc_plus_ports_tcp);
 
     # initialize logging streams for all ROC_PLUS logs
     Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_LOG,

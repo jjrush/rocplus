@@ -33,13 +33,44 @@ import ROC_PLUS_OPCODE_206;
 # import ROC_PLUS_OPCODE_225;
 import ROC_PLUS_OPCODE_255;
 
+type IP_Header = unit {
+    versionAndHeaderLength : uint8;
+    typeOfService          : uint8;
+    totalLength            : uint16;
+    identification         : uint16;
+    flagsAndFragmentOffset : uint16;
+    ttl                    : uint8;
+    protocol               : uint8;
+    headerChecksum         : uint16;
+    sourceIP               : bytes &size=4 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+    destIP                 : bytes &size=4 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+};
+
+public type TCP_Header = unit {
+    sourcePort            : uint16;
+    destPort              : uint16;
+    sequenceNum           : uint32;
+    ackNum                : uint32;
+    dataOffsetAndReserved : uint8;
+    flags                 : uint8;
+    windowSize            : uint16;
+    checksum              : uint16;
+    urgentPointer         : uint16;
+};
+
 public type UDP_Messages = unit {
     rocMessage : ROC_Message[];
 };
 
-# public type TCP_Messages = unit {
-#     rocMessageTCP : ROC_Message_TCP[];
-# };
+public type TCP_Messages = unit {
+    rocMessageTCP : ROC_Message_TCP[];
+};
+
+public type ROC_Message_TCP = unit {
+    ipHeader   : IP_Header;
+    tcpHeader  : TCP_Header;
+    rocMessage : ROC_Message;
+};
 
 public type ROC_Message = unit {
     var rocPlusLinkId : string;
@@ -68,9 +99,7 @@ public type ROC_Message = unit {
     }
 };
 
-# public type ROC_Message_TCP = unit {
-#     # TODO: fill this out
-# };
+
 
 public type DataBytes = unit(rocMessage: ROC_Message) {
     # var opcode     : ROC_PLUS_ENUMS::Opcode;
