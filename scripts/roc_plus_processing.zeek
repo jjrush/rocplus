@@ -113,27 +113,27 @@ module ROC_PLUS;
 
     function process_message_tcp(c: connection, log: roc_plus_log, rocMessageTCP: ROC_PLUS::ROC_Message_TCP) : connection {
         # IP Header
-        log$version_and_header_length = rocMessageTCP$ipHeader$versionAndHeaderLength;
-        log$type_of_service           = rocMessageTCP$ipHeader$typeOfService;
-        log$total_length              = rocMessageTCP$ipHeader$totalLength;
-        log$identification            = rocMessageTCP$ipHeader$identification;
-        log$flags_and_fragment_offset = rocMessageTCP$ipHeader$flagsAndFragmentOffset;
-        log$ttl                       = rocMessageTCP$ipHeader$ttl;
-        log$ip_header_protocol        = rocMessageTCP$ipHeader$protocol;
-        log$header_checksum           = rocMessageTCP$ipHeader$headerChecksum;
-        log$source_ip                 = rocMessageTCP$ipHeader$sourceIP;
-        log$dest_ip                   = rocMessageTCP$ipHeader$destIP;
+        # log$version_and_header_length = rocMessageTCP$ipHeader$versionAndHeaderLength;
+        # log$type_of_service           = rocMessageTCP$ipHeader$typeOfService;
+        # log$total_length              = rocMessageTCP$ipHeader$totalLength;
+        # log$identification            = rocMessageTCP$ipHeader$identification;
+        # log$flags_and_fragment_offset = rocMessageTCP$ipHeader$flagsAndFragmentOffset;
+        # log$ttl                       = rocMessageTCP$ipHeader$ttl;
+        # log$ip_header_protocol        = rocMessageTCP$ipHeader$protocol;
+        # log$header_checksum           = rocMessageTCP$ipHeader$headerChecksum;
+        # log$source_ip                 = rocMessageTCP$ipHeader$sourceIP;
+        # log$dest_ip                   = rocMessageTCP$ipHeader$destIP;
 
         # TCP header
-        log$source_port              = rocMessageTCP$tcpHeader$sourcePort;
-        log$dest_port                = rocMessageTCP$tcpHeader$destPort;
-        log$sequence_num             = rocMessageTCP$tcpHeader$sequenceNum;
-        log$ack_num                  = rocMessageTCP$tcpHeader$ackNum;
-        log$data_offset_and_reserved = rocMessageTCP$tcpHeader$dataOffsetAndReserved;
-        log$flags                    = rocMessageTCP$tcpHeader$flags;
-        log$window_size              = rocMessageTCP$tcpHeader$windowSize;
-        log$checksum                 = rocMessageTCP$tcpHeader$checksum;
-        log$urgent_pointer           = rocMessageTCP$tcpHeader$urgentPointer;
+        # log$source_port              = rocMessageTCP$tcpHeader$sourcePort;
+        # log$dest_port                = rocMessageTCP$tcpHeader$destPort;
+        # log$sequence_num             = rocMessageTCP$tcpHeader$sequenceNum;
+        # log$ack_num                  = rocMessageTCP$tcpHeader$ackNum;
+        # log$data_offset_and_reserved = rocMessageTCP$tcpHeader$dataOffsetAndReserved;
+        # log$flags                    = rocMessageTCP$tcpHeader$flags;
+        # log$window_size              = rocMessageTCP$tcpHeader$windowSize;
+        # log$checksum                 = rocMessageTCP$tcpHeader$checksum;
+        # log$urgent_pointer           = rocMessageTCP$tcpHeader$urgentPointer;
 
         # Process the UDP msg
         c = process_message(c, c$roc_plus_log, rocMessageTCP$rocMessage);

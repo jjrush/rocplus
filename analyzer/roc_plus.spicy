@@ -67,8 +67,8 @@ public type TCP_Messages = unit {
 };
 
 public type ROC_Message_TCP = unit {
-    ipHeader   : IP_Header;
-    tcpHeader  : TCP_Header;
+    # ipHeader   : IP_Header;
+    # tcpHeader  : TCP_Header;
     rocMessage : ROC_Message;
 };
 
@@ -81,6 +81,7 @@ public type ROC_Message = unit {
     sourceGroup       : uint8;
     opcode            : uint8 &convert=ROC_PLUS_ENUMS::Opcode($$);
     dataLength        : uint8;
+    
     dataBytes         : DataBytes(self);
 
     lsbCRC            : uint8; # least significant byte

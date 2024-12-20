@@ -9,8 +9,12 @@
 module ROC_PLUS;
 
 export {
-    const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
-    const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
+    const roc_plus_ports_udp: set[port] = { 4000/udp, 22222/udp } &redef;
+    const roc_plus_ports_tcp: set[port] = { 4000/tcp, 22222/tcp } &redef;
+
+    # TODO - amend this back
+    # const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
+    # const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
 
     redef enum Log::ID += { LOG_ROC_PLUS_LOG, 
                             LOG_ROC_PLUS_SYS_CFG_LOG,
