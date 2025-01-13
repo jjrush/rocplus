@@ -1,12 +1,37 @@
-# @TEST-EXEC: touch roc_plus_log.log
-# @TEST-EXEC: touch roc_plus_configurable_opcode_log.log
-
-# @TEST-EXEC: zeek -C -r ${TRACES}/rocplus_traffic_test_opcode_10.pcap ${PACKAGE} %INPUT
-
-# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_configurable_opcode_log.log > log.tmp && mv log.tmp roc_plus_configurable_opcode_log.log
-# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_log.log > log.tmp && mv log.tmp roc_plus_log.log
-
-# @TEST-EXEC: btest-diff roc_plus_log.log
-# @TEST-EXEC: btest-diff roc_plus_configurable_opcode_log.log
-#
-# @TEST-DOC: Test rocplus analyzer with rocplus_traffic_test_opcode_10.pcap
+# @TEST-EXEC: touch roc_plus.log
+# @TEST-EXEC: touch roc_plus_sys_cfg.log
+# @TEST-EXEC: touch roc_plus_historical_min_max_vals.log
+# @TEST-EXEC: touch roc_plus_realtime_clock.log
+# @TEST-EXEC: touch roc_plus_configurable_opcode.log
+# @TEST-EXEC: touch roc_plus_login.log
+# @TEST-EXEC: touch roc_plus_store_and_forward.log
+# @TEST-EXEC: touch roc_plus_data_request.log
+# @TEST-EXEC: touch roc_plus_user_defined_info.log
+# @TEST-EXEC: touch roc_plus_single_point_parameters.log
+# @TEST-EXEC: touch roc_plus_file_transfer.log
+# @TEST-EXEC: touch roc_plus_transaction_history.log
+# @TEST-EXEC: zeek -C -r ${TRACES}/realistic_tcp_traffic.pcap ${PACKAGE} %INPUT
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus.log > log.tmp && mv log.tmp roc_plus.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_sys_cfg.log > log.tmp && mv log.tmp roc_plus_sys_cfg.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_historical_min_max_vals.log > log.tmp && mv log.tmp roc_plus_historical_min_max_vals.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_realtime_clock.log > log.tmp && mv log.tmp roc_plus_realtime_clock.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_configurable_opcode.log > log.tmp && mv log.tmp roc_plus_configurable_opcode.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_login.log > log.tmp && mv log.tmp roc_plus_login.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_store_and_forward.log > log.tmp && mv log.tmp roc_plus_store_and_forward.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_data_request.log > log.tmp && mv log.tmp roc_plus_data_request.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_user_defined_info.log > log.tmp && mv log.tmp roc_plus_user_defined_info.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_single_point_parameters.log > log.tmp && mv log.tmp roc_plus_single_point_parameters.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_file_transfer.log > log.tmp && mv log.tmp roc_plus_file_transfer.log
+# @TEST-EXEC: zeek-cut -n uid roc_plus_link_id < roc_plus_transaction_history.log > log.tmp && mv log.tmp roc_plus_transaction_history.log
+# @TEST-EXEC: btest-diff roc_plus.log
+# @TEST-EXEC: btest-diff roc_plus_sys_cfg.log
+# @TEST-EXEC: btest-diff roc_plus_historical_min_max_vals.log
+# @TEST-EXEC: btest-diff roc_plus_realtime_clock.log
+# @TEST-EXEC: btest-diff roc_plus_configurable_opcode.log
+# @TEST-EXEC: btest-diff roc_plus_login.log
+# @TEST-EXEC: btest-diff roc_plus_store_and_forward.log
+# @TEST-EXEC: btest-diff roc_plus_data_request.log
+# @TEST-EXEC: btest-diff roc_plus_user_defined_info.log
+# @TEST-EXEC: btest-diff roc_plus_single_point_parameters.log
+# @TEST-EXEC: btest-diff roc_plus_file_transfer.log
+# @TEST-EXEC: btest-diff roc_plus_transaction_history.log

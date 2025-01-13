@@ -6,21 +6,21 @@ import ROC_PLUS_FUNCTIONS;
 
 type SystemConfiguration = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SystemConfiguration_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SystemConfiguration_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SystemConfiguration_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SystemConfigurationRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SystemConfigurationResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SystemConfigurationUnknown();
     };
 };
 
-type SystemConfiguration_Unknown = unit {
+type SystemConfigurationUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type SystemConfiguration_Request = unit {
+type SystemConfigurationRequest = unit {
     # System configuration request does not contain any data
 };
 
-type SystemConfiguration_Response = unit {
+type SystemConfigurationResponse = unit {
     systemMode                 : uint8 &convert=ROC_PLUS_ENUMS::SystemMode($$);
     portNumber                 : uint16;
     securityAccessMode         : uint8;

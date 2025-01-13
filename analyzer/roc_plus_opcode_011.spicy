@@ -6,23 +6,23 @@ import ROC_PLUS_FUNCTIONS;
 
 type WriteConfigurableOpcodePointData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : WriteConfigurableOpcodePointData_Request(dataLength);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : WriteConfigurableOpcodePointData_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : WriteConfigurableOpcodePointData_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : WriteConfigurableOpcodePointDataRequest(dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : WriteConfigurableOpcodePointDataResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : WriteConfigurableOpcodePointDataUnknown();
 };
 };
 
-type WriteConfigurableOpcodePointData_Request = unit(dataLength : uint8) {
+type WriteConfigurableOpcodePointDataRequest = unit(dataLength : uint8) {
     tableNumber           : uint8;
     startingTableLocation : uint8;
     numTableLocations     : uint8;
     data                  : bytes &size=(dataLength - 3); # Subtract previous fields in bytes
 };
 
-type WriteConfigurableOpcodePointData_Response = unit {
+type WriteConfigurableOpcodePointDataResponse = unit {
     # Response response does not contain any data
 };
 
-type WriteConfigurableOpcodePointData_Unknown = unit {
+type WriteConfigurableOpcodePointDataUnknown = unit {
     # This opcode should always be a request or a response
 };

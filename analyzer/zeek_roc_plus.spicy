@@ -11,10 +11,10 @@ on ROC_PLUS::UDP_Messages::%error {
     spicy::decline_input("error parsing ROC_PLUS UDP message");
 }
 
-# on ROC_PLUS::TCP_Messages::%done {
-#     spicy::accept_input();
-# }
+on ROC_PLUS::TCP_Messages::%done {
+    spicy::accept_input();
+}
 
-# on ROC_PLUS::TCP_Messages::%error {
-#     spicy::decline_input("error parsing ROC_PLUS TCP message");
-# }
+on ROC_PLUS::TCP_Messages::%error {
+    spicy::decline_input("error parsing ROC_PLUS TCP message");
+}

@@ -10,7 +10,7 @@ module ROC_PLUS;
 
 export {
     const roc_plus_ports_udp: set[port] = { 4000/udp, 22222/udp } &redef;
-    const roc_plus_ports_tcp: set[port] = { 4000/tcp, 22222/tcp } &redef;
+    const roc_plus_ports_tcp: set[port] = { 4000/tcp,22222/tcp } &redef;
 
     # TODO - amend this back
     # const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
@@ -94,6 +94,7 @@ redef likely_server_ports += { roc_plus_ports_tcp, roc_plus_ports_udp };
 
 #Put protocol detection information here
 event zeek_init() &priority=5 {
+    print "ROCplus analyzer initialized";
 
     # register with the file analysis framework
     Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_UDP,
@@ -213,8 +214,8 @@ function emit_roc_plus_realtime_clock_log(c: connection) {
 function emit_roc_plus_configurable_opcode_log(c: connection) {
     if (! c?$roc_plus_configurable_opcode_log )
         return;
-    if ( c?$roc_plus_protocol )
-        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    if ( c?$roc_plus_protocol ) # this syntax with the ?$ specifically means "Does field exist"
+        c$roc_plus_log$protocol = c$roc_plus_protocol; # if it does, set the protocol field to the protocol value. This will set the higher level roc_plus_log.log's protocol value to rocplus
     Log::write(ROC_PLUS::LOG_ROC_PLUS_CONFIGURABLE_OPCODE_LOG, c$roc_plus_configurable_opcode_log);
 }
 
@@ -282,3 +283,31 @@ function emit_roc_plus_transaction_history_log(c: connection) {
 function get_file_handle(c: connection, is_orig: bool): string {
     return cat(Analyzer::ANALYZER_ROC_PLUS_UDP, c$start_time, c$id, is_orig, c$orig);
 }
+
+# event connection_established(c: connection) {
+#     print fmt("Connection established: %s", c$id);
+# }
+
+# event connection_state_remove(c: connection) {
+#     if ( c?$roc_plus_protocol ) {
+#         print fmt("Connection removed with ROCplus protocol: %s", c$id);
+#         if ( c?$roc_plus_configurable_opcode_log )
+#             print "Has configurable opcode log data";
+#         if ( c?$roc_plus_log )
+#             print "Has main log data";
+#     }
+# }
+
+# event zeek_done() {
+#     print "Zeek Done";
+# }
+
+# event ROC_PLUS::UDP_MessagesEvt(c: connection, is_orig: bool, messages: ROC_PLUS::UDP_Messages) 
+# {
+#     print fmt("UDP Messages event: %s", messages);
+# }
+
+# event ROC_PLUS::TCP_MessagesEvt(c: connection, is_orig: bool, messages: ROC_PLUS::ROC_Message_TCP)
+# {
+#     print fmt("TCP Messages event: %s", messages);
+# }

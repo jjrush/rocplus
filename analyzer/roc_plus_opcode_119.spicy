@@ -10,22 +10,22 @@ type RequestEventData_EventData = unit {
 
 type RequestEventData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestEventData_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestEventData_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestEventData_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestEventDataRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestEventDataResponse(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestEventDataUnknown();
     };
 };
 
-type RequestEventData_Unknown = unit {
+type RequestEventDataUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type RequestEventData_Request = unit {
+type RequestEventDataRequest = unit {
     numEventsRequested        : uint8;
     startingEventLogIndexReq  : uint16;
 };
 
-type RequestEventData_Response = unit(dataLength: uint8) {
+type RequestEventDataResponse = unit(dataLength: uint8) {
     numEventsSent             : uint8;
     startingEventLogIndexRes  : uint16;
     currentEventLogIndex      : uint16;

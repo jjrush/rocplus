@@ -6,20 +6,20 @@ import ROC_PLUS_FUNCTIONS;
 
 type RequestDailyAndPeriodicHistory = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestDailyAndPeriodicHistory_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestDailyAndPeriodicHistory_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestDailyAndPeriodicHistory_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestDailyAndPeriodicHistoryRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestDailyAndPeriodicHistoryResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestDailyAndPeriodicHistoryUnknown();
     };
 };
 
-type RequestDailyAndPeriodicHistory_Request = unit {
+type RequestDailyAndPeriodicHistoryRequest = unit {
     historySegment : uint8;
     historyPoint   : uint8;
     dayRequested   : uint8;
     monthRequested : uint8;
 };
 
-type RequestDailyAndPeriodicHistory_Response = unit {
+type RequestDailyAndPeriodicHistoryResponse = unit {
     historySegment      : uint8;
     historyPoint        : uint8;
     dayRequested        : uint8;
@@ -30,6 +30,6 @@ type RequestDailyAndPeriodicHistory_Response = unit {
     dailyValues         : uint32[self.numDailyEntries];    
 };
 
-type RequestDailyAndPeriodicHistory_Unknown = unit {
+type RequestDailyAndPeriodicHistoryUnknown = unit {
     # This opcode should always be a request or a response
 };

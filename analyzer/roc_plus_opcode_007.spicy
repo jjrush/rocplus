@@ -6,21 +6,21 @@ import ROC_PLUS_FUNCTIONS;
 
 type ReadRealtimeClock = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadRealtimeClock_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadRealtimeClock_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadRealtimeClock_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadRealtimeClockRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadRealtimeClockResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadRealtimeClockUnknown();
     };
 };
 
-type ReadRealtimeClock_Unknown = unit {
+type ReadRealtimeClockUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type ReadRealtimeClock_Request = unit {
+type ReadRealtimeClockRequest = unit {
     # ReadRealtimeClock request does not contain any data
 };
 
-type ReadRealtimeClock_Response = unit {
+type ReadRealtimeClockResponse = unit {
     currentSecond    : uint8;
     currentMinute    : uint8;
     currentHour      : uint8;

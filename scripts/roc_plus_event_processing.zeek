@@ -14,16 +14,14 @@ event ROC_PLUS::UDP_MessagesEvt(c: connection, is_orig: bool, messages: ROC_PLUS
     }
 }
 
-event ROC_PLUS::TCP_MessagesEvt(c: connection, is_orig: bool, tcpMessages: ROC_PLUS::TCP_Messages) {
-    for (i in tcpMessages$rocMessageTCP) {
-        # Set sesssion rocplus log object
-        c = set_roc_plus_log(c);
+event ROC_PLUS::TCP_MessagesEvt(c: connection, is_orig: bool, tcpMessage: ROC_PLUS::ROC_Message_TCP) {
+    # Set sesssion rocplus log object
+    c = set_roc_plus_log(c);
 
-        # Process the UDP msg
-        c = process_message_tcp(c, c$roc_plus_log, tcpMessages$rocMessageTCP[i]);
-    
-        # Fire the event and tidy up
-        ROC_PLUS::emit_roc_plus_log(c);
-        delete c$roc_plus_log;
-    }
+    # Process the UDP msg
+    c = process_message_tcp(c, c$roc_plus_log, tcpMessage);
+
+    # Fire the event and tidy up
+    ROC_PLUS::emit_roc_plus_log(c);
+    delete c$roc_plus_log;
 }

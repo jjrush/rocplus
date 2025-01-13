@@ -6,24 +6,24 @@ import ROC_PLUS_FUNCTIONS;
 
 type Login = unit(packetType: ROC_PLUS_ENUMS::PacketType, op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : Login_Request(op17Type);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : Login_Response(op17Type);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : Login_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : LoginRequest(op17Type);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : LoginResponse(op17Type);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : LoginUnknown();
     };
 };
 
-type Login_Unknown = unit {
+type LoginUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type Login_Response = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
+type LoginResponse = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
     switch (op17Type) {
         ROC_PLUS_ENUMS::Opcode17Type::WRAPPED_SESSION_KEY -> wrappedSessionKey : Wrapped_Session_Key();
         # all other responses have no data
     };
 };
 
-type Login_Request = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
+type LoginRequest = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
     switch (op17Type) {
         ROC_PLUS_ENUMS::Opcode17Type::STANDARD_LOGIN  -> standardLogin  : Standard_Login();
         ROC_PLUS_ENUMS::Opcode17Type::STANDARD_LOGOUT -> standardLogout : Standard_Logout();

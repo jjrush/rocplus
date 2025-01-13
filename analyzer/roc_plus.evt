@@ -21,10 +21,8 @@ on ROC_PLUS::UDP_Messages -> event ROC_PLUS::UDP_MessagesEvt (
     self
 );
 
-on ROC_PLUS::TCP_Messages -> event ROC_PLUS::TCP_MessagesEvt (
+on ROC_PLUS::ROC_Message_TCP -> event ROC_PLUS::TCP_MessagesEvt (
     $conn,
     $is_orig,
     self
 );
-
-

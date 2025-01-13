@@ -6,24 +6,24 @@ import ROC_PLUS_FUNCTIONS;
 
 type RequestSinglePointParameters = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestSinglePointParameters_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestSinglePointParameters_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestSinglePointParameters_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestSinglePointParametersRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestSinglePointParametersResponse(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestSinglePointParametersUnknown();
     };
 };
 
-type RequestSinglePointParameters_Unknown = unit {
+type RequestSinglePointParametersUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type RequestSinglePointParameters_Request = unit {
+type RequestSinglePointParametersRequest = unit {
     pointType           : uint8;
     pointLogicNumber    : uint8;
     numParameters       : uint8;
     startParameterNum   : uint8;
 };
 
-type RequestSinglePointParameters_Response = unit(dataLength : uint8) {
+type RequestSinglePointParametersResponse = unit(dataLength : uint8) {
     pointType           : uint8;
     pointLogicNumber    : uint8;
     numParameters       : uint8;

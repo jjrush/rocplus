@@ -7,9 +7,9 @@ function process_file_transfer(c: connection, data: ROC_PLUS::DataBytes, link_id
     log$roc_plus_link_id = link_id;
 
     if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST) {
-        log$command = ROC_PLUS_ENUMS::FILE_TRANSFER[data$generalFileTransfer$request$command];
+        log$command = ROC_PLUS_ENUMS::FILE_TRANSFER[data$generalFileTransfer$command];
 
-        switch (data$generalFileTransfer$request$command) {
+        switch (data$generalFileTransfer$command) {
             case ROC_PLUS_ENUMS::FileTransfer_OPEN:
                 log$open_options = ROC_PLUS_ENUMS::FILE_OPEN_OPTIONS[data$generalFileTransfer$request$open$options];
                 log$path         = data$generalFileTransfer$request$open$path;
@@ -46,9 +46,9 @@ function process_file_transfer(c: connection, data: ROC_PLUS::DataBytes, link_id
         }
     }
     else if (data$packetType == ROC_PLUS_ENUMS::PacketType_RESPONSE) {
-        log$command = ROC_PLUS_ENUMS::FILE_TRANSFER[data$generalFileTransfer$response$command];
+        log$command = ROC_PLUS_ENUMS::FILE_TRANSFER[data$generalFileTransfer$command];
 
-        switch (data$generalFileTransfer$response$command) {
+        switch (data$generalFileTransfer$command) {
             case ROC_PLUS_ENUMS::FileTransfer_OPEN:
                 log$file_descriptor = data$generalFileTransfer$response$openResp$fileDescriptor;
                 break;

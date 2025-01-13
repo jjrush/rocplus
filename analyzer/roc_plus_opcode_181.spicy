@@ -17,21 +17,21 @@ type ParameterWithData = unit {
 
 type RequestParameters = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestParameters_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestParameters_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestParameters_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestParametersRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestParametersResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestParametersUnknown();
     };
 };
 
-type RequestParameters_Unknown = unit {
+type RequestParametersUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type RequestParameters_Request = unit {
+type RequestParametersRequest = unit {
     numParameters : uint8;
     parameters    : ParameterWithData[self.numParameters];
 };
 
-type RequestParameters_Response = unit {
+type RequestParametersResponse = unit {
 
 };

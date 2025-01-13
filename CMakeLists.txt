@@ -2,18 +2,17 @@
 #
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-project(ROC_PLUS LANGUAGES C)
+project(roc_plus LANGUAGES C)
 
 list(PREPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 find_package(SpicyPlugin REQUIRED)
 
-# Set minimum versions that this plugin needs.
-#spicy_required_version("1.2.0")
-#zeek_required_version("6.0.0")
+# We'll let the SpicyPlugin package handle version requirements
+# instead of using spicy_required_version
 
 if(NOT CMAKE_BUILD_TYPE)
     # Default to the release build
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "")
-endif()
+endif(NOT CMAKE_BUILD_TYPE)
 
 add_subdirectory(analyzer)

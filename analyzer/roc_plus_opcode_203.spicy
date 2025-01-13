@@ -51,8 +51,8 @@ type DeleteRequest = unit {
 
 type ReadDirRequest = unit {
     path          : bytes &size=100;
-    totalNumFiles : uint8 &optional;
-    versionCheck  : uint8 &optional;
+    totalNumFiles : uint8;
+    versionCheck  : uint8;
 };
 
 type ReadDirResponse = unit(dataLength: uint8) {
@@ -61,22 +61,28 @@ type ReadDirResponse = unit(dataLength: uint8) {
     fileNames       : bytes &size=(dataLength - 3); # Command byte + additionalFiles + totalNumFiles
 };
 
-type GeneralFileTransfer = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength: uint8) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : GeneralFileTransfer_Request(dataLength);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : GeneralFileTransfer_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : GeneralFileTransfer_Unknown;
+type GeneralFileTransfer = unit(dataLength: uint8) {
+    var packetType : ROC_PLUS_ENUMS::PacketType;
+    
+    # Need this byte to determine packet type
+    command : uint8 &convert=ROC_PLUS_ENUMS::FileTransfer($$);
+    on command {
+        self.packetType = ROC_PLUS_FUNCTIONS::determineOpcode203PacketType(dataLength, self.command);
+    }
+
+    switch(self.packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : GeneralFileTransferRequest(dataLength, self.command);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : GeneralFileTransferResponse(dataLength, self.command);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : GeneralFileTransferUnknown;
     };
 };
 
-type GeneralFileTransfer_Unknown = unit {
+type GeneralFileTransferUnknown = unit {
     # For ambiguous packets
 };
 
-type GeneralFileTransfer_Request = unit(dataLength: uint8) {
-    command : uint8 &convert=ROC_PLUS_ENUMS::FileTransfer($$);
-
-    switch(self.command) {
+type GeneralFileTransferRequest = unit(dataLength: uint8, command: ROC_PLUS_ENUMS::FileTransfer) {
+    switch(command) {
         ROC_PLUS_ENUMS::FileTransfer::OPEN           -> open    : OpenRequest;
         ROC_PLUS_ENUMS::FileTransfer::READ           -> read    : ReadRequest;
         ROC_PLUS_ENUMS::FileTransfer::WRITE          -> write   : WriteRequest(dataLength);
@@ -86,10 +92,8 @@ type GeneralFileTransfer_Request = unit(dataLength: uint8) {
     };
 };
 
-type GeneralFileTransfer_Response = unit(dataLength: uint8) {
-    command : uint8 &convert=ROC_PLUS_ENUMS::FileTransfer($$);
-
-    switch(self.command) {
+type GeneralFileTransferResponse = unit(dataLength: uint8, command: ROC_PLUS_ENUMS::FileTransfer) {
+    switch(command) {
         ROC_PLUS_ENUMS::FileTransfer::OPEN  -> openResp  : OpenResponse;
         ROC_PLUS_ENUMS::FileTransfer::READ  -> readResp  : ReadResponse(dataLength);
         ROC_PLUS_ENUMS::FileTransfer::WRITE -> writeResp : WriteResponse;

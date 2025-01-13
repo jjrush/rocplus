@@ -17,46 +17,13 @@ import ROC_PLUS_OPCODE_105;
 import ROC_PLUS_OPCODE_108;
 import ROC_PLUS_OPCODE_118;
 import ROC_PLUS_OPCODE_119;
-# import ROC_PLUS_OPCODE_135;
-# import ROC_PLUS_OPCODE_136;
 import ROC_PLUS_OPCODE_137;
 import ROC_PLUS_OPCODE_138;
-# import ROC_PLUS_OPCODE_139;
 import ROC_PLUS_OPCODE_166;
 import ROC_PLUS_OPCODE_167;
-# import ROC_PLUS_OPCODE_180;
-# import ROC_PLUS_OPCODE_181;
 import ROC_PLUS_OPCODE_203;
-# import ROC_PLUS_OPCODE_205;
 import ROC_PLUS_OPCODE_206;
-# import ROC_PLUS_OPCODE_224;
-# import ROC_PLUS_OPCODE_225;
 import ROC_PLUS_OPCODE_255;
-
-type IP_Header = unit {
-    versionAndHeaderLength : uint8;
-    typeOfService          : uint8;
-    totalLength            : uint16;
-    identification         : uint16;
-    flagsAndFragmentOffset : uint16;
-    ttl                    : uint8;
-    protocol               : uint8;
-    headerChecksum         : uint16;
-    sourceIP               : bytes &size=4 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-    destIP                 : bytes &size=4 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-};
-
-public type TCP_Header = unit {
-    sourcePort            : uint16;
-    destPort              : uint16;
-    sequenceNum           : uint32;
-    ackNum                : uint32;
-    dataOffsetAndReserved : uint8;
-    flags                 : uint8;
-    windowSize            : uint16;
-    checksum              : uint16;
-    urgentPointer         : uint16;
-};
 
 public type UDP_Messages = unit {
     rocMessage : ROC_Message[];
@@ -64,56 +31,67 @@ public type UDP_Messages = unit {
 
 public type TCP_Messages = unit {
     rocMessageTCP : ROC_Message_TCP[];
+
+    on %error(msg: string) {
+        print "ERROR in TCP_Messages: %s" % msg;
+    }
 };
 
 public type ROC_Message_TCP = unit {
-    # ipHeader   : IP_Header;
-    # tcpHeader  : TCP_Header;
     rocMessage : ROC_Message;
+
+    on %error(msg: string) {
+        print "ERROR in ROC_Message_TCP: %s" % msg;
+    }
 };
 
 public type ROC_Message = unit {
+    on %init {
+        self.rocPlusLinkId = ROC_PLUS_FUNCTIONS::generateId();
+    }
+
     var rocPlusLinkId : string;
 
-    destinationUnit   : uint8;
+    destinationUnit   : uint8; 
     destinationGroup  : uint8;
     sourceUnit        : uint8;
     sourceGroup       : uint8;
     opcode            : uint8 &convert=ROC_PLUS_ENUMS::Opcode($$);
     dataLength        : uint8;
-    
+
     dataBytes         : DataBytes(self);
 
     lsbCRC            : uint8; # least significant byte
     msbCRC            : uint8; # most signfiicant byte
 
-    on %init {
-        self.rocPlusLinkId = ROC_PLUS_FUNCTIONS::generateId();
-    }
-    
-    on %done { 
-#        print self; 
-    }
+    # on %done {
+    #     print "Got destinationUnit: ", self.destinationUnit;
+    #     print "Got destinationGroup: ", self.destinationGroup;
+    #     print "Got sourceUnit: ", self.sourceUnit;
+    #     print "Got sourceGroup: ", self.sourceGroup;
+    #     print "Got opcode: ", self.opcode;
+    #     print "Got dataLength: %s", self.dataLength;
+    #     print "Got lsbCRC: ", self.lsbCRC;
+    #     print "Got msbCRC: ", self.msbCRC;
+    # }
 
     on %error(msg: string) {
-        print "ERROR: %s" % msg;
+        print "ERROR: " % msg;
     }
 };
-
-
 
 public type DataBytes = unit(rocMessage: ROC_Message) {
     # var opcode     : ROC_PLUS_ENUMS::Opcode;
     var dataLength : uint8;
     var packetType : ROC_PLUS_ENUMS::PacketType;
-    
+
     switch(rocMessage.opcode) {
         ROC_PLUS_ENUMS::Opcode::SYSTEM_CONFIG                            -> systemConfiguration                  : ROC_PLUS_OPCODE_006::SystemConfiguration(self.packetType);
         ROC_PLUS_ENUMS::Opcode::READ_REALTIME_CLOCK                      -> readRealtimeClock                    : ROC_PLUS_OPCODE_007::ReadRealtimeClock(self.packetType);
         ROC_PLUS_ENUMS::Opcode::SET_REALTIME_CLOCK                       -> setRealtimeClock                     : ROC_PLUS_OPCODE_008::SetRealtimeClock(self.packetType);
         ROC_PLUS_ENUMS::Opcode::READ_CONFIGURABLE_OPCODE_POINT_DATA      -> readConfigurableOpcodePointData      : ROC_PLUS_OPCODE_010::ReadConfigurableOpcodePointData(self.packetType, self.dataLength);
         ROC_PLUS_ENUMS::Opcode::WRITE_CONFIGURABLE_OPCODE_POINT_DATA     -> writeConfigurableOpcodePointData     : ROC_PLUS_OPCODE_011::WriteConfigurableOpcodePointData(self.packetType, self.dataLength);
-        ROC_PLUS_ENUMS::Opcode::LOGIN_REQUEST                            -> login                                : ROC_PLUS_OPCODE_017::Login(self.packetType, ROC_PLUS_FUNCTIONS::determineOpcode17Type(self.dataLength));  
+        ROC_PLUS_ENUMS::Opcode::LOGIN_REQUEST                            -> login                                : ROC_PLUS_OPCODE_017::Login(self.packetType, ROC_PLUS_FUNCTIONS::determineOpcode17SubType(self.dataLength));  
         ROC_PLUS_ENUMS::Opcode::STORE_AND_FORWARD                        -> storeAndForward                      : ROC_PLUS_OPCODE_024::StoreAndForward(self.packetType, self.dataLength);
         ROC_PLUS_ENUMS::Opcode::REQUEST_IO_POINT_POSITION                -> ioPointPosition                      : ROC_PLUS_OPCODE_050::IOPointPosition(self.packetType, self.dataLength);
         ROC_PLUS_ENUMS::Opcode::ACCESS_USER_DEFINED_INFORMATION          -> accessUserDefinedInfo                : ROC_PLUS_OPCODE_100::AccessUserDefinedInformation(self.packetType);
@@ -130,17 +108,27 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
         ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_POINT_PARAMETERS          -> requestSinglePointParameters         : ROC_PLUS_OPCODE_167::RequestSinglePointParameters(self.packetType, self.dataLength);
         # ROC_PLUS_ENUMS::Opcode::REQUEST_PARAMETERS                       -> requestParameters                    : ROC_PLUS_OPCODE_180::RequestParameters(self.packetType);
         # ROC_PLUS_ENUMS::Opcode::WRITE_PARAMETERS                         -> writeParameters                      : ROC_PLUS_OPCODE_181::WriteParameters(self.packetType);
-        ROC_PLUS_ENUMS::Opcode::GENERAL_FILE_TRANSFER                    -> generalFileTransfer                  : ROC_PLUS_OPCODE_203::GeneralFileTransfer(self.packetType, self.dataLength);
+        ROC_PLUS_ENUMS::Opcode::GENERAL_FILE_TRANSFER                    -> generalFileTransfer                  : ROC_PLUS_OPCODE_203::GeneralFileTransfer(self.dataLength);
         # ROC_PLUS_ENUMS::Opcode::PEER_TO_PEER_NETWORK_MESSAGES            -> peerToPeerNetworkMessages            : ROC_PLUS_OPCODE_205::PeerToPeerNetworkMessages(self.packetType);
-        ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA            -> readTransactionHistory               : ROC_PLUS_OPCODE_206::ReadTransactionHistory(self.packetType);
+        ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA            -> readTransactionHistory               : ROC_PLUS_OPCODE_206::ReadTransactionHistory(self.dataLength);
         # ROC_PLUS_ENUMS::Opcode::SRBX_SIGNAL                              -> srbxSignal                           : ROC_PLUS_OPCODE_224::SRBXSignal(self.packetType);
         # ROC_PLUS_ENUMS::Opcode::ACKNOWLEDGE_SRBX                         -> ackSRBX                              : ROC_PLUS_OPCODE_225::AcknowledgeSRBX(self.packetType);
         ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR                          -> errorIndicator                       : ROC_PLUS_OPCODE_255::ErrorIndicator(self.packetType, self.dataLength); 
     };
 
     on %init {
-        # self.opcode = ;
         self.dataLength = rocMessage.dataLength;
-        self.packetType = ROC_PLUS_FUNCTIONS::determinePacketType(rocMessage.opcode, rocMessage.dataLength);
+
+        # Special case for opcodes 203 and 206 
+        # Need next byte in stream to determine packet type so handle that in opcode 203 and 206
+        # Otherwise determine packet type here
+        if(rocMessage.opcode != ROC_PLUS_ENUMS::Opcode::GENERAL_FILE_TRANSFER && 
+           rocMessage.opcode != ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA) {
+            self.packetType = ROC_PLUS_FUNCTIONS::determinePacketType(rocMessage.opcode, rocMessage.dataLength);
+        }
+    }
+
+    on %error(msg: string) {
+        print "ERROR in DataBytes: " % msg;
     }
 };

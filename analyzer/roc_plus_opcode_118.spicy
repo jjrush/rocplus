@@ -10,22 +10,22 @@ type RequestAlarmData_AlarmData = unit {
 
 type RequestAlarmData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestAlarmData_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestAlarmData_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestAlarmData_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestAlarmDataRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestAlarmDataResponse(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestAlarmDataUnknown();
     };
 };
 
-type RequestAlarmData_Unknown = unit {
+type RequestAlarmDataUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type RequestAlarmData_Request = unit {
+type RequestAlarmDataRequest = unit {
     numAlarmsRequested     : uint8;
     startingAlarmIndexReq  : uint16;
 };
 
-type RequestAlarmData_Response = unit(dataLength: uint8) {
+type RequestAlarmDataResponse = unit(dataLength: uint8) {
     numAlarmsSent          : uint8;
     startingAlarmIndexRes  : uint16;
     currentAlarmIndex      : uint16;

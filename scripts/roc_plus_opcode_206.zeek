@@ -6,15 +6,15 @@ function process_transaction_history(c: connection, data: ROC_PLUS::DataBytes, l
 
     log$roc_plus_link_id = link_id;
 
-    if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST) {
-        log$command = ROC_PLUS_ENUMS::TRANSACTION_HISTORY_COMMAND[data$readTransactionHistory$request$command];
+    log$command = ROC_PLUS_ENUMS::TRANSACTION_HISTORY_COMMAND[data$readTransactionHistory$command];
 
-        if (data$readTransactionHistory$request$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_LIST_TRANSACTION) {
+    if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST) {
+        if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_LIST_TRANSACTION) {
             # List Transaction Request
             log$segment            = data$readTransactionHistory$request$listt$segment;
             log$transaction_offset = data$readTransactionHistory$request$listt$transactionOffset;
         } 
-        else if (data$readTransactionHistory$request$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION) {
+        else if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION) {
             # Read Transaction Request
             log$segment            = data$readTransactionHistory$request$read$segment;
             log$transaction_number = data$readTransactionHistory$request$read$transactionNumber;
@@ -22,9 +22,7 @@ function process_transaction_history(c: connection, data: ROC_PLUS::DataBytes, l
         }
     }
     else if (data$packetType == ROC_PLUS_ENUMS::PacketType_RESPONSE) {
-        log$command = ROC_PLUS_ENUMS::TRANSACTION_HISTORY_COMMAND[data$readTransactionHistory$response$command];
-
-        if (data$readTransactionHistory$response$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_LIST_TRANSACTION) {
+        if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_LIST_TRANSACTION) {
             # List Transaction Response
             log$num_transactions = data$readTransactionHistory$response$listt$numTransactions;
             log$more_data        = (data$readTransactionHistory$response$listt$moreData == 1) ? "Yes" : "No";
@@ -38,7 +36,7 @@ function process_transaction_history(c: connection, data: ROC_PLUS::DataBytes, l
                 }
             }
         }
-        else if (data$readTransactionHistory$response$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION) {
+        else if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION) {
             # Read Transaction Response
             log$msg_data_size = data$readTransactionHistory$response$read$messageDataSize;
             log$more_data     = (data$readTransactionHistory$response$read$moreData == 1) ? "Yes" : "No";

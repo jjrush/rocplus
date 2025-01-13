@@ -6,20 +6,20 @@ import ROC_PLUS_FUNCTIONS;
 
 type IOPointPosition = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : IOPointPosition_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : IOPointPosition_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : IOPointPosition_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : IOPointPositionRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : IOPointPositionResponse(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : IOPointPositionUnknown();
     };
 };
 
-type IOPointPosition_Request = unit {
+type IOPointPositionRequest = unit {
     ioDataToReq : uint8 &convert=ROC_PLUS_ENUMS::IODataType($$);
 };
 
-type IOPointPosition_Response = unit(dataLength : uint8) {
+type IOPointPositionResponse = unit(dataLength : uint8) {
     ioData : bytes &size=dataLength;
 };
 
-type IOPointPosition_Unknown = unit {
+type IOPointPositionUnknown = unit {
     # This opcode should always be a request or a response
 };

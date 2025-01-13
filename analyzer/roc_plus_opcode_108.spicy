@@ -10,19 +10,19 @@ type RequestHistoryTagAndPeriodicIndex_HistoricalPoints = unit {
 
 type RequestHistoryTagAndPeriodicIndex = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestHistoryTagAndPeriodicIndex_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestHistoryTagAndPeriodicIndex_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestHistoryTagAndPeriodicIndex_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestHistoryTagAndPeriodicIndexRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestHistoryTagAndPeriodicIndexResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestHistoryTagAndPeriodicIndexUnknown();
     };
 };
 
-type RequestHistoryTagAndPeriodicIndex_Request = unit {
+type RequestHistoryTagAndPeriodicIndexRequest = unit {
     historySegment   : uint8;
     numPoints        : uint8;
     historicalPoints : RequestHistoryTagAndPeriodicIndex_HistoricalPoints[self.numPoints];
 };
 
-type RequestHistoryTagAndPeriodicIndex_Response = unit {
+type RequestHistoryTagAndPeriodicIndexResponse = unit {
     historySegment   : uint8;
     numPoints        : uint8;
     periodicIndex    : uint16;
@@ -30,6 +30,6 @@ type RequestHistoryTagAndPeriodicIndex_Response = unit {
     tag              : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type RequestHistoryTagAndPeriodicIndex_Unknown = unit {
+type RequestHistoryTagAndPeriodicIndexUnknown = unit {
     # If data length field is less than 23 but greater than 15 we are UNKNOWN 
 };

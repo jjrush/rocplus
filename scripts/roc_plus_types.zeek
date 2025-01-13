@@ -9,29 +9,6 @@ type roc_plus_log: record {
 
     packet_type       : string  &log &optional;
 
-    # IP header
-    # version_and_header_length : count &log &optional;
-    # type_of_service           : count &log &optional;
-    # total_length              : count &log &optional;
-    # identification            : count &log &optional;
-    # flags_and_fragment_offset : count &log &optional;
-    # ttl                       : count &log &optional;
-    # ip_header_protocol        : count &log &optional;
-    # header_checksum           : count &log &optional;
-    # source_ip                 : string &log &optional;
-    # dest_ip                   : string &log &optional;
-
-    # TCP header
-    # source_port              : count &log &optional;
-    # dest_port                : count &log &optional;
-    # sequence_num             : count &log &optional;
-    # ack_num                  : count &log &optional;
-    # data_offset_and_reserved : count &log &optional;
-    # flags                    : count &log &optional;
-    # window_size              : count &log &optional;
-    # checksum                 : count &log &optional;
-    # urgent_pointer           : count &log &optional;
-
     # ROC Plus Header ############################
     destination_unit  : count   &log &optional;
     destination_group : count   &log &optional;

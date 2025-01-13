@@ -6,19 +6,19 @@ import ROC_PLUS_FUNCTIONS;
 
 type RequestHistoryIndex = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestHistoryIndex_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestHistoryIndex_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestHistoryIndex_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestHistoryIndexRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestHistoryIndexResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestHistoryIndexUnknown();
     };
 };
 
-type RequestHistoryIndex_Request = unit {
+type RequestHistoryIndexRequest = unit {
     historySegment : uint8;
     dayRequested   : uint8;
     monthRequested : uint8;
 };
 
-type RequestHistoryIndex_Response = unit {
+type RequestHistoryIndexResponse = unit {
     historySegment      : uint8;
     startingPeriodicIdx : uint16;
     numPeriodicEntries  : uint16;
@@ -26,6 +26,6 @@ type RequestHistoryIndex_Response = unit {
     numDailyEntries     : uint16;
 };
 
-type RequestHistoryIndex_Unknown = unit {
+type RequestHistoryIndexUnknown = unit {
     # This opcode should always be a request or a response
 };

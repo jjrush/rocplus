@@ -11,26 +11,26 @@ type AccessUserDefinedInformation_PointType = unit {
 
 type AccessUserDefinedInformation = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : AccessUserDefinedInformation_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : AccessUserDefinedInformation_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : AccessUserDefinedInformation_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : AccessUserDefinedInformationRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : AccessUserDefinedInformationResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : AccessUserDefinedInformationUnknown();
     };
 };
 
-type AccessUserDefinedInformation_Request = unit {
+type AccessUserDefinedInformationRequest = unit {
     command      : uint8;
     startPoint   : uint8;
     numPoints    : uint8;
 };
 
-type AccessUserDefinedInformation_Response = unit {
+type AccessUserDefinedInformationResponse = unit {
     command    : uint8;
     startPoint : uint8;
     numPoints  : uint8;
     pointTypes : AccessUserDefinedInformation_PointType[self.numPoints];
 };
 
-type AccessUserDefinedInformation_Unknown = unit {
+type AccessUserDefinedInformationUnknown = unit {
     # This opcode should always be a request or a response
 };
 

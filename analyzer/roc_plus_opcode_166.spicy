@@ -6,17 +6,17 @@ import ROC_PLUS_FUNCTIONS;
 
 type SetSinglePointParameters = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SetSinglePointParameters_Request(dataLength);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SetSinglePointParameters_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SetSinglePointParameters_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SetSinglePointParametersRequest(dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SetSinglePointParametersResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SetSinglePointParametersUnknown();
     };
 };
 
-type SetSinglePointParameters_Unknown = unit {
+type SetSinglePointParametersUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type SetSinglePointParameters_Request = unit(dataLength : uint8) {
+type SetSinglePointParametersRequest = unit(dataLength : uint8) {
     pointType           : uint8;
     pointLogicNumber    : uint8;
     numParameters       : uint8;
@@ -24,6 +24,6 @@ type SetSinglePointParameters_Request = unit(dataLength : uint8) {
     parameterData       : bytes &size=(dataLength - 4) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type SetSinglePointParameters_Response = unit {
+type SetSinglePointParametersResponse = unit {
     # Response is empty - just acknowledgment
 };

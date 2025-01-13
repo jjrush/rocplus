@@ -6,23 +6,23 @@ import ROC_PLUS_FUNCTIONS;
 
 type ReadConfigurableOpcodePointData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadConfigurableOpcodePointData_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadConfigurableOpcodePointData_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadConfigurableOpcodePointData_Unknown();
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadConfigurableOpcodePointDataRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadConfigurableOpcodePointDataResponse(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadConfigurableOpcodePointDataUnknown();
     };
 };
 
-type ReadConfigurableOpcodePointData_Unknown = unit {
+type ReadConfigurableOpcodePointDataUnknown = unit {
     # This opcode should always be a request or a response
 };
 
-type ReadConfigurableOpcodePointData_Request = unit {
+type ReadConfigurableOpcodePointDataRequest = unit {
     tableNumber           : uint8;
     startingTableLocation : uint8;
     numTableLocations     : uint8;
 };
 
-type ReadConfigurableOpcodePointData_Response = unit(dataLength : uint8) {
+type ReadConfigurableOpcodePointDataResponse = unit(dataLength : uint8) {
     tableNumber           : uint8;
     startingTableLocation : uint8;
     numTableLocations     : uint8;

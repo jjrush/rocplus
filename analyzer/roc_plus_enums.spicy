@@ -154,16 +154,6 @@ public type FileOpenOptions = enum {
 
 #
 # Chapter 2 - Table 2-29 - Opcode 206, Read Transaction History Data
-# Note: offsets are re-used for different 
-public type Opcode206Type = enum {
-    LIST_REQ = 0,
-    LIST_RES = 1, # always 21 bytes but READ_RES could also be 21 bytes rendering this unparse-able
-    READ_REQ = 2, # always 6 bytes but the response could also be 6 bytes rendering this unparse-able
-    READ_RES = 3  # unparse-able if between 6 bytes and 21 bytes 
-};
-
-#
-# Chapter 2 - Table 2-29 - Opcode 206, Read Transaction History Data
 #
 public type DataType = enum {
     U8         = 1,
