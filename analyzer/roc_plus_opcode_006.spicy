@@ -3,18 +3,15 @@ module ROC_PLUS_OPCODE_006;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type SystemConfiguration = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
+type SystemConfiguration = unit {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
         ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SystemConfigurationRequest();
         ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SystemConfigurationResponse();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SystemConfigurationUnknown();
     };
 };
 
-type SystemConfigurationUnknown = unit {
-    # This opcode should always be a request or a response
-};
 
 type SystemConfigurationRequest = unit {
     # System configuration request does not contain any data
@@ -32,7 +29,7 @@ type SystemConfigurationResponse = unit {
 
     typeOfROC                  : uint8 &convert=ROC_PLUS_ENUMS::TypeOfROC($$);
 
-    pointTypes                 : uint8[195]; #Point Type 60 - Point Type 255 - see Table 2-2
+    pointTypes                 : uint8[196]; #Point Type 60 - Point Type 255 - see Table 2-2
 
     # on %done {
     #     print self;

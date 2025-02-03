@@ -3,17 +3,13 @@ module ROC_PLUS_OPCODE_010;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type ReadConfigurableOpcodePointData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
-    switch(packetType) {
+type ReadConfigurableOpcodePointData = unit(dataLength : uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
         ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadConfigurableOpcodePointDataRequest();
         ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadConfigurableOpcodePointDataResponse(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadConfigurableOpcodePointDataUnknown();
     };
-};
-
-type ReadConfigurableOpcodePointDataUnknown = unit {
-    # This opcode should always be a request or a response
 };
 
 type ReadConfigurableOpcodePointDataRequest = unit {

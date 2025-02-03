@@ -28,7 +28,7 @@ const OPCODE_050_REQ_DATA_LENGTH : uint8 = 1;
 const OPCODE_100_REQ_DATA_LENGTH : uint8 = 3;
 const OPCODE_105_REQ_DATA_LENGTH : uint8 = 2;
 
-# In the case of opcode 8 it is possible for the REQ and RES data lengths to match. 
+# In the case of opcode 108 it is possible for the REQ and RES data lengths to match. 
 # We can only parse this opcode if the REQ < 15 bytes (the minimum size of a response)
 # or if the RES > 23 bytes (the maximum size of a REQ)
 const OPCODE_108_REQ_MIN_DATA_LENGTH : uint8 = 3;
@@ -50,7 +50,9 @@ const OPCODE_139_REQ_COMMAND_1_MAX_DATA_LENGTH : uint8 = 126; # Last two byte fi
 
 const OPCODE_166_RES_DATA_LENGTH : uint8 = 0; # Opcode 166's RESPONSE contains no data
 const OPCODE_167_REQ_DATA_LENGTH : uint8 = 4; 
-#const OPCODE_180_REQ_DATA_LENGTH : int8 = -1; # TODO: figure out if 180 is parseable
+
+const OPCODE_180_REQ_DATA_LENGTH_MIN : uint8 = 5; 
+
 const OPCODE_181_RES_DATA_LENGTH : uint8 = 0; # Opcode 181's RESPONSE contains no data
 
 # Opcode 203 has variable lengths for both response and request depending on the operation being performed
@@ -88,13 +90,11 @@ const OPCODE_225_REQ_DATA_LENGTH : uint8 = 0; # Opcode 224's RESPONSE contains n
 ####################################################
 
 public function determineOpcode17PacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
-    if (dataLength != OPCODE_017_SESSION_KEY_REQ_RESPONSE_DATA_LENGTH &&
-       dataLength != OPCODE_017_RES_DATA_LENGTH)
-    {
-        return ROC_PLUS_ENUMS::PacketType::REQUEST;
+    if ( dataLength == OPCODE_017_WRAPPED_SESSION_KEY_DATA_LENGTH || dataLength == 0 ) {
+        return ROC_PLUS_ENUMS::PacketType::RESPONSE;
     }
 
-    return ROC_PLUS_ENUMS::PacketType::RESPONSE;
+    return ROC_PLUS_ENUMS::PacketType::REQUEST;
 }
 
 public function determineOpcode108PacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
@@ -111,7 +111,20 @@ public function determineOpcode108PacketType(opcode: ROC_PLUS_ENUMS::Opcode, dat
     return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
 }
 
-public function determineOpcode203PacketType(dataLength: uint8, command: ROC_PLUS_ENUMS::FileTransfer) : ROC_PLUS_ENUMS::PacketType {
+public function determineOpcode203PacketType(dataLength: uint8, command_raw: uint8, inout command: ROC_PLUS_ENUMS::FileTransfer) : ROC_PLUS_ENUMS::PacketType {
+    if (dataLength == OPCODE_203_REQ_DELETE_DATA_LENGTH && command_raw == 6) {
+        command = ROC_PLUS_ENUMS::FileTransfer::DELETE;
+    } 
+    else if (dataLength == OPCODE_203_REQ_READ_DIR_V305_DATA_LENGTH && command_raw == 6) {
+        command = ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY;
+    }
+    else if (dataLength == OPCODE_203_REQ_READ_DIR_V310_DATA_LENGTH && command_raw == 6) {
+        command = ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY_64;
+    }
+    else {
+        command = cast<ROC_PLUS_ENUMS::FileTransfer>(command_raw);
+    }
+
     switch(command) {
         case ROC_PLUS_ENUMS::FileTransfer::OPEN:
             if(dataLength == OPCODE_203_REQ_OPEN_DATA_LENGTH) {
@@ -142,14 +155,16 @@ public function determineOpcode203PacketType(dataLength: uint8, command: ROC_PLU
                 return ROC_PLUS_ENUMS::PacketType::RESPONSE;
             }
         case ROC_PLUS_ENUMS::FileTransfer::DELETE:
+        {
             # Special case - documentation states DELETE is both command 6 and 5 but treated request and response respectively
             # See Table 2-27 for more details
-            if(cast<uint8>(command) == 6) {
+            if(command_raw == 6) {
                 return ROC_PLUS_ENUMS::PacketType::REQUEST;
             }
             else {
                 return ROC_PLUS_ENUMS::PacketType::RESPONSE;
             }
+        }
         case ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY:
             if(dataLength == OPCODE_203_REQ_READ_DIR_V305_DATA_LENGTH) {
                 return ROC_PLUS_ENUMS::PacketType::REQUEST;
@@ -179,7 +194,8 @@ public function determineOpcode206PacketType(dataLength: uint8, command: ROC_PLU
             }
         case ROC_PLUS_ENUMS::TransactionHistoryCommand::READ_TRANSACTION:
             if(dataLength == OPCODE_206_REQ_READ_DATA_LENGTH) {
-                return ROC_PLUS_ENUMS::PacketType::REQUEST;
+                # Request is 6 bytes but it is possible for response to also be 6 bytes rendering this unparseable
+                return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
             }
             else {
                 return ROC_PLUS_ENUMS::PacketType::RESPONSE;
@@ -209,7 +225,7 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
             return determineOpcode17PacketType(opcode, dataLength);
             
         case ROC_PLUS_ENUMS::Opcode::STORE_AND_FORWARD:
-            return dataLength == OPCODE_024_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
+            return dataLength == OPCODE_024_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::RESPONSE : ROC_PLUS_ENUMS::PacketType::REQUEST;
             
         case ROC_PLUS_ENUMS::Opcode::REQUEST_IO_POINT_POSITION:
             return dataLength == OPCODE_050_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
@@ -256,7 +272,9 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
             return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
             
         case ROC_PLUS_ENUMS::Opcode::WRITE_PARAMETERS:
-            return dataLength != OPCODE_181_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
+            # TODO: figure out if this is parseable
+            return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
+            # return dataLength != OPCODE_181_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
             
         # Special case for opcode 203 GeneralFileTransfer 
         # Need next byte in stream to determine packet type so handle that in opcode 203 directly
@@ -275,6 +293,11 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
             
         case ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR:
             return ROC_PLUS_ENUMS::PacketType::RESPONSE;  # Error indicators are always responses
+        default:
+        {
+            print "Unknown opcode: %s while determining packet type" % opcode;
+            return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
+        }
     }
 }
 
@@ -303,28 +326,17 @@ public function uintToHexString(data: uint64): string {
 
 public function bytesToHexString(data: bytes): string {
     local bytesAsHexString : string;
-    local cnt : uint8;
-
-    cnt = 0;
     bytesAsHexString = "";
 
     for (byte in data) {
         bytesAsHexString = bytesAsHexString + ("%02x" % byte);
-
-        ++cnt;
-        if (cnt >= 15) {
-            break;
-        }
     }
-
-    if (cnt > 0) {
-        bytesAsHexString = "0x" + bytesAsHexString;
-    }
-
+    
     return bytesAsHexString;
 }
 
-public function dataTypeSize( dataType : ROC_PLUS_ENUMS::DataType): uint8 {
+public function dataTypeSize(dataType : ROC_PLUS_ENUMS::DataType): uint8 {
+    print "dataType: ", cast<uint8>(dataType);
     switch (dataType) {
         # apparently spicy doesn't support fallthroughs
         case ROC_PLUS_ENUMS::DataType::U32:    return 4;
@@ -341,11 +353,12 @@ public function dataTypeSize( dataType : ROC_PLUS_ENUMS::DataType): uint8 {
         case ROC_PLUS_ENUMS::DataType::BINARY:     return 1;
         case ROC_PLUS_ENUMS::DataType::U8:         return 1;
         case ROC_PLUS_ENUMS::DataType::S8:         return 1;
-        case ROC_PLUS_ENUMS::DataType::STRING3:    return 1;
-        case ROC_PLUS_ENUMS::DataType::STRING7:    return 1;
-        case ROC_PLUS_ENUMS::DataType::STRING10:   return 1;
-        case ROC_PLUS_ENUMS::DataType::STRING20:   return 1;
-        case ROC_PLUS_ENUMS::DataType::STRING30:   return 1;
-        case ROC_PLUS_ENUMS::DataType::T_STRING40: return 1;
+
+        case ROC_PLUS_ENUMS::DataType::STRING3:    return 3;
+        case ROC_PLUS_ENUMS::DataType::STRING7:    return 7;
+        case ROC_PLUS_ENUMS::DataType::STRING10:   return 10;
+        case ROC_PLUS_ENUMS::DataType::STRING20:   return 20;
+        case ROC_PLUS_ENUMS::DataType::STRING30:   return 30;
+        case ROC_PLUS_ENUMS::DataType::T_STRING40: return 40;
     } 
 }

@@ -56,9 +56,9 @@ export{
     }&default = "Unknown";
 
     const LOGICAL_COMPATABILITY_STATUS = {
-        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_NINE_MAX_MODULE_SLOTS]         = "Compatability Mode: 0 | 16 points per slot | 160 bytes total | 9  module slots max)",
-        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_FOURTEEN_MAX_MODULE_SLOTS]     = "Compatability Mode: 1 | 16 points per slot | 240 bytes total | 14 module slots max)",
-        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_TWENTY_SEVEN_MAX_MODULE_SLOTS] = "Compatability Mode: 2 | 9 points per slot  | 224 bytes total | 27 module slots max)"
+        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_NINE_MAX_MODULE_SLOTS]         = "Compatability Mode: 0 | 16 points per slot | 160 bytes total | 9  module slots max",
+        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_FOURTEEN_MAX_MODULE_SLOTS]     = "Compatability Mode: 1 | 16 points per slot | 240 bytes total | 14 module slots max",
+        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_TWENTY_SEVEN_MAX_MODULE_SLOTS] = "Compatability Mode: 2 | 9 points per slot  | 224 bytes total | 27 module slots max"
     }&default = "Unknown";
 
     const REVISION = {

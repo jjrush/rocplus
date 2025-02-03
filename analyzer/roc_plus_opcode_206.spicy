@@ -3,24 +3,19 @@ module ROC_PLUS_OPCODE_206;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
 type ReadTransactionHistory = unit(dataLength: uint8) {
-    var packetType : ROC_PLUS_ENUMS::PacketType;
-
     command : uint8 &convert=ROC_PLUS_ENUMS::TransactionHistoryCommand($$);
     on command {
-        self.packetType = ROC_PLUS_FUNCTIONS::determineOpcode206PacketType(dataLength, self.command);
+        ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL = ROC_PLUS_FUNCTIONS::determineOpcode206PacketType(dataLength, self.command);
     }
 
-    switch(self.packetType) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
         ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadTransactionHistoryRequest(self.command);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadTransactionHistoryResponse(self.command);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadTransactionHistoryUnknown;
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadTransactionHistoryResponse(self.command, dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadTransactionHistoryUnknown(dataLength);
     };
-};
-
-type ReadTransactionHistoryUnknown = unit {
-    # For ambiguous packets
 };
 
 type ReadTransactionHistoryRequest = unit(command: ROC_PLUS_ENUMS::TransactionHistoryCommand) {
@@ -30,11 +25,15 @@ type ReadTransactionHistoryRequest = unit(command: ROC_PLUS_ENUMS::TransactionHi
     };
 };
 
-type ReadTransactionHistoryResponse = unit(command: ROC_PLUS_ENUMS::TransactionHistoryCommand) {
+type ReadTransactionHistoryResponse = unit(command: ROC_PLUS_ENUMS::TransactionHistoryCommand, dataLength: uint8) {
     switch(command) {
         ROC_PLUS_ENUMS::TransactionHistoryCommand::LIST_TRANSACTION -> listt : ListTransactionResponse;
-        ROC_PLUS_ENUMS::TransactionHistoryCommand::READ_TRANSACTION -> read  : ReadTransactionResponse;
+        ROC_PLUS_ENUMS::TransactionHistoryCommand::READ_TRANSACTION -> read  : ReadTransactionResponse(dataLength);
     };
+};
+
+type ReadTransactionHistoryUnknown = unit(dataLength: uint8) {
+    data : bytes &size=(dataLength - 1) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
 type ListTransactionRequest = unit {
@@ -48,12 +47,33 @@ type ReadTransactionRequest = unit {
     dataOffset        : uint16;
 };
 
-type ReadTransactionResponse = unit {
-    command          : uint8;
+type ReadTransactionResponse = unit(dataLength: uint8) {
+    var types  : vector<uint8>;
+    var values : vector<uint8>;
+
     messageDataSize  : uint8;
     moreData         : uint8;
 
-    readTransactions : ReadTransaction[self.messageDataSize];
+    data             : bytes &size=(dataLength - 3);
+
+    on data {
+        local counter : uint8 = 0;
+        for (byte in self.data) {
+            # if the counter has been incremented we need to collect the data corresponding to the type
+            if( counter > 0 ) {
+                self.values.push_back(byte);
+                counter = counter - 1;
+                continue;
+            }
+
+            # need to extract data type byte in order to know how many bytes to read next
+            self.types.push_back(byte);
+            # need to convert data type byte to actual size and increment index by that amount so we can read next type + value
+            counter = counter + ROC_PLUS_FUNCTIONS::dataTypeSize(ROC_PLUS_ENUMS::DataType(byte));
+        }
+    }
+    # readTransactions : ReadTransaction[self.messageDataSize];
+
 };
 
 type ListTransactionResponse = unit {

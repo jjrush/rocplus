@@ -40,8 +40,12 @@ function process_file_transfer(c: connection, data: ROC_PLUS::DataBytes, link_id
 
             case ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY:
                 log$path = data$generalFileTransfer$request$readDir$path;
-                if (data$generalFileTransfer$request$readDir?$totalNumFiles)
-                    log$total_num_files = data$generalFileTransfer$request$readDir$totalNumFiles;
+                log$total_num_files = data$generalFileTransfer$request$readDir$totalNumFiles;
+                break;
+
+            case ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY_64:
+                log$path = data$generalFileTransfer$request$readDir64$path;
+                log$total_num_files = data$generalFileTransfer$request$readDir64$totalNumFiles;
                 break;
         }
     }

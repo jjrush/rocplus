@@ -2,13 +2,12 @@ module ROC_PLUS_OPCODE_011;
 
 import spicy;
 import ROC_PLUS_ENUMS;
-import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type WriteConfigurableOpcodePointData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
-    switch(packetType) {
+type WriteConfigurableOpcodePointData = unit(dataLength : uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
         ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : WriteConfigurableOpcodePointDataRequest(dataLength);
         ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : WriteConfigurableOpcodePointDataResponse();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : WriteConfigurableOpcodePointDataUnknown();
 };
 };
 
@@ -21,8 +20,4 @@ type WriteConfigurableOpcodePointDataRequest = unit(dataLength : uint8) {
 
 type WriteConfigurableOpcodePointDataResponse = unit {
     # Response response does not contain any data
-};
-
-type WriteConfigurableOpcodePointDataUnknown = unit {
-    # This opcode should always be a request or a response
 };

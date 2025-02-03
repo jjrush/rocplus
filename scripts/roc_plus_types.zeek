@@ -21,8 +21,8 @@ type roc_plus_log: record {
     msb_crc           : count   &log &optional; # most signfiicant byte
     ##############################################
 
-    error_code        : string  &log &optional;
-    error_offset      : count   &log &optional;
+    error_code        : vector of string &log &optional;
+    error_offset      : vector of count  &log &optional;
 };
 
 type roc_plus_sys_cfg_log: record {
@@ -461,7 +461,7 @@ type roc_plus_data_request_log: record {
     # num_periodic_entries : count &log &optional;
     # num_daily_entries    : count &log &optional;
     periodic_values      : vector of count &log &optional;
-    daily_dalues         : vector of count &log &optional;  
+    daily_values         : vector of count &log &optional;  
     ##################
 };
 
@@ -574,5 +574,15 @@ type roc_plus_transaction_history_log: record {
     msg_data_size      : count &log &optional;
     # more_data          : string &log &optional;
     data_type          : vector of string &log &optional;
-    data               : vector of string &log &optional;
+    data               : vector of count &log &optional;
+};
+
+type roc_plus_unknown_opcode_data_log: record {
+    ts               : time    &log;
+    uid              : string  &log;
+    id               : conn_id &log;
+    roc_plus_link_id : string  &log &optional;
+
+    # Raw data bytes for opcodes that are unparse-able
+    data             : string &log &optional;
 };

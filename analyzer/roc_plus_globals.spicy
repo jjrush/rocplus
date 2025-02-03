@@ -1,0 +1,6 @@
+module ROC_PLUS_GLOBALS;
+
+import ROC_PLUS_ENUMS;
+import spicy;
+
+public global PACKET_TYPE_GLOBAL : ROC_PLUS_ENUMS::PacketType;

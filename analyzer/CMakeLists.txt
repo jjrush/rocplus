@@ -4,6 +4,7 @@ spicy_add_analyzer(
     SOURCES zeek_roc_plus.spicy
             roc_plus_enums.spicy
             roc_plus_functions.spicy
+            roc_plus_globals.spicy
             roc_plus_functions.cc
             roc_plus.spicy
             roc_plus.evt
@@ -24,6 +25,8 @@ spicy_add_analyzer(
             roc_plus_opcode_138.spicy
             roc_plus_opcode_166.spicy
             roc_plus_opcode_167.spicy
+            roc_plus_opcode_180.spicy
+            roc_plus_opcode_181.spicy
             roc_plus_opcode_203.spicy
             roc_plus_opcode_206.spicy
             roc_plus_opcode_255.spicy
@@ -31,6 +34,7 @@ spicy_add_analyzer(
             main.zeek
             roc_plus_enums.zeek
             roc_plus_processing.zeek
+            roc_plus_globals.zeek
             roc_plus_event_processing.zeek
             roc_plus_types.zeek
             roc_plus_utilities.zeek
@@ -51,6 +55,8 @@ spicy_add_analyzer(
             roc_plus_opcode_138.zeek
             roc_plus_opcode_166.zeek
             roc_plus_opcode_167.zeek
+            roc_plus_opcode_180.zeek
+            roc_plus_opcode_181.zeek
             roc_plus_opcode_203.zeek
             roc_plus_opcode_206.zeek
             roc_plus_opcode_255.zeek

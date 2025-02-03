@@ -22,6 +22,8 @@
 @load ./roc_plus_opcode_138
 @load ./roc_plus_opcode_166
 @load ./roc_plus_opcode_167
+@load ./roc_plus_opcode_180
+@load ./roc_plus_opcode_181
 @load ./roc_plus_opcode_203
 @load ./roc_plus_opcode_206
 @load ./roc_plus_opcode_255

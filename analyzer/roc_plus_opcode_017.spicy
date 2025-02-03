@@ -3,17 +3,13 @@ module ROC_PLUS_OPCODE_017;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type Login = unit(packetType: ROC_PLUS_ENUMS::PacketType, op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
-    switch(packetType) {
+type Login = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
         ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : LoginRequest(op17Type);
         ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : LoginResponse(op17Type);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : LoginUnknown();
     };
-};
-
-type LoginUnknown = unit {
-    # This opcode should always be a request or a response
 };
 
 type LoginResponse = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
@@ -45,10 +41,6 @@ type Standard_Logout = unit {
     logoutString : bytes &size=6 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type Session_Key_Req = unit {
-    sessionKeyString : bytes &size=13 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-};
-
 type Enhanced_Login = unit {
     operatorId  : bytes &size=30 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
     password    : bytes &size=40 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
@@ -61,6 +53,18 @@ type Enhanced_Logout = unit {
     logoutString : bytes &size=6 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
+type Session_Key_Req = unit {
+    sessionKeyString : bytes &size=13 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+
+    # on %done {
+    #     print self;
+    # }
+};
+
 type Wrapped_Session_Key = unit {
     wrappedSessionKey : bytes &size=24 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+
+    # on %done {
+    #     print self;
+    # }
 };

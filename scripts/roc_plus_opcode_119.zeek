@@ -17,9 +17,11 @@ module ROC_PLUS;
             log$starting_event_log_idx = data$requestEventData$response$startingEventLogIndexRes;
             log$current_event_log_idx  = data$requestEventData$response$currentEventLogIndex;
 
+            log$event_data = vector();
+
             for (index in data$requestEventData$response$eventDataRes)
             {
-                log$event_data[index] = data$requestEventData$response$eventDataRes[index]$data;
+                log$event_data += data$requestEventData$response$eventDataRes[index]$data;
             }
         }
 

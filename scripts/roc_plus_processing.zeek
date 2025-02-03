@@ -63,9 +63,10 @@ module ROC_PLUS;
                 process_request_single_point_parameters(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_PARAMETERS:
-                # process_request_parameters(c, data, roc_plus_link_id);
+                process_request_parameters(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_WRITE_PARAMETERS:
+                process_write_parameters(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_GENERAL_FILE_TRANSFER:
                 process_file_transfer(c, data, roc_plus_link_id);

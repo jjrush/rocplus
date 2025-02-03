@@ -120,3 +120,13 @@ module ROC_PLUS;
 
         return c;
     }
+
+    function set_unknown_opcode_data_log(c: connection): connection {
+        if ( ! c?$roc_plus_unknown_opcode_data_log )
+            c$roc_plus_unknown_opcode_data_log = roc_plus_unknown_opcode_data_log(
+                $ts=network_time(),
+                $uid=c$uid,
+                $id=c$id);
+
+        return c;
+    }

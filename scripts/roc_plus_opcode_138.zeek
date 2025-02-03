@@ -20,14 +20,16 @@ module ROC_PLUS;
             log$num_periodic_entries = data$requestDailyAndPeriodicHistory$response$numPeriodicEntries;
             log$num_daily_entries    = data$requestDailyAndPeriodicHistory$response$numDailyEntries;
 
+            log$periodic_values = vector();
             for (index in data$requestDailyAndPeriodicHistory$response$periodicValues)
             {
-                log$periodic_values[index] = data$requestDailyAndPeriodicHistory$response$periodicValues[index];
+                log$periodic_values += data$requestDailyAndPeriodicHistory$response$periodicValues[index];
             }
 
+            log$daily_values = vector();
             for (index in data$requestDailyAndPeriodicHistory$response$dailyValues)
             {
-                log$daily_dalues[index] = data$requestDailyAndPeriodicHistory$response$dailyValues[index];
+                log$daily_values += data$requestDailyAndPeriodicHistory$response$dailyValues[index];
             }
         }
 
