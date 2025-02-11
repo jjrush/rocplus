@@ -163,6 +163,21 @@ export{
         [ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION] = "Read"
     } &default="Unknown";
 
+    const HISTORY_TYPE = {
+        [ROC_PLUS_ENUMS::HistoryType_MINUTE]              = "Minute",
+        [ROC_PLUS_ENUMS::HistoryType_PERIODIC]            = "Periodic",
+        [ROC_PLUS_ENUMS::HistoryType_DAILY]               = "Daily",
+        [ROC_PLUS_ENUMS::HistoryType_PERIODIC_TIMESTAMPS] = "Periodic Time Stamps",
+        [ROC_PLUS_ENUMS::HistoryType_DAILY_TIMESTAMPS]    = "Daily Time Stamps"
+    } &default="Unknown";
+    # function(i: ROCPLUS_ENUM::historyTypeEnums):string{return fmt("unknown-0x%x", i); } &redef;
+
+    const HISTORY_SUB_COMMANDS = {
+        [ROC_PLUS_ENUMS::HistorySubCommands_REQUEST_CONFIGURED_POINTS]    = "Request Configured Points",
+        [ROC_PLUS_ENUMS::HistorySubCommands_REQUEST_SPECIFIED_POINT_DATA] = "Request Specified Point Data"
+    } &default="Unknown";
+    # function(i: ROCPLUS_ENUM::HistorySubCommands):string{return fmt("unknown-0x%x", i); } &redef;
+
     const ERROR_CODE = {
         [ROC_PLUS_ENUMS::ErrorCode_INVALID_OPCODE_REQUEST]              = "Invalid Opcode Request",
         [ROC_PLUS_ENUMS::ErrorCode_INVALID_PARAMETER_NUMBER]            = "Invalid Parameter Number",

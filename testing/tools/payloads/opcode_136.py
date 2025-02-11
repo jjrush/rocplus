@@ -31,35 +31,13 @@ Must be <= 255 bytes
 
 PAYLOAD = {
     "request": {
-        "empty": {
-            "payload": {
-                "history_segment": 1,
-                "segment_index": 0,
-                "history_type": 0,  # Minute
-                "start_point": 0,
-                "num_points": 0,
-                "num_periods": 0
-            }
-        },
-        "single": {
-            "payload": {
-                "history_segment": 1,
-                "segment_index": 30,  # Middle of hour
-                "history_type": 0,  # Minute
-                "start_point": 0,
-                "num_points": 1,
-                "num_periods": 1
-            }
-        },
-        "max": {
-            "payload": {
-                "history_segment": 1,
-                "segment_index": 59,  # End of hour
-                "history_type": 0,  # Minute
-                "start_point": 0,
-                "num_points": 5,  # 5 points
-                "num_periods": 3   # 3 periods
-            }
+        "payload": {
+            "history_segment": 1,
+            "segment_index": 59,  # End of hour
+            "history_type": 0,  # Minute
+            "start_point": 0,
+            "num_points": 5,  # 5 points
+            "num_periods": 3   # 3 periods
         }
     },
     "response": {
@@ -77,7 +55,7 @@ PAYLOAD = {
                 "history_segment": 1,
                 "segment_index": 30,
                 "current_index": 30,
-                "num_elements": 1,
+                "num_elements": 2,  # (1 point + 1 timestamp) * 1 period = 2 elements
                 "periods": [
                     {
                         "timestamp": 0x12345678,
@@ -93,7 +71,7 @@ PAYLOAD = {
                 "history_segment": 1,
                 "segment_index": 59,
                 "current_index": 59,
-                "num_elements": 15,  # 5 points * 3 periods
+                "num_elements": 18,  # (5 points + 1 timestamp) * 3 periods = 18 elements
                 "periods": [
                     {
                         "timestamp": 0x01020304 + i,  # Base timestamp + increment

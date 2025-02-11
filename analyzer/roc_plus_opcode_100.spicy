@@ -6,7 +6,7 @@ import ROC_PLUS_FUNCTIONS;
 import ROC_PLUS_GLOBALS;
 
 # Wrapper for response PointType object
-type AccessUserDefinedInformation_PointType = unit {
+type AccessUserDefinedInformationPointType = unit {
     pointType : uint8 &convert=ROC_PLUS_ENUMS::PointType($$);
 };
 
@@ -27,5 +27,5 @@ type AccessUserDefinedInformationResponse = unit {
     command    : uint8;
     startPoint : uint8;
     numPoints  : uint8;
-    pointTypes : AccessUserDefinedInformation_PointType[self.numPoints];
+    pointTypes : AccessUserDefinedInformationPointType[self.numPoints];
 };

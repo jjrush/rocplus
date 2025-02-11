@@ -18,8 +18,11 @@
 @load ./roc_plus_opcode_108
 @load ./roc_plus_opcode_118
 @load ./roc_plus_opcode_119
+@load ./roc_plus_opcode_135
+@load ./roc_plus_opcode_136
 @load ./roc_plus_opcode_137
 @load ./roc_plus_opcode_138
+@load ./roc_plus_opcode_139
 @load ./roc_plus_opcode_166
 @load ./roc_plus_opcode_167
 @load ./roc_plus_opcode_180

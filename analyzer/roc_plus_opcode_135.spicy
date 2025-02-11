@@ -1,0 +1,34 @@
+module ROC_PLUS_OPCODE_135;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
+
+type SingleHistoryPointData = unit {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SingleHistoryPointDataRequest;
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SingleHistoryPointDataResponse;
+        *                                    ->          : void;
+    };
+};
+
+# Body for opcode 135
+type SingleHistoryPointDataRequest = unit {
+    historySegment           : uint8;
+    pointNumber              : uint8;
+    typeOfHistory            : uint8 &convert=ROC_PLUS_ENUMS::HistoryType($$);
+    # Starting history segment index. Minute 0 - 59, Periodic 0 (periodic entries in history point). Daily 0 (daily entries in history point).
+    historySegmentIndex      : uint16;
+    # Maximum value of 60
+    numValuesRequested       : uint8;
+};
+
+# ROC Plus Protocol Specifications Manual 2-32
+type SingleHistoryPointDataResponse = unit {
+    historySegment           : uint8;
+    pointNumber              : uint8;
+    historySegmentIndex      : uint16;
+    numValuesSent            : uint8;
+    historyValues            : (uint32)[self.numValuesSent];
+};

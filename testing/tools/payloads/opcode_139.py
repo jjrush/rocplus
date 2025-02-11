@@ -32,13 +32,13 @@ PAYLOAD = {
         "cmd1_single": {
             "payload": {
                 "command": 1,              # Command (1) [UINT8]
-                "history_segment": 0,      # History Segment (0-10) [UINT8]
-                "segment_index": 0,        # History Segment Index [UINT16]
+                "history_segment": 2,      # History Segment (0-10) [UINT8]
+                "segment_index": 3,        # History Segment Index [UINT16]
                 "history_type": 0,         # Type of History (0=Minute, 1=Periodic, 2=Daily) [UINT8]
                 "num_periods": 1,          # Number of time periods [UINT8]
                 "req_timestamps": 1,       # Request Timestamps [UINT8]
                 "num_points": 1,           # Number of points [UINT8]
-                "points": [0]              # One history point
+                "points": [5]              # One history point
             }
         },
         "cmd1_max": {

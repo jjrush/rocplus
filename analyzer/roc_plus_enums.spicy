@@ -133,6 +133,21 @@ public type PointType = enum {
     NO_POINT_TYPE  = 255
 };
 
+# ROS Plus Protocol Specifications Manual 2-32
+public type HistoryType = enum {
+    MINUTE               = 0,
+    PERIODIC             = 1,
+    DAILY                = 2,
+    PERIODIC_TIMESTAMPS = 3,
+    DAILY_TIMESTAMPS    = 4
+};
+
+# ROS Plus Protocol Specifications Manual 2-36
+public type HistorySubCommands = enum {
+    REQUEST_CONFIGURED_POINTS    = 0,
+    REQUEST_SPECIFIED_POINT_DATA = 1
+};
+
 # Chapter 2 - Table 2-27 - Opcode 203, General File Transfer
 public type FileTransfer = enum {
     OPEN              = 1,

@@ -18,14 +18,20 @@ import ROC_PLUS_OPCODE_105;
 import ROC_PLUS_OPCODE_108;
 import ROC_PLUS_OPCODE_118;
 import ROC_PLUS_OPCODE_119;
+import ROC_PLUS_OPCODE_135;
+import ROC_PLUS_OPCODE_136;
 import ROC_PLUS_OPCODE_137;
 import ROC_PLUS_OPCODE_138;
+import ROC_PLUS_OPCODE_139;
 import ROC_PLUS_OPCODE_166;
 import ROC_PLUS_OPCODE_167;
 import ROC_PLUS_OPCODE_180;
 import ROC_PLUS_OPCODE_181;
 import ROC_PLUS_OPCODE_203;
+# import ROC_PLUS_OPCODE_205;
 import ROC_PLUS_OPCODE_206;
+# import ROC_PLUS_OPCODE_224;
+# import ROC_PLUS_OPCODE_225;
 import ROC_PLUS_OPCODE_255;
 
 public type UDP_Messages = unit {
@@ -105,11 +111,11 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
         ROC_PLUS_ENUMS::Opcode::REQUEST_HISTORY_TAG_AND_PERIODIC_INDEX   -> requestHistoryTagAndPeriodicIndex    : ROC_PLUS_OPCODE_108::RequestHistoryTagAndPeriodicIndex(self.dataLength);
         ROC_PLUS_ENUMS::Opcode::REQUEST_ALARM_DATA                       -> requestAlarmData                     : ROC_PLUS_OPCODE_118::RequestAlarmData();
         ROC_PLUS_ENUMS::Opcode::REQUEST_EVENT_DATA                       -> requestEventData                     : ROC_PLUS_OPCODE_119::RequestEventData();
-        # ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_HISTORY_POINT_DATA        -> requestSingleHistoryPointData        : ROC_PLUS_OPCODE_135::RequestSingleHistoryPointData();
-        # ROC_PLUS_ENUMS::Opcode::REQUEST_MULTIPLE_HISTORY_POINT_DATA      -> requestMultipleHistoryPointData      : ROC_PLUS_OPCODE_136::RequestMultipleHistoryPointData();
+        ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_HISTORY_POINT_DATA        -> singleHistoryPointData               : ROC_PLUS_OPCODE_135::SingleHistoryPointData();
+        ROC_PLUS_ENUMS::Opcode::REQUEST_MULTIPLE_HISTORY_POINT_DATA      -> multipleHistoryPointData             : ROC_PLUS_OPCODE_136::MultipleHistoryPointData();
         ROC_PLUS_ENUMS::Opcode::REQUEST_HISTORY_INDEX                    -> requestHistoryIndex                  : ROC_PLUS_OPCODE_137::RequestHistoryIndex();
         ROC_PLUS_ENUMS::Opcode::REQUEST_DAILY_AND_PERIODIC_HISTORY       -> requestDailyAndPeriodicHistory       : ROC_PLUS_OPCODE_138::RequestDailyAndPeriodicHistory();
-        # ROC_PLUS_ENUMS::Opcode::HISTORY_INFORMATION_DATA                 -> historyInformationData               : ROC_PLUS_OPCODE_139::HistoryInformationData();
+        ROC_PLUS_ENUMS::Opcode::HISTORY_INFORMATION_DATA                 -> historyInformationData               : ROC_PLUS_OPCODE_139::HistoryInformationData(self.dataLength);
         ROC_PLUS_ENUMS::Opcode::SET_SINGLE_POINT_PARAMETERS              -> setSinglePointParameters             : ROC_PLUS_OPCODE_166::SetSinglePointParameters(self.dataLength);
         ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_POINT_PARAMETERS          -> requestSinglePointParameters         : ROC_PLUS_OPCODE_167::RequestSinglePointParameters(self.dataLength);
         ROC_PLUS_ENUMS::Opcode::REQUEST_PARAMETERS                       -> requestParameters                    : ROC_PLUS_OPCODE_180::RequestParameters(self.dataLength);
@@ -125,11 +131,12 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
     on %init {
         self.dataLength = rocMessage.dataLength;
 
-        # Special case for opcodes 203 and 206 
+        # Special case for opcodes 139, 203, and 206 
         # Need next byte in stream to determine packet type so handle that in opcode 203 and 206
         # Otherwise determine packet type here
         if(rocMessage.opcode != ROC_PLUS_ENUMS::Opcode::GENERAL_FILE_TRANSFER && 
-           rocMessage.opcode != ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA) {
+           rocMessage.opcode != ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA &&
+           rocMessage.opcode != ROC_PLUS_ENUMS::Opcode::HISTORY_INFORMATION_DATA) {
             ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL = ROC_PLUS_FUNCTIONS::determinePacketType(rocMessage.opcode, rocMessage.dataLength);
         }
     }

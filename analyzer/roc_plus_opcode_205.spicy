@@ -1,0 +1,33 @@
+module ROC_PLUS_OPCODE_205;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+
+type PeerToPeerNetworkMessages = unit (packetType : ROC_PLUS_ENUMS::PacketType) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST        -> peerToPeerNetworkMessagesRequest     : PeerToPeerNetworkMessagesRequest;
+        ROC_PLUS_ENUMS::PacketType::RESPONSE       -> peerToPeerNetworkMessagesResponse    : PeerToPeerNetworkMessagesResponse;
+        *                                          ->                                      : void;
+    };
+};
+
+# Body for opcode 205
+type PeerToPeerNetworkMessagesRequest = unit {
+    # 1 - 255
+    networkID                        : uint8;
+    commissionedIndexOneBased        : uint8;
+    embeddedRocOpcode                : uint8;
+    embeddedRequestLength            : uint8;
+    embeddedRequestData              : bytes &size=self.embeddedRequestLength;
+};
+
+# ROC Plus Protocol Specifications Manual 2-42
+type PeerToPeerNetworkMessagesResponse = unit {
+    # 1 - 255
+    networkID                        : uint8;
+    commissionedIndexOneBased        : uint32;
+    embeddedRocOpcode                : uint8;
+    embeddedResponseLength           : uint8;
+    embeddedRequestDataResponse      : bytes &size=self.embeddedResponseLength;
+};

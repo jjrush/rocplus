@@ -18,9 +18,7 @@ module ROC_PLUS;
             log$current_alarm_log_idx  = data$requestAlarmData$response$currentAlarmIndex;
 
             log$alarm_data = vector();
-
-            for (index in data$requestAlarmData$response$alarmData)
-            {
+            for (index in data$requestAlarmData$response$alarmData) {
                 log$alarm_data += data$requestAlarmData$response$alarmData[index]$data;
             }
         }

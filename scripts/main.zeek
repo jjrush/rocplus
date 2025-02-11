@@ -28,6 +28,10 @@ export {
                             LOG_ROC_PLUS_SINGLE_POINT_PARAMETERS_LOG,
                             LOG_ROC_PLUS_FILE_TRANSFER_LOG,
                             LOG_ROC_PLUS_TRANSACTION_HISTORY_LOG,
+                            LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG,
+                            LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
+                            LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG,
+                            LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG,
                             LOG_ROC_PLUS_UNKNOWN_OPCODE_DATA_LOG };
 
     # Callback event for integrating with the file analysis framework
@@ -46,6 +50,10 @@ export {
     global log_policy_roc_plus_single_point_parameters: Log::PolicyHook;
     global log_policy_roc_plus_file_transfer: Log::PolicyHook;
     global log_policy_roc_plus_transaction_history: Log::PolicyHook;
+    global log_policy_roc_plus_history_point_data: Log::PolicyHook;
+    global log_policy_roc_plus_history_information: Log::PolicyHook;
+    global log_policy_roc_plus_peer_to_peer_network_messages: Log::PolicyHook;
+    global log_policy_roc_plus_time_period_history_points: Log::PolicyHook;
     global log_policy_roc_plus_unknown_opcode_data: Log::PolicyHook;
 
     global log_roc_plus_log: event(rec: roc_plus_log);
@@ -60,6 +68,10 @@ export {
     global log_roc_plus_single_point_parameters_log: event(rec: roc_plus_single_point_parameters_log);
     global log_roc_plus_file_transfer_log: event(rec: roc_plus_file_transfer_log);
     global log_roc_plus_transaction_history_log: event(rec: roc_plus_transaction_history_log);
+    global log_roc_plus_history_point_data_log: event(rec: roc_plus_history_point_data_log);
+    global log_roc_plus_history_information_log: event(rec: roc_plus_history_information_log);
+    global log_roc_plus_peer_to_peer_network_messages_log: event(rec: roc_plus_peer_to_peer_network_messages_log);
+    global log_roc_plus_time_period_history_points_log: event(rec: roc_plus_time_period_history_points_log);
     global log_roc_plus_unknown_opcode_data_log: event(rec: roc_plus_unknown_opcode_data_log);
 
     global emit_roc_plus_log: function(c: connection);
@@ -74,6 +86,10 @@ export {
     global emit_roc_plus_single_point_parameters_log: function(c: connection);
     global emit_roc_plus_file_transfer_log: function(c: connection);
     global emit_roc_plus_transaction_history_log: function(c: connection);
+    global emit_roc_plus_history_point_data_log: function(c: connection);
+    global emit_roc_plus_history_information_log: function(c: connection);
+    global emit_roc_plus_peer_to_peer_network_messages_log: function(c: connection);
+    global emit_roc_plus_time_period_history_points_log: function(c: connection);
     global emit_roc_plus_unknown_opcode_data_log: function(c: connection); 
 }
 
@@ -92,6 +108,10 @@ redef record connection += {
     roc_plus_single_point_parameters_log: roc_plus_single_point_parameters_log &optional;
     roc_plus_file_transfer_log: roc_plus_file_transfer_log &optional;
     roc_plus_transaction_history_log: roc_plus_transaction_history_log &optional;
+    roc_plus_history_point_data_log: roc_plus_history_point_data_log &optional;
+    roc_plus_history_information_log: roc_plus_history_information_log &optional;
+    roc_plus_peer_to_peer_network_messages_log: roc_plus_peer_to_peer_network_messages_log &optional;
+    roc_plus_time_period_history_points_log: roc_plus_time_period_history_points_log &optional;
     roc_plus_unknown_opcode_data_log: roc_plus_unknown_opcode_data_log &optional;
 };
 
@@ -182,6 +202,30 @@ event zeek_init() &priority=5 {
                       $ev=log_roc_plus_transaction_history_log,
                       $path="roc_plus_transaction_history",
                       $policy=log_policy_roc_plus_transaction_history]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG,
+                      [$columns=roc_plus_history_point_data_log,
+                      $ev=log_roc_plus_history_point_data_log,
+                      $path="roc_plus_history_point_data",
+                      $policy=log_policy_roc_plus_history_point_data]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG,
+                      [$columns=roc_plus_peer_to_peer_network_messages_log,
+                      $ev=log_roc_plus_peer_to_peer_network_messages_log,
+                      $path="roc_plus_peer_to_peer_network_messages",
+                      $policy=log_policy_roc_plus_peer_to_peer_network_messages]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
+                      [$columns=roc_plus_history_information_log,
+                      $ev=log_roc_plus_history_information_log,
+                      $path="roc_plus_history_information",
+                      $policy=log_policy_roc_plus_history_information]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG,
+                      [$columns=roc_plus_time_period_history_points_log,
+                      $ev=log_roc_plus_time_period_history_points_log,
+                      $path="roc_plus_time_period_history_points",
+                      $policy=log_policy_roc_plus_time_period_history_points]);
 
     # Create all log streams
     Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_UNKNOWN_OPCODE_DATA_LOG,
@@ -285,6 +329,38 @@ function emit_roc_plus_transaction_history_log(c: connection) {
     if ( c?$roc_plus_protocol )
         c$roc_plus_log$protocol = c$roc_plus_protocol;
     Log::write(ROC_PLUS::LOG_ROC_PLUS_TRANSACTION_HISTORY_LOG, c$roc_plus_transaction_history_log);
+}
+
+function emit_roc_plus_history_point_data_log(c: connection) {
+    if (! c?$roc_plus_history_point_data_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG, c$roc_plus_history_point_data_log);
+}
+
+function emit_roc_plus_peer_to_peer_network_messages_log(c: connection) {
+    if (! c?$roc_plus_peer_to_peer_network_messages_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG, c$roc_plus_peer_to_peer_network_messages_log);
+}
+
+function emit_roc_plus_history_information_log(c: connection) {
+    if (! c?$roc_plus_history_information_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_HISTORY_INFORMATION_LOG, c$roc_plus_history_information_log);
+}
+
+function emit_roc_plus_time_period_history_points_log(c: connection) {
+    if (! c?$roc_plus_time_period_history_points_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG, c$roc_plus_time_period_history_points_log);
 }
 
 function emit_roc_plus_unknown_opcode_data_log(c: connection) {

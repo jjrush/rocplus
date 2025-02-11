@@ -9,13 +9,12 @@ module ROC_PLUS;
 
             log_request$history_segment = data$requestHistoryTagAndPeriodicIndex$request$historySegment;
             log_request$num_points      = data$requestHistoryTagAndPeriodicIndex$request$numPoints;
-            
-            log_request$historical_points = vector();
 
-            for (index, historicalPoint in data$requestHistoryTagAndPeriodicIndex$request$historicalPoints)
-            {
-                log_request$historical_points += historicalPoint$historicalPoint;
+            log_request$historical_points = vector();
+            for (index in data$requestHistoryTagAndPeriodicIndex$request$historicalPoints) {
+                log_request$historical_points += data$requestHistoryTagAndPeriodicIndex$request$historicalPoints[index]$historicalPoint;
             }
+
             ROC_PLUS::emit_roc_plus_data_request_log(conn_request);
             delete conn_request$roc_plus_data_request_log;
         }
@@ -30,11 +29,10 @@ module ROC_PLUS;
             log_response$periodic_index  = data$requestHistoryTagAndPeriodicIndex$response$periodicIndex;
 
             log_response$historical_points = vector();
-
-            for (index, historicalPoint in data$requestHistoryTagAndPeriodicIndex$response$historicalPoints)
-            {
-                log_response$historical_points += historicalPoint$historicalPoint;
+            for (index in data$requestHistoryTagAndPeriodicIndex$response$historicalPoints) {
+                log_response$historical_points += data$requestHistoryTagAndPeriodicIndex$response$historicalPoints[index]$historicalPoint;
             }
+
             log_response$tag = data$requestHistoryTagAndPeriodicIndex$response$tag;
             
             ROC_PLUS::emit_roc_plus_data_request_log(conn_response);

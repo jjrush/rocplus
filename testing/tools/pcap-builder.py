@@ -71,7 +71,7 @@ OPCODE_VARIANTS = {
     136: {
         'variants': ['empty', 'single', 'max'],
         'description': 'Request Multiple History Point Data',
-        'required': True
+        'required': 'response_only'
     },
     138: {
         'variants': ['empty', 'single', 'max'],
@@ -995,19 +995,12 @@ class ROCPlusPacketBuilder:
         header += self.host_group.to_bytes(1, byteorder='big')
         header += opcode.to_bytes(1, byteorder='big')
         
-        # For opcode 205, we need to include the embedded data length byte
-        if opcode == 205:
-            # Calculate total length - embedded data length byte is already in payload
-            total_length = len(payload)
-            logger.debug(f"Opcode 205 total length: {total_length}")
-            header += total_length.to_bytes(1, byteorder='big')
-        else:
-            # Standard length calculation - ensure we handle lengths > 255
-            length = len(payload)
-            if length > 255:
-                logger.debug(f"Large payload detected ({length} bytes), truncating to 255")
-                length = 255
-            header += length.to_bytes(1, byteorder='big')  # Length is always 1 byte
+        # Standard length calculation - ensure we handle lengths > 255
+        length = len(payload)
+        if length > 255:
+            logger.debug(f"Large payload detected ({length} bytes), truncating to 255")
+            length = 255
+        header += length.to_bytes(1, byteorder='big')  # Length is always 1 byte
             
         logger.debug(f"Header built successfully: {header.hex()}")
         return header

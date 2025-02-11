@@ -5,7 +5,7 @@ import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
 import ROC_PLUS_GLOBALS;
 
-type RequestHistoryTagAndPeriodicIndex_HistoricalPoints = unit {
+type RequestHistoryTagAndPeriodicIndexHistoricalPoints = unit {
     historicalPoint : uint8 &convert=ROC_PLUS_FUNCTIONS::uintToHexString($$);
 };
 
@@ -20,14 +20,14 @@ type RequestHistoryTagAndPeriodicIndex = unit(dataLength : uint8) {
 type RequestHistoryTagAndPeriodicIndexRequest = unit {
     historySegment   : uint8;
     numPoints        : uint8;
-    historicalPoints : RequestHistoryTagAndPeriodicIndex_HistoricalPoints[self.numPoints];
+    historicalPoints : RequestHistoryTagAndPeriodicIndexHistoricalPoints[self.numPoints];
 };
 
 type RequestHistoryTagAndPeriodicIndexResponse = unit {
     historySegment   : uint8;
     numPoints        : uint8;
     periodicIndex    : uint16;
-    historicalPoints : RequestHistoryTagAndPeriodicIndex_HistoricalPoints[self.numPoints];
+    historicalPoints : RequestHistoryTagAndPeriodicIndexHistoricalPoints[self.numPoints];
     tag              : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 

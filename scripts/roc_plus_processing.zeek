@@ -42,10 +42,10 @@ module ROC_PLUS;
                 process_event_data(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_SINGLE_HISTORY_POINT_DATA:
-# RESERVED
+                process_single_history_point_data(c, data, roc_plus_link_id);  
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_MULTIPLE_HISTORY_POINT_DATA:
-# RESERVED
+                process_multiple_history_point_data(c, data, roc_plus_link_id); 
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_HISTORY_INDEX:
                 process_history_index(c, data, roc_plus_link_id);
@@ -54,7 +54,7 @@ module ROC_PLUS;
                 process_periodic_history(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_HISTORY_INFORMATION_DATA:
-# RESERVED
+                process_history_information(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_SET_SINGLE_POINT_PARAMETERS:
                 process_set_single_point_parameters(c, data, roc_plus_link_id);
