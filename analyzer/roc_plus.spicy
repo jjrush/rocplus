@@ -31,7 +31,7 @@ import ROC_PLUS_OPCODE_203;
 # import ROC_PLUS_OPCODE_205;
 import ROC_PLUS_OPCODE_206;
 # import ROC_PLUS_OPCODE_224;
-# import ROC_PLUS_OPCODE_225;
+import ROC_PLUS_OPCODE_225;
 import ROC_PLUS_OPCODE_255;
 
 public type UDP_Messages = unit {
@@ -123,8 +123,8 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
         ROC_PLUS_ENUMS::Opcode::GENERAL_FILE_TRANSFER                    -> generalFileTransfer                  : ROC_PLUS_OPCODE_203::GeneralFileTransfer(self.dataLength);
         # ROC_PLUS_ENUMS::Opcode::PEER_TO_PEER_NETWORK_MESSAGES            -> peerToPeerNetworkMessages            : ROC_PLUS_OPCODE_205::PeerToPeerNetworkMessages();
         ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA            -> readTransactionHistory               : ROC_PLUS_OPCODE_206::ReadTransactionHistory(self.dataLength);
-        # ROC_PLUS_ENUMS::Opcode::SRBX_SIGNAL                              -> srbxSignal                           : ROC_PLUS_OPCODE_224::SRBXSignal();
-        # ROC_PLUS_ENUMS::Opcode::ACKNOWLEDGE_SRBX                         -> ackSRBX                              : ROC_PLUS_OPCODE_225::AcknowledgeSRBX();
+        # ROC_PLUS_ENUMS::Opcode::SERROR in TCP_Messages: no matching case in switch statement for value 'Opcode::ACKNOWLEDGE_SRBX' (/home/jasonf/Documents/rocplus/analyzer/roc_plus.spicy:100:5-129:6RBX_SIGNAL                              -> srbxSignal                           : ROC_PLUS_OPCODE_224::SRBXSignal();
+        ROC_PLUS_ENUMS::Opcode::ACKNOWLEDGE_SRBX                         -> ackSRBX                              : ROC_PLUS_OPCODE_225::AcknowledgeSRBX();
         ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR                          -> errorIndicator                       : ROC_PLUS_OPCODE_255::ErrorIndicator(self.dataLength); 
     };
 

@@ -170,3 +170,14 @@ module ROC_PLUS;
 
         return c;
     }
+
+    function set_acknowledge_srbx_log(c: connection): connection {
+        if ( ! c?$roc_plus_acknowledge_srbx_log )
+            c$roc_plus_acknowledge_srbx_log = roc_plus_acknowledge_srbx_log(
+                $ts=network_time(),
+                $uid=c$uid,
+                $id=c$id);
+
+        return c;
+    }
+

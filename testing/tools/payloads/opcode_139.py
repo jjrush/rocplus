@@ -47,7 +47,7 @@ PAYLOAD = {
                 "history_segment": 0,      # History Segment (0-10) [UINT8]
                 "segment_index": 0,        # History Segment Index [UINT16]
                 "history_type": 0,         # Type of History (0=Minute, 1=Periodic, 2=Daily) [UINT8]
-                "num_periods": 60,         # Number of time periods [UINT8]
+                "num_periods": 3,          # Number of time periods [UINT8]
                 "req_timestamps": 1,       # Request Timestamps [UINT8]
                 "num_points": 20,          # Number of points [UINT8]
                 "points": list(range(20))  # 20 sequential points

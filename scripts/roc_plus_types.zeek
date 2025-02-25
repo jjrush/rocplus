@@ -663,4 +663,13 @@ export {
         embedded_response_length            : count &log &optional;
         embedded_request_data_response      : string &log &optional;
     };
+
+    #Opcode 225
+    type roc_plus_acknowledge_srbx_log: record {
+        ts                                  : time    &log;
+        uid                                 : string  &log;
+        id                                  : conn_id &log;
+        roc_plus_link_id                    : string  &log &optional;
+        current_alarm_log_index             : count &log &optional;
+    };
 }

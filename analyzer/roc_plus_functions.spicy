@@ -83,7 +83,7 @@ const OPCODE_206_RES_LIST_DATA_LENGTH     : uint8 = 21;
 const OPCODE_206_RES_READ_MIN_DATA_LENGTH : uint8 = 5;
 
 const OPCODE_224_RES_DATA_LENGTH : uint8 = 0; # Opcode 224's RESPONSE contains no data
-const OPCODE_225_REQ_DATA_LENGTH : uint8 = 0; # Opcode 224's RESPONSE contains no data
+const OPCODE_225_REQ_DATA_LENGTH : uint8 = 2; # Opcode 224's RESPONSE contains no data
 
 # const OPCODE_255_REQ_DATA_LENGTH : int8 = -1; # The REQUEST is reserved for ROC800 use. This opcode will always be a RESPONSE. 
 ####################################################

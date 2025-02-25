@@ -80,7 +80,7 @@ module ROC_PLUS;
 # RESERVED
                 break;
             case ROC_PLUS_ENUMS::Opcode_ACKNOWLEDGE_SRBX:
-# RESERVED
+                process_acknowledge_srbx(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_ERROR_INDICATOR:
                 process_error_codes(c, data, roc_plus_link_id);

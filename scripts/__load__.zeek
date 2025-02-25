@@ -29,6 +29,7 @@
 @load ./roc_plus_opcode_181
 @load ./roc_plus_opcode_203
 @load ./roc_plus_opcode_206
+@load ./roc_plus_opcode_225
 @load ./roc_plus_opcode_255
 @load ./roc_plus_processing
 @load ./roc_plus_event_processing

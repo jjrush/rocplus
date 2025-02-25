@@ -31,6 +31,7 @@ export {
                             LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG,
                             LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
                             LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG,
+                            LOG_ROC_PLUS_ACKNOWLEDGE_SRBX_LOG,
                             LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG,
                             LOG_ROC_PLUS_UNKNOWN_OPCODE_DATA_LOG };
 
@@ -53,6 +54,7 @@ export {
     global log_policy_roc_plus_history_point_data: Log::PolicyHook;
     global log_policy_roc_plus_history_information: Log::PolicyHook;
     global log_policy_roc_plus_peer_to_peer_network_messages: Log::PolicyHook;
+    global log_policy_roc_plus_acknowledge_srbx: Log::PolicyHook;
     global log_policy_roc_plus_time_period_history_points: Log::PolicyHook;
     global log_policy_roc_plus_unknown_opcode_data: Log::PolicyHook;
 
@@ -71,6 +73,7 @@ export {
     global log_roc_plus_history_point_data_log: event(rec: roc_plus_history_point_data_log);
     global log_roc_plus_history_information_log: event(rec: roc_plus_history_information_log);
     global log_roc_plus_peer_to_peer_network_messages_log: event(rec: roc_plus_peer_to_peer_network_messages_log);
+    global log_roc_plus_acknowledge_srbx_log: event(rec: roc_plus_acknowledge_srbx_log);
     global log_roc_plus_time_period_history_points_log: event(rec: roc_plus_time_period_history_points_log);
     global log_roc_plus_unknown_opcode_data_log: event(rec: roc_plus_unknown_opcode_data_log);
 
@@ -89,6 +92,7 @@ export {
     global emit_roc_plus_history_point_data_log: function(c: connection);
     global emit_roc_plus_history_information_log: function(c: connection);
     global emit_roc_plus_peer_to_peer_network_messages_log: function(c: connection);
+    global emit_roc_plus_acknowledge_srbx_log: function(c: connection);
     global emit_roc_plus_time_period_history_points_log: function(c: connection);
     global emit_roc_plus_unknown_opcode_data_log: function(c: connection); 
 }
@@ -111,6 +115,7 @@ redef record connection += {
     roc_plus_history_point_data_log: roc_plus_history_point_data_log &optional;
     roc_plus_history_information_log: roc_plus_history_information_log &optional;
     roc_plus_peer_to_peer_network_messages_log: roc_plus_peer_to_peer_network_messages_log &optional;
+    roc_plus_acknowledge_srbx_log: roc_plus_acknowledge_srbx_log &optional;
     roc_plus_time_period_history_points_log: roc_plus_time_period_history_points_log &optional;
     roc_plus_unknown_opcode_data_log: roc_plus_unknown_opcode_data_log &optional;
 };
@@ -214,6 +219,12 @@ event zeek_init() &priority=5 {
                       $ev=log_roc_plus_peer_to_peer_network_messages_log,
                       $path="roc_plus_peer_to_peer_network_messages",
                       $policy=log_policy_roc_plus_peer_to_peer_network_messages]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_ACKNOWLEDGE_SRBX_LOG,
+                      [$columns=roc_plus_acknowledge_srbx_log,
+                      $ev=log_roc_plus_acknowledge_srbx_log,
+                      $path="roc_plus_acknowledge_srbx",
+                      $policy=log_policy_roc_plus_acknowledge_srbx]);
 
     Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
                       [$columns=roc_plus_history_information_log,
@@ -345,6 +356,14 @@ function emit_roc_plus_peer_to_peer_network_messages_log(c: connection) {
     if ( c?$roc_plus_protocol )
         c$roc_plus_log$protocol = c$roc_plus_protocol;
     Log::write(ROC_PLUS::LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG, c$roc_plus_peer_to_peer_network_messages_log);
+}
+
+function emit_roc_plus_acknowledge_srbx_log(c: connection) {
+    if (! c?$roc_plus_acknowledge_srbx_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_ACKNOWLEDGE_SRBX_LOG, c$roc_plus_acknowledge_srbx_log);
 }
 
 function emit_roc_plus_history_information_log(c: connection) {
