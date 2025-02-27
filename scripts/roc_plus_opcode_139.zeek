@@ -53,9 +53,12 @@ module ROC_PLUS;
                 log_response$num_points         = data$historyInformationData$response$specifiedPointDataResponse$numPoints;
                 
                 local counter = 0;
+                local timestamp = 0;
                 # for each time period
                 while(counter < data$historyInformationData$response$specifiedPointDataResponse$numTimePeriods) {
-                    local timestamp = data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$timestampForIndex;
+                    if(data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]?$timestampForIndex) {
+                        timestamp = data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$timestampForIndex;
+                    }
                     local history_points = data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$historyPointValues;
 
                     # Set sesssion rocplus log object
@@ -84,14 +87,14 @@ module ROC_PLUS;
             delete conn_response$roc_plus_history_information_log;
         }
         else {
-            local unknown_connection = set_unknown_opcode_data_log(c);
-            local unknown_opcode_data_log = unknown_connection$roc_plus_unknown_opcode_data_log;
+            local unknown_connection = set_unknown_data_log(c);
+            local unknown_data_log = unknown_connection$roc_plus_unknown_data_log;
 
-            unknown_opcode_data_log$roc_plus_link_id = link_id;
+            unknown_data_log$roc_plus_link_id = link_id;
 
-            unknown_opcode_data_log$data = ROC_PLUS_ENUMS::HISTORY_SUB_COMMANDS[data$historyInformationData$command] + data$historyInformationData$unknown$data;
+            unknown_data_log$data = ROC_PLUS_ENUMS::HISTORY_SUB_COMMANDS[data$historyInformationData$command] + data$historyInformationData$unknown$data;
             
-            ROC_PLUS::emit_roc_plus_unknown_opcode_data_log(unknown_connection);
-            delete unknown_connection$roc_plus_unknown_opcode_data_log;
+            ROC_PLUS::emit_roc_plus_unknown_data_log(unknown_connection);
+            delete unknown_connection$roc_plus_unknown_data_log;
         }
     }

@@ -72,6 +72,7 @@ module ROC_PLUS;
                 process_file_transfer(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_PEER_TO_PEER_NETWORK_MESSAGES:
+                process_peer_to_peer_network_messages(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_READ_TRANSACTION_HISTORY_DATA:
                 process_transaction_history(c, data, roc_plus_link_id);

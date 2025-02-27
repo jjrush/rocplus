@@ -39,13 +39,13 @@ module ROC_PLUS;
             delete conn_response$roc_plus_data_request_log;
         }
         else {
-            local unknown_connection = set_unknown_opcode_data_log(c);
-            local unknown_opcode_data_log = unknown_connection$roc_plus_unknown_opcode_data_log;
+            local unknown_connection = set_unknown_data_log(c);
+            local unknown_data_log = unknown_connection$roc_plus_unknown_data_log;
 
-            unknown_opcode_data_log$roc_plus_link_id = link_id;
+            unknown_data_log$roc_plus_link_id = link_id;
 
-            unknown_opcode_data_log$data = data$requestHistoryTagAndPeriodicIndex$unknown$data;
-            ROC_PLUS::emit_roc_plus_unknown_opcode_data_log(unknown_connection);
-            delete unknown_connection$roc_plus_unknown_opcode_data_log;
+            unknown_data_log$data = data$requestHistoryTagAndPeriodicIndex$unknown$data;
+            ROC_PLUS::emit_roc_plus_unknown_data_log(unknown_connection);
+            delete unknown_connection$roc_plus_unknown_data_log;
         }
     }

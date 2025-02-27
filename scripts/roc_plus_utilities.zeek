@@ -121,9 +121,9 @@ module ROC_PLUS;
         return c;
     }
 
-    function set_unknown_opcode_data_log(c: connection): connection {
-        if ( ! c?$roc_plus_unknown_opcode_data_log )
-            c$roc_plus_unknown_opcode_data_log = roc_plus_unknown_opcode_data_log(
+    function set_unknown_data_log(c: connection): connection {
+        if ( ! c?$roc_plus_unknown_data_log )
+            c$roc_plus_unknown_data_log = roc_plus_unknown_data_log(
                 $ts=network_time(),
                 $uid=c$uid,
                 $id=c$id);
@@ -141,15 +141,15 @@ module ROC_PLUS;
         return c;
     }
 
-    # function set_peer_to_peer_network_messages_log(c: connection): connection {
-    #     if ( ! c?$roc_plus_peer_to_peer_network_messages_log )
-    #         c$roc_plus_peer_to_peer_network_messages_log = roc_plus_peer_to_peer_network_messages_log(
-    #             $ts=network_time(),
-    #             $uid=c$uid,
-    #             $id=c$id);
+    function set_peer_to_peer_network_messages_log(c: connection): connection {
+        if ( ! c?$roc_plus_peer_to_peer_network_messages_log )
+            c$roc_plus_peer_to_peer_network_messages_log = roc_plus_peer_to_peer_network_messages_log(
+                $ts=network_time(),
+                $uid=c$uid,
+                $id=c$id);
 
-    #     return c;
-    # }
+        return c;
+    }
 
     function set_history_information_log(c: connection): connection {
         if ( ! c?$roc_plus_history_information_log )
@@ -164,16 +164,6 @@ module ROC_PLUS;
     function set_time_period_history_points_log(c: connection): connection {
         if ( ! c?$roc_plus_time_period_history_points_log )
             c$roc_plus_time_period_history_points_log = roc_plus_time_period_history_points_log(
-                $ts=network_time(),
-                $uid=c$uid,
-                $id=c$id);
-
-        return c;
-    }
-
-    function set_acknowledge_srbx_log(c: connection): connection {
-        if ( ! c?$roc_plus_acknowledge_srbx_log )
-            c$roc_plus_acknowledge_srbx_log = roc_plus_acknowledge_srbx_log(
                 $ts=network_time(),
                 $uid=c$uid,
                 $id=c$id);
