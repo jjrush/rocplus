@@ -3,16 +3,21 @@ module ROC_PLUS_OPCODE_205;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type PeerToPeerNetworkMessages = unit (packetType : ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST        -> peerToPeerNetworkMessagesRequest     : PeerToPeerNetworkMessagesRequest;
-        ROC_PLUS_ENUMS::PacketType::RESPONSE       -> peerToPeerNetworkMessagesResponse    : PeerToPeerNetworkMessagesResponse;
-        *                                          ->                                      : void;
+# ROC Plus Protocol Specifications Manual 2-42
+type PeerToPeerNetworkMessages = unit (dataLength: uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : PeerToPeerNetworkMessagesRequest;
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : PeerToPeerNetworkMessagesResponse;
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : PeerToPeerNetworkMessagesUnknown(dataLength);
     };
 };
 
-# Body for opcode 205
+type PeerToPeerNetworkMessagesUnknown = unit (dataLength: uint8) {
+    data : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+};
+
 type PeerToPeerNetworkMessagesRequest = unit {
     # 1 - 255
     networkID                        : uint8;
@@ -22,7 +27,6 @@ type PeerToPeerNetworkMessagesRequest = unit {
     embeddedRequestData              : bytes &size=self.embeddedRequestLength;
 };
 
-# ROC Plus Protocol Specifications Manual 2-42
 type PeerToPeerNetworkMessagesResponse = unit {
     # 1 - 255
     networkID                        : uint8;

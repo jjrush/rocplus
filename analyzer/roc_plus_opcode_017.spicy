@@ -5,10 +5,12 @@ import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
 import ROC_PLUS_GLOBALS;
 
-type Login = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
+type Login = unit(dataLength: uint8) {
+    var op17Type : ROC_PLUS_ENUMS::Opcode17Type = ROC_PLUS_FUNCTIONS::determineOpcode17SubType(dataLength);
+    
     switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : LoginRequest(op17Type);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : LoginResponse(op17Type);
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : LoginRequest(self.op17Type, dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : LoginResponse(self.op17Type);
     };
 };
 
@@ -19,14 +21,19 @@ type LoginResponse = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
     };
 };
 
-type LoginRequest = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
+type LoginRequest = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type, dataLength: uint8) {
     switch (op17Type) {
         ROC_PLUS_ENUMS::Opcode17Type::STANDARD_LOGIN  -> standardLogin  : Standard_Login();
         ROC_PLUS_ENUMS::Opcode17Type::STANDARD_LOGOUT -> standardLogout : Standard_Logout();
         ROC_PLUS_ENUMS::Opcode17Type::SESSION_KEY_REQ -> sessionKeyReq  : Session_Key_Req();
         ROC_PLUS_ENUMS::Opcode17Type::ENHANCED_LOGIN  -> enhancedLogin  : Enhanced_Login();
         ROC_PLUS_ENUMS::Opcode17Type::ENHANCED_LOGOUT -> enhancedLogout : Enhanced_Logout();
+        ROC_PLUS_ENUMS::Opcode17Type::UNKNOWN         -> unknown        : Unknown(dataLength);
     };
+};
+
+type Unknown = unit(dataLength: uint8) {
+    data : bytes &size=(dataLength - 1) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
 type Standard_Login = unit {

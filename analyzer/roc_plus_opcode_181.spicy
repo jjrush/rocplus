@@ -4,7 +4,6 @@ import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
 import ROC_PLUS_GLOBALS;
-
 type Parameter = unit {
     pointType        : uint8;
     pointLogicNumber : uint8;
@@ -27,6 +26,8 @@ type WriteParameters = unit(dataLength : uint8) {
 type WriteParametersRequest = unit (dataLength : uint8) {
     numParameters : uint8;
     # TODO: sending this the datalength does not work as there is a double repeating data portion
+    # Just like in opcode 180 we would have to build structures for every Point/Logic Number defined in the spec which numbers 300 pages
+    # This is not feasible so we are considering all opcode 181 packets to be unknown and dumping the data
     parameters    : ParameterWithData(dataLength)[self.numParameters];
 };
 

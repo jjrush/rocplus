@@ -48,6 +48,10 @@ type ReadTransactionRequest = unit {
 };
 
 type ReadTransactionResponse = unit(dataLength: uint8) {
+    # Note: https://github.com/zeek/zeek/issues/4250
+    # spicy doesn't support vectors of enums as of the time of this comment
+    # as a result we have to collect the data as-is and convert it manually when needed
+    # var types  : vector<ROC_PLUS_ENUMS::ReadTransactionDataType>;
     var types  : vector<uint8>;
     var values : vector<uint8>;
 
@@ -67,9 +71,10 @@ type ReadTransactionResponse = unit(dataLength: uint8) {
             }
 
             # need to extract data type byte in order to know how many bytes to read next
+            # self.types.push_back(ROC_PLUS_ENUMS::ReadTransactionDataType(byte));
             self.types.push_back(byte);
             # need to convert data type byte to actual size and increment index by that amount so we can read next type + value
-            counter = counter + ROC_PLUS_FUNCTIONS::dataTypeSize(ROC_PLUS_ENUMS::DataType(byte));
+            counter = counter + ROC_PLUS_FUNCTIONS::dataTypeSize(ROC_PLUS_ENUMS::ReadTransactionDataType(byte));
         }
     }
     # readTransactions : ReadTransaction[self.messageDataSize];
@@ -80,17 +85,17 @@ type ListTransactionResponse = unit {
     numTransactions : uint8;
     moreData        : uint8;
     description     : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+    payloadSize     : uint16;
 
     listTransactions : ListTransaction[self.numTransactions];
 };
 
 type ReadTransaction = unit {
-    dataType         : uint8 &convert=ROC_PLUS_ENUMS::DataType($$);
+    dataType         : uint8 &convert=ROC_PLUS_ENUMS::ReadTransactionDataType($$);
     data             : bytes &size=ROC_PLUS_FUNCTIONS::dataTypeSize(self.dataType) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
 type ListTransaction = unit {
-    payloadSize       : uint16;
     transactionNumber : uint16;
     dateCreated       : uint32;
 };

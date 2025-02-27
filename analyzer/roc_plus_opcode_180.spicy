@@ -36,5 +36,7 @@ type RequestParametersRequest = unit(dataLength : uint8) {
 type RequestParametersResponse = unit(dataLength : uint8) {
     numParameters     : uint8;
     # TODO: sending this the datalength does not work as there is a double repeating data portion
+    # We would have to build structures for every Point/Logic Number defined in the spec which numbers 300 pages
+    # This is not feasible so we are considering all opcode 180 packets to be unknown and dumping the data
     responseParameter : ParameterWithData(dataLength)[self.numParameters];
 };
