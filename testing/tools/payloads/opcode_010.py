@@ -40,11 +40,11 @@ PAYLOAD = {
         },
         "max": {
             "payload": {
-                "table_number": 1,
+                "table_number": 15,
                 "start_location": 0,
-                "num_locations": 248,  # Adjusted to account for header bytes (3 + 4 = 7 bytes overhead)
+                "num_locations": 44,  # Documentation says 1-44 for table locations
                 "table_version": bytes([0x00, 0x00, 0x01, 0x00]),  # 4-byte version number
-                "data": bytes([i % 256 for i in range(248)])  # 248 data bytes + 7 header bytes = 255 total
+                "data": bytes([i % 44 for i in range(44)])  # 44 data bytes + 7 header bytes = 51 total
             }
         }
     }

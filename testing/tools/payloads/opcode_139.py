@@ -17,18 +17,6 @@ PAYLOAD = {
                 "history_segment": 0       # History Segment (0-10) [UINT8]
             }
         },
-        "cmd1_empty": {
-            "payload": {
-                "command": 1,              # Command (1) [UINT8]
-                "history_segment": 0,      # History Segment (0-10) [UINT8]
-                "segment_index": 0,        # History Segment Index [UINT16]
-                "history_type": 0,         # Type of History (0=Minute, 1=Periodic, 2=Daily) [UINT8]
-                "num_periods": 0,          # Number of time periods [UINT8]
-                "req_timestamps": 0,       # Request Timestamps [UINT8]
-                "num_points": 0,           # Number of points [UINT8]
-                "points": []               # Empty array since num_points = 0
-            }
-        },
         "cmd1_single": {
             "payload": {
                 "command": 1,              # Command (1) [UINT8]
@@ -47,7 +35,7 @@ PAYLOAD = {
                 "history_segment": 0,      # History Segment (0-10) [UINT8]
                 "segment_index": 0,        # History Segment Index [UINT16]
                 "history_type": 0,         # Type of History (0=Minute, 1=Periodic, 2=Daily) [UINT8]
-                "num_periods": 3,          # Number of time periods [UINT8]
+                "num_periods": 60,         # Number of time periods [UINT8]
                 "req_timestamps": 1,       # Request Timestamps [UINT8]
                 "num_points": 20,          # Number of points [UINT8]
                 "points": list(range(20))  # 20 sequential points
@@ -55,14 +43,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "cmd0_empty": {
-            "payload": {
-                "command": 0,              # Command (0) [UINT8]
-                "history_segment": 0,      # History Segment (0-10) [UINT8]
-                "num_points": 0,           # Number of configured points [UINT8]
-                "points": []               # Empty array since num_points = 0
-            }
-        },
         "cmd0_single": {
             "payload": {
                 "command": 0,              # Command (0) [UINT8]
@@ -77,17 +57,6 @@ PAYLOAD = {
                 "history_segment": 0,      # History Segment (0-10) [UINT8]
                 "num_points": 20,          # Number of configured points [UINT8]
                 "points": list(range(20))  # 20 sequential points
-            }
-        },
-        "cmd1_empty": {
-            "payload": {
-                "command": 1,              # Command (1) [UINT8]
-                "history_segment": 0,      # History Segment (0-10) [UINT8]
-                "current_index": 0,        # Current Index [UINT16]
-                "num_periods": 0,          # Number of time periods [UINT8]
-                "req_timestamps": 0,       # Request Timestamps [UINT8]
-                "num_points": 0,           # Number of points [UINT8]
-                "point_data": []           # Empty array since num_points = 0
             }
         },
         "cmd1_single": {
@@ -106,20 +75,39 @@ PAYLOAD = {
                 ]
             }
         },
-        "cmd1_max": {
+        "cmd1_max_without_timestamps": {
             "payload": {
                 "command": 1,              # Command (1) [UINT8]
                 "history_segment": 0,      # History Segment (0-10) [UINT8]
                 "current_index": 0,        # Current Index [UINT16]
-                "num_periods": 60,         # Number of time periods [UINT8]
-                "req_timestamps": 1,       # Request Timestamps [UINT8]
+                "num_periods": 3,          # Number of time periods [UINT8]
+                "req_timestamps": 0,       # Request Timestamps [UINT8]
                 "num_points": 20,          # Number of points [UINT8]
-                "point_data": [            # Array of timestamp/value pairs
+                "point_data": [            # Array of timestamp/value pairs (timestamps not included if req_timestamps is 0)
                     {
-                        "timestamp": 1234567890 + i,  # Timestamp [UINT32]
                         "value": [(i % 155) + 1] * 4  # 4-byte value
                     }
-                    for i in range(20)     # Generate 20 different points
+                    for i in range(20)     # Generate 19 different points since req_timestamps is 1
+                ]
+            }
+        },
+        "cmd1_max_with_timestamps": {
+            "payload": {
+                "command": 1,              # Command (1) [UINT8]
+                "history_segment": 0,      # History Segment (0-10) [UINT8]
+                "current_index": 0,        # Current Index [UINT16]
+                "num_periods": 3,          # Number of time periods [UINT8]
+                "req_timestamps": 1,       # Request Timestamps [UINT8]
+                "num_points": 19,          # Number of points [UINT8]
+                "timestamp":               # Timestamps for each period [UINT32]
+                    [123, 
+                     567, 
+                     890],  
+                "point_data": [            # Array of timestamp/value pairs
+                    {
+                        "value": [(i % 155) + 1] * 4  # 4-byte value
+                    }
+                    for i in range(19)     # Generate 19 different points since req_timestamps is 1
                 ]
             }
         }

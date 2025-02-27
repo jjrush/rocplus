@@ -20,21 +20,22 @@ PAYLOAD = {
     "request": {
         "login_standard": {
             "payload": {
-                "operator_id": "OP1",  # 3 chars
-                "password": 0x1234     # 2 bytes
+                "operator_id": "OP1",    # 3 chars
+                "password": 0x1234,      # 2 bytes
+                "access_level": 0x01     # 1 byte
             }
         },
         "login_enhanced": {
             "payload": {
                 "operator_id": "OPERATOR1",  # Up to 30 chars
-                "password": "PASSWORD1"      # Up to 40 chars
+                "password": "PASSWORD1",     # Up to 40 chars
+                "access_level": 0x01,          # 1 byte
             }
         },
         "logout_standard": {
             "payload": {
                 "operator_id": "OP1",       # 3 chars
                 "password": 0x1234,         # 2 bytes
-                "access_level": 0x01,       # 1 byte
                 "logout_string": "LOGOUT"   # 6 chars
             }
         },
@@ -42,26 +43,21 @@ PAYLOAD = {
             "payload": {
                 "operator_id": "OPERATOR1",  # Up to 30 chars
                 "password": "PASSWORD1",     # Up to 40 chars
-                "access_level": 0x01,        # 1 byte
                 "logout_string": "LOGOUT"    # 6 chars
             }
         },
         "session": {
             "payload": {
-                "session_key": "SESSION_KEY_13"  # 13 chars
+                "session_key": "SESSIONKEY_13"  # 13 chars
             }
         }
     },
     "response": {
         "login_standard": {
-            "payload": {
-                "access_level": 0x01  # 1 byte
-            }
+            "payload": {}  # No payload
         },
         "login_enhanced": {
-            "payload": {
-                "access_level": 0x01  # 1 byte
-            }
+            "payload": {}  # No payload
         },
         "logout_standard": {
             "payload": {}  # No payload

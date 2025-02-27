@@ -43,10 +43,8 @@ Request:
 - read: Read Transaction request
 
 Response:
-- list_empty: List with no transactions
 - list_single: List with one transaction
 - list_max: List with multiple transactions
-- read_empty: Read with no data
 - read_single: Read with single data point
 - read_max: Read with multiple data points
 """
@@ -99,16 +97,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "list_empty": {
-            "payload": {
-                "command": 1,
-                "num_transactions": 0,
-                "more_transactions": 0,
-                "description": b"EMPTY DATA",
-                "payload_size": 6,
-                "transactions": []
-            }
-        },
         "list_single": {
             "payload": {
                 "command": 1,
@@ -147,25 +135,12 @@ PAYLOAD = {
                 ]
             }
         },
-        "read_empty": {
-            "payload": {
-                "command": 2,
-                "message_data_size": 0,
-                "more_data": 0,
-                "data_type": 1,
-                "data_points": []
-            }
-        },
         "read_single": {
             "payload": {
                 "command": 2,  # Read Transaction
                 "message_data_size": 6,  # 1 byte type + 1 byte U8 value + 1 byte type + 4 byte FLOAT
                 "more_data": 0,  # No more data
                 "data_points": [
-                    {
-                        "type": "U8",  # code 1 (1 byte) + value (1 byte)
-                        "value": 42
-                    },
                     {
                         "type": "FLOAT",  # code 7 (1 byte) + value (4 bytes)
                         "value": 3.14159

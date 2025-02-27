@@ -7,13 +7,6 @@ Maximum of 20 history points allowed per request, all must be within a single se
 
 PAYLOAD = {
     "request": {
-        "empty": {
-            "payload": {
-                "history_segment": 1,       # History Segment (0-10) [UINT8]
-                "num_points": 0,            # Number of historical points [UINT8]
-                "points": []                # Empty array since num_points = 0
-            }
-        },
         "single": {
             "payload": {
                 "history_segment": 1,       # History Segment (0-10) [UINT8]
@@ -32,15 +25,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "empty": {
-            "payload": {
-                "history_segment": 1,       # History Segment (0-10) [UINT8]
-                "num_points": 0,            # Number of historical points [UINT8]
-                "periodic_index": 1234,     # Periodic Index (common among all points) [UINT16]
-                "points": [],               # Empty array since num_points = 0
-                "tag": "0000000000"         # Tag [AC10] - comes after all points
-            }
-        },
         "single": {
             "payload": {
                 "history_segment": 1,       # History Segment (0-10) [UINT8]

@@ -44,52 +44,52 @@ OPCODE_VARIANTS = {
         'required': 'response_only'
     },
     100: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Access User-defined Information',
         'required': 'response_only'
     },
     108: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'several', 'max'],
         'description': 'Request History Tag and Periodic Index',
         'required': True
     },
     118: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Request Alarm Data',
         'required': True
     },
     119: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Request Event Data',
         'required': 'response_only'
     },
     135: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Request Single History Point Data',
         'required': 'response_only'
     },
     136: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Request Multiple History Point Data',
         'required': 'response_only'
     },
     138: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Request Daily and Periodic History for a Day',
         'required': 'response_only'
     },
     139: {
-        'variants': ['cmd0', 'cmd0_empty', 'cmd0_single', 'cmd0_max', 'cmd1_empty', 'cmd1_single', 'cmd1_max'],
+        'variants': ['cmd0', 'cmd0_single', 'cmd0_max', 'cmd1_single', 'cmd1_max_with_timestamps', 'cmd1_max_without_timestamps'],
         'description': 'History Information Data',
         'required': True
     },
     166: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Set Single Point Parameters',
         'required': 'request_only'
     },
     167: {
-        'variants': ['empty', 'single', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Request Single Point Parameters',
         'required': 'response_only'
     },
@@ -114,7 +114,7 @@ OPCODE_VARIANTS = {
         'required': True
     },
     206: {
-        'variants': ['list', 'read', 'list_empty', 'list_single', 'list_max', 'read_empty', 'read_single', 'read_max'],
+        'variants': ['list', 'read', 'list_single', 'list_max', 'read_single', 'read_max'],
         'description': 'Read Transaction History Data',
         'required': True
     },
@@ -208,9 +208,9 @@ class ROCPlusPacketBuilder:
         if opcode == 17:
             if not variant:
                 raise ValueError("Opcode 17 requires a variant type (--variant login_standard|login_enhanced|logout_standard|logout_enhanced|session)")
-            if variant not in payload_def:
-                raise ValueError(f"Unknown variant '{variant}' for opcode 17")
-            payload_def = payload_def[variant]
+            if variant not in ["login_standard", "login_enhanced", "logout_standard", "logout_enhanced", "session"]:
+                raise ValueError(f"Unknown variant '{variant}' for opcode 17. Valid variants are: login_standard, login_enhanced, logout_standard, logout_enhanced, session")
+            # No need to reassign payload_def here as opcode 17 is handled specially later
         elif opcode == 50 and is_response:
             if not variant:
                 raise ValueError("Opcode 50 response requires a variant (--variant mode_1|mode_2|mode_3)")
@@ -218,7 +218,7 @@ class ROCPlusPacketBuilder:
                 raise ValueError(f"Unknown variant '{variant}' for opcode 50")
         elif opcode == 166 and not is_response:
             if not variant:
-                raise ValueError("Opcode 166 request requires a variant (--variant empty|single|max)")
+                raise ValueError("Opcode 166 request requires a variant (--variant single|max)")
             if variant not in payload_def["request"]:
                 raise ValueError(f"Unknown variant '{variant}' for opcode 166")
 
@@ -240,8 +240,8 @@ class ROCPlusPacketBuilder:
         if needs_variant:
             if variant is None:
                 raise ValueError(f"Opcode {opcode} requires a variant")
-            if opcode == 17:  # Special case: variant is at top level
-                payload_data = payload_def[msg_type]["payload"]
+            if opcode == 17:  # Special case: variant is structured differently
+                payload_data = payload_def[msg_type][variant]["payload"]
             else:
                 payload_data = payload_def[msg_type][variant]["payload"]
         else:
@@ -385,7 +385,7 @@ class ROCPlusPacketBuilder:
             else:
                 # Response depends on variant
                 if not variant:
-                    raise ValueError("Opcode 100 response requires a variant (--variant empty|single|max)")
+                    raise ValueError("Opcode 100 response requires a variant (--variant single|max)")
                 if variant not in payload_def["response"]:
                     raise ValueError(f"Unknown variant '{variant}' for opcode 100")
 
@@ -420,30 +420,30 @@ class ROCPlusPacketBuilder:
                 payload += payload_data["archival_method"].to_bytes(1, byteorder='big')
                 payload += payload_data["point_type"].to_bytes(1, byteorder='big')
                 payload += payload_data["point_logic_number"].to_bytes(1, byteorder='big')
-                payload += payload_data["parameter_number"].to_bytes(1, byteorder='big')
+                payload += payload_data["parameter_number"].to_bytes(1, byteorder='big')   # 6 bytes as of this point
                 
                 # Add float values (4 bytes each)
-                payload += struct.pack('>f', payload_data["current_value"])
-                payload += struct.pack('>f', payload_data["min_value_today"])
-                payload += struct.pack('>f', payload_data["max_value_today"])
+                payload += struct.pack('>f', payload_data["current_value"])                # 10 bytes as of this point
+                payload += struct.pack('>f', payload_data["min_value_today"])              # 14 bytes as of this point
+                payload += struct.pack('>f', payload_data["max_value_today"])              # 18 bytes as of this point
                 
                 # Add timestamps (UINT32 - 4 bytes each)
-                payload += payload_data["min_time_today"].to_bytes(4, byteorder='big')
-                payload += payload_data["max_time_today"].to_bytes(4, byteorder='big')
+                payload += payload_data["min_time_today"].to_bytes(5, byteorder='big')     # 23 bytes as of this point
+                payload += payload_data["max_time_today"].to_bytes(5, byteorder='big')     # 28 bytes as of this point
                 
                 # Add yesterday's values
-                payload += struct.pack('>f', payload_data["min_value_yesterday"])
-                payload += struct.pack('>f', payload_data["max_value_yesterday"])
-                payload += payload_data["min_time_yesterday"].to_bytes(4, byteorder='big')
-                payload += payload_data["max_time_yesterday"].to_bytes(4, byteorder='big')
+                payload += struct.pack('>f', payload_data["min_value_yesterday"])          # 32 bytes as of this point
+                payload += struct.pack('>f', payload_data["max_value_yesterday"])          # 36 bytes as of this point
+                payload += payload_data["min_time_yesterday"].to_bytes(5, byteorder='big') # 41 bytes as of this point
+                payload += payload_data["max_time_yesterday"].to_bytes(5, byteorder='big') # 46 bytes as of this point
                 
                 # Add last period value
-                payload += struct.pack('>f', payload_data["last_period_value"])
+                payload += struct.pack('>f', payload_data["last_period_value"])            # 50 bytes as of this point
                 
         elif opcode == 108:  # Request History Tag and Periodic Index
             # Both request and response require variants
             if not variant:
-                raise ValueError("Opcode 108 requires a variant (--variant empty|single|max)")
+                raise ValueError("Opcode 108 requires a variant (--variant single|several|max)")
             if variant not in payload_def[msg_type]:
                 raise ValueError(f"Unknown variant '{variant}' for opcode 108")
                 
@@ -656,7 +656,19 @@ class ROCPlusPacketBuilder:
                     for point in payload_data["points"]:
                         payload += point.to_bytes(1, byteorder='big')
             else:  # cmd1 variants
-                if not is_response:
+                if is_response:
+                    # Command 1 response includes current index through point data
+                    payload += payload_data["current_index"].to_bytes(2, byteorder='big')
+                    payload += payload_data["num_periods"].to_bytes(1, byteorder='big')    
+                    payload += payload_data["req_timestamps"].to_bytes(1, byteorder='big')
+                    payload += payload_data["num_points"].to_bytes(1, byteorder='big')
+                    for i in range(0, payload_data["num_periods"]):
+                        if( variant == "cmd1_max_with_timestamps"):
+                            payload += payload_data["timestamp"][i].to_bytes(4, byteorder='big')
+                        for point in payload_data["point_data"]:
+                            for value_byte in point["value"]:
+                                payload += value_byte.to_bytes(1, byteorder='big')
+                else:
                     # Command 1 request includes segment index through points array
                     payload += payload_data["segment_index"].to_bytes(2, byteorder='big')
                     payload += payload_data["history_type"].to_bytes(1, byteorder='big')
@@ -665,16 +677,6 @@ class ROCPlusPacketBuilder:
                     payload += payload_data["num_points"].to_bytes(1, byteorder='big')
                     for point in payload_data["points"]:
                         payload += point.to_bytes(1, byteorder='big')
-                else:
-                    # Command 1 response includes current index through point data
-                    payload += payload_data["current_index"].to_bytes(2, byteorder='big')
-                    payload += payload_data["num_periods"].to_bytes(1, byteorder='big')
-                    payload += payload_data["req_timestamps"].to_bytes(1, byteorder='big')
-                    payload += payload_data["num_points"].to_bytes(1, byteorder='big')
-                    for point in payload_data["point_data"]:
-                        payload += point["timestamp"].to_bytes(4, byteorder='big')
-                        for value_byte in point["value"]:
-                            payload += value_byte.to_bytes(1, byteorder='big')
                     
         elif opcode == 166:  # Set Single Point Parameters
             if is_response:
@@ -908,7 +910,6 @@ class ROCPlusPacketBuilder:
                 if not is_response:
                     # Build Read Transaction request
                     logger.debug(f"Segment: {payload_data['segment']}")
-                    payload += payload_data["command"].to_bytes(1, byteorder='big')
                     payload += payload_data["segment"].to_bytes(1, byteorder='big')
                     payload += payload_data["transaction_number"].to_bytes(2, byteorder='big')
                     payload += payload_data["data_offset"].to_bytes(2, byteorder='big')

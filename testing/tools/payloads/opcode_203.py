@@ -162,10 +162,8 @@ PAYLOAD = {
         "write_single": {
             "payload": {
                 "command": 3,
-                "file_descriptor": 0,
-                "offset": 0,
-                "num_bytes": 4,
-                "data": bytes([0x0A, 0x0B, 0x0C, 0x0D])  # Simple 4-byte pattern
+                "file_descriptor": 4,
+                "offset": 5,
             }
         },
         "write_max": {
