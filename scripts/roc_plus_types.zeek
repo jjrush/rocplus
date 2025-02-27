@@ -566,7 +566,7 @@ export {
         # num_transactions   : count  &log &optional;
         more_data          : string &log &optional; # Re-use
         description        : string &log &optional;
-        payload_size       : vector of count &log &optional;
+        payload_size       : count &log &optional;
         transaction_num    : vector of count &log &optional;
         date_created       : vector of count &log &optional;
 
@@ -578,7 +578,7 @@ export {
         data               : vector of count &log &optional;
     };
 
-    type roc_plus_unknown_opcode_data_log: record {
+    type roc_plus_unknown_data_log: record {
         ts               : time    &log;
         uid              : string  &log;
         id               : conn_id &log;
@@ -653,8 +653,8 @@ export {
         ts                                  : time &log;
         uid                                 : string &log;
         id                                  : conn_id &log;
-
         roc_plus_link_id                    : string  &log &optional;
+
         network_id                          : count &log &optional;
         commissioned_index_one_based        : count &log &optional;
         embedded_roc_opcode                 : count &log &optional;
@@ -662,14 +662,5 @@ export {
         embedded_request_data               : string &log &optional;
         embedded_response_length            : count &log &optional;
         embedded_request_data_response      : string &log &optional;
-    };
-
-    #Opcode 225
-    type roc_plus_acknowledge_srbx_log: record {
-        ts                                  : time    &log;
-        uid                                 : string  &log;
-        id                                  : conn_id &log;
-        roc_plus_link_id                    : string  &log &optional;
-        current_alarm_log_index             : count &log &optional;
     };
 }
