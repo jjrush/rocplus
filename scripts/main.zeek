@@ -9,12 +9,8 @@
 module ROC_PLUS;
 
 export {
-    const roc_plus_ports_udp: set[port] = { 4000/udp, 22222/udp } &redef;
-    const roc_plus_ports_tcp: set[port] = { 4000/tcp,22222/tcp } &redef;
-
-    # TODO - amend this back
-    # const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
-    # const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
+    const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
+    const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
 
     redef enum Log::ID += { LOG_ROC_PLUS_LOG, 
                             LOG_ROC_PLUS_SYS_CFG_LOG,
@@ -31,9 +27,8 @@ export {
                             LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG,
                             LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
                             LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG,
-                            LOG_ROC_PLUS_ACKNOWLEDGE_SRBX_LOG,
                             LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG,
-                            LOG_ROC_PLUS_UNKNOWN_OPCODE_DATA_LOG };
+                            LOG_ROC_PLUS_UNKNOWN_DATA_LOG };
 
     # Callback event for integrating with the file analysis framework
     global get_file_handle: function(c: connection, is_orig: bool): string;
@@ -54,9 +49,8 @@ export {
     global log_policy_roc_plus_history_point_data: Log::PolicyHook;
     global log_policy_roc_plus_history_information: Log::PolicyHook;
     global log_policy_roc_plus_peer_to_peer_network_messages: Log::PolicyHook;
-    global log_policy_roc_plus_acknowledge_srbx: Log::PolicyHook;
     global log_policy_roc_plus_time_period_history_points: Log::PolicyHook;
-    global log_policy_roc_plus_unknown_opcode_data: Log::PolicyHook;
+    global log_policy_roc_plus_unknown_data: Log::PolicyHook;
 
     global log_roc_plus_log: event(rec: roc_plus_log);
     global log_roc_plus_sys_cfg_log: event(rec: roc_plus_sys_cfg_log);
@@ -73,9 +67,8 @@ export {
     global log_roc_plus_history_point_data_log: event(rec: roc_plus_history_point_data_log);
     global log_roc_plus_history_information_log: event(rec: roc_plus_history_information_log);
     global log_roc_plus_peer_to_peer_network_messages_log: event(rec: roc_plus_peer_to_peer_network_messages_log);
-    global log_roc_plus_acknowledge_srbx_log: event(rec: roc_plus_acknowledge_srbx_log);
     global log_roc_plus_time_period_history_points_log: event(rec: roc_plus_time_period_history_points_log);
-    global log_roc_plus_unknown_opcode_data_log: event(rec: roc_plus_unknown_opcode_data_log);
+    global log_roc_plus_unknown_data_log: event(rec: roc_plus_unknown_data_log);
 
     global emit_roc_plus_log: function(c: connection);
     global emit_roc_plus_sys_cfg_log: function(c: connection);
@@ -92,9 +85,8 @@ export {
     global emit_roc_plus_history_point_data_log: function(c: connection);
     global emit_roc_plus_history_information_log: function(c: connection);
     global emit_roc_plus_peer_to_peer_network_messages_log: function(c: connection);
-    global emit_roc_plus_acknowledge_srbx_log: function(c: connection);
     global emit_roc_plus_time_period_history_points_log: function(c: connection);
-    global emit_roc_plus_unknown_opcode_data_log: function(c: connection); 
+    global emit_roc_plus_unknown_data_log: function(c: connection); 
 }
 
 # redefine connection record to contain one of each of the ROC_PLUS records
@@ -115,9 +107,8 @@ redef record connection += {
     roc_plus_history_point_data_log: roc_plus_history_point_data_log &optional;
     roc_plus_history_information_log: roc_plus_history_information_log &optional;
     roc_plus_peer_to_peer_network_messages_log: roc_plus_peer_to_peer_network_messages_log &optional;
-    roc_plus_acknowledge_srbx_log: roc_plus_acknowledge_srbx_log &optional;
     roc_plus_time_period_history_points_log: roc_plus_time_period_history_points_log &optional;
-    roc_plus_unknown_opcode_data_log: roc_plus_unknown_opcode_data_log &optional;
+    roc_plus_unknown_data_log: roc_plus_unknown_data_log &optional;
 };
 
 redef likely_server_ports += { roc_plus_ports_tcp, roc_plus_ports_udp };
@@ -220,12 +211,6 @@ event zeek_init() &priority=5 {
                       $path="roc_plus_peer_to_peer_network_messages",
                       $policy=log_policy_roc_plus_peer_to_peer_network_messages]);
 
-    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_ACKNOWLEDGE_SRBX_LOG,
-                      [$columns=roc_plus_acknowledge_srbx_log,
-                      $ev=log_roc_plus_acknowledge_srbx_log,
-                      $path="roc_plus_acknowledge_srbx",
-                      $policy=log_policy_roc_plus_acknowledge_srbx]);
-
     Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
                       [$columns=roc_plus_history_information_log,
                       $ev=log_roc_plus_history_information_log,
@@ -239,11 +224,11 @@ event zeek_init() &priority=5 {
                       $policy=log_policy_roc_plus_time_period_history_points]);
 
     # Create all log streams
-    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_UNKNOWN_OPCODE_DATA_LOG,
-                      [$columns=roc_plus_unknown_opcode_data_log,
-                      $ev=log_roc_plus_unknown_opcode_data_log,
-                      $path="roc_plus_unknown_opcode_data",
-                      $policy=log_policy_roc_plus_unknown_opcode_data]);
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_UNKNOWN_DATA_LOG,
+                      [$columns=roc_plus_unknown_data_log,
+                      $ev=log_roc_plus_unknown_data_log,
+                      $path="roc_plus_unknown_data",
+                      $policy=log_policy_roc_plus_unknown_data]);
 }
 
 function emit_roc_plus_log(c: connection) {
@@ -358,14 +343,6 @@ function emit_roc_plus_peer_to_peer_network_messages_log(c: connection) {
     Log::write(ROC_PLUS::LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG, c$roc_plus_peer_to_peer_network_messages_log);
 }
 
-function emit_roc_plus_acknowledge_srbx_log(c: connection) {
-    if (! c?$roc_plus_acknowledge_srbx_log )
-        return;
-    if ( c?$roc_plus_protocol )
-        c$roc_plus_log$protocol = c$roc_plus_protocol;
-    Log::write(ROC_PLUS::LOG_ROC_PLUS_ACKNOWLEDGE_SRBX_LOG, c$roc_plus_acknowledge_srbx_log);
-}
-
 function emit_roc_plus_history_information_log(c: connection) {
     if (! c?$roc_plus_history_information_log )
         return;
@@ -382,12 +359,12 @@ function emit_roc_plus_time_period_history_points_log(c: connection) {
     Log::write(ROC_PLUS::LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG, c$roc_plus_time_period_history_points_log);
 }
 
-function emit_roc_plus_unknown_opcode_data_log(c: connection) {
-    if (! c?$roc_plus_unknown_opcode_data_log )
+function emit_roc_plus_unknown_data_log(c: connection) {
+    if (! c?$roc_plus_unknown_data_log )
         return;
     if ( c?$roc_plus_protocol )
         c$roc_plus_log$protocol = c$roc_plus_protocol;
-    Log::write(ROC_PLUS::LOG_ROC_PLUS_UNKNOWN_OPCODE_DATA_LOG, c$roc_plus_unknown_opcode_data_log);
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_UNKNOWN_DATA_LOG, c$roc_plus_unknown_data_log);
 }
 
 # 
@@ -398,31 +375,3 @@ function emit_roc_plus_unknown_opcode_data_log(c: connection) {
 function get_file_handle(c: connection, is_orig: bool): string {
     return cat(Analyzer::ANALYZER_ROC_PLUS_UDP, c$start_time, c$id, is_orig, c$orig);
 }
-
-# event connection_established(c: connection) {
-#     print fmt("Connection established: %s", c$id);
-# }
-
-# event connection_state_remove(c: connection) {
-#     if ( c?$roc_plus_protocol ) {
-#         print fmt("Connection removed with ROCplus protocol: %s", c$id);
-#         if ( c?$roc_plus_configurable_opcode_log )
-#             print "Has configurable opcode log data";
-#         if ( c?$roc_plus_log )
-#             print "Has main log data";
-#     }
-# }
-
-# event zeek_done() {
-#     print "Zeek Done";
-# }
-
-# event ROC_PLUS::UDP_MessagesEvt(c: connection, is_orig: bool, messages: ROC_PLUS::UDP_Messages) 
-# {
-#     print fmt("UDP Messages event: %s", messages);
-# }
-
-# event ROC_PLUS::TCP_MessagesEvt(c: connection, is_orig: bool, messages: ROC_PLUS::ROC_Message_TCP)
-# {
-#     print fmt("TCP Messages event: %s", messages);
-# }
