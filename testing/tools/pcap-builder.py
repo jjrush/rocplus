@@ -159,16 +159,16 @@ def validate_variant(opcode, variant, is_response):
     return True
 
 class ROCPlusPacketBuilder:
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, src_ip=None, dst_ip=None, src_port=None, dst_port=None):
         # Enable debug logging if requested
         if debug:
             logger.setLevel(logging.DEBUG)
         
         # Network configuration
-        self.src_ip = "192.168.1.100"
-        self.dst_ip = "192.168.1.200"
-        self.src_port = 32107
-        self.dst_port = 22222
+        self.src_ip = src_ip or "192.168.1.100"
+        self.dst_ip = dst_ip or "192.168.1.200"
+        self.src_port = src_port or 32107
+        self.dst_port = dst_port or 4000
         self.initial_seq = 100
 
         # ROC Plus Header configuration
@@ -1082,6 +1082,10 @@ def main():
     parser.add_argument('--res', action='store_true', help='Generate response packet')
     parser.add_argument('--variant', type=str, help='Variant type for specific opcodes')
     parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+    parser.add_argument('--src-ip', type=str, help='Source IP address (default: 192.168.1.100)')
+    parser.add_argument('--dst-ip', type=str, help='Destination IP address (default: 192.168.1.200)')
+    parser.add_argument('--src-port', type=int, help='Source port (default: 32107)')
+    parser.add_argument('--dst-port', type=int, help='Destination port (default: 4000)')
     args = parser.parse_args()
 
     if not args.req and not args.res:
@@ -1126,8 +1130,15 @@ def main():
         variant_suffix = f"_{args.variant}" if args.variant else ""
         output_file = args.output or f"rocplus_opcode_{args.opcode:03d}{variant_suffix}_{msg_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pcap"
 
-        # Build the PCAP
-        builder = ROCPlusPacketBuilder(debug=args.debug)
+        # Build the PCAP with network params directly passed to constructor
+        builder = ROCPlusPacketBuilder(
+            debug=args.debug,
+            src_ip=args.src_ip,
+            dst_ip=args.dst_ip,
+            src_port=args.src_port,
+            dst_port=args.dst_port
+        )
+        
         builder.build_pcap(args.opcode, output_file, is_response=args.res, variant=args.variant)
     except Exception as e:
         logger.error(f"Error: {str(e)}")
