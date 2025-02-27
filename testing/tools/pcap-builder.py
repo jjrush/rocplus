@@ -49,7 +49,7 @@ OPCODE_VARIANTS = {
         'required': 'response_only'
     },
     108: {
-        'variants': ['single', 'several', 'max'],
+        'variants': ['single', 'max'],
         'description': 'Request History Tag and Periodic Index',
         'required': True
     },
@@ -79,7 +79,7 @@ OPCODE_VARIANTS = {
         'required': 'response_only'
     },
     139: {
-        'variants': ['cmd0', 'cmd0_single', 'cmd0_max', 'cmd1_single', 'cmd1_max_with_timestamps', 'cmd1_max_without_timestamps'],
+        'variants': ['cmd0', 'cmd0_single', 'cmd0_max', 'cmd1_single', 'cmd1_max','cmd1_max_with_timestamps', 'cmd1_max_without_timestamps'],
         'description': 'History Information Data',
         'required': True
     },
@@ -443,7 +443,7 @@ class ROCPlusPacketBuilder:
         elif opcode == 108:  # Request History Tag and Periodic Index
             # Both request and response require variants
             if not variant:
-                raise ValueError("Opcode 108 requires a variant (--variant single|several|max)")
+                raise ValueError("Opcode 108 requires a variant (--variant single|max)")
             if variant not in payload_def[msg_type]:
                 raise ValueError(f"Unknown variant '{variant}' for opcode 108")
                 
