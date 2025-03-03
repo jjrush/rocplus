@@ -106,7 +106,8 @@ public type Opcode17Type = enum {
     ENHANCED_LOGIN      = 3,
     ENHANCED_LOGOUT     = 4,
     WRAPPED_SESSION_KEY = 5,
-    UNKNOWN             = 6
+    RESPONSE            = 6, # any response message other than wrapped session key
+    UNKNOWN             = 7
 };
 
 #

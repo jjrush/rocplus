@@ -17,8 +17,13 @@ type Login = unit(dataLength: uint8) {
 type LoginResponse = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type) {
     switch (op17Type) {
         ROC_PLUS_ENUMS::Opcode17Type::WRAPPED_SESSION_KEY -> wrappedSessionKey : Wrapped_Session_Key();
+        ROC_PLUS_ENUMS::Opcode17Type::RESPONSE            -> response          : General_Response();
         # all other responses have no data
     };
+};
+
+type General_Response = unit {
+    # response has no fields
 };
 
 type LoginRequest = unit(op17Type: ROC_PLUS_ENUMS::Opcode17Type, dataLength: uint8) {

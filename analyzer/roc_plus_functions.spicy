@@ -22,6 +22,7 @@ const OPCODE_017_SESSION_KEY_REQ_DATA_LENGTH = 13;
 const OPCODE_017_STANDARD_LOGOUT_DATA_LENGTH = 11;
 const OPCODE_017_ENHANCED_LOGOUT_DATA_LENGTH = 76;
 const OPCODE_017_WRAPPED_SESSION_KEY_DATA_LENGTH = 24;
+const OPCODE_017_RESPONSE_DATA_LENGTH = 0;
 
 const OPCODE_024_RES_DATA_LENGTH : uint8 = 0; # Opcode 24's RESPONSE contains no data
 const OPCODE_050_REQ_DATA_LENGTH : uint8 = 1;
@@ -346,27 +347,69 @@ public function determineOpcode17SubType(dataLength: uint8) : ROC_PLUS_ENUMS::Op
     else if (dataLength == OPCODE_017_WRAPPED_SESSION_KEY_DATA_LENGTH) {
         return ROC_PLUS_ENUMS::Opcode17Type::WRAPPED_SESSION_KEY;
     }
+    else if( dataLength == OPCODE_017_RESPONSE_DATA_LENGTH ) {
+        return ROC_PLUS_ENUMS::Opcode17Type::RESPONSE;
+    }
     else {
         print "Unknown opcode 17 subtype: ", dataLength;
         return ROC_PLUS_ENUMS::Opcode17Type::UNKNOWN;
     }
 }
 
-public function generateId() : string &cxxname="ROC_PLUS_FUNCTIONS::generateId";
+# Helper function to convert a number 0-15 to a hex character
+function getHexChar(n: uint8): string {
+    if (n < 10)
+        return "%d" % n;
+    else if (n == 10) return "a";
+    else if (n == 11) return "b";
+    else if (n == 12) return "c";
+    else if (n == 13) return "d";
+    else if (n == 14) return "e";
+    else return "f";
+}
+
+# Generate a random ID string 
+public function generateId(): string {
+    local id = "";
+    
+    # Get the current time
+    local timestamp = spicy::current_time();
+    
+    # Extract time components for randomness and convert to integers
+    local sec = cast<uint64>(timestamp.seconds());
+    local nsec = cast<uint64>(timestamp.nanoseconds());
+    
+    # Use different parts of the time as a source of entropy
+    for ( i in [0, 1, 2, 3, 4, 5, 6, 7, 8] ) {
+        # Convert loop index to integer
+        local idx = cast<uint64>(i);
+        
+        # Use different calculations for each position to create variation
+        local byte1 = cast<uint8>((sec + idx * 7 + (nsec >> (idx * 3))) % 16);
+        local byte2 = cast<uint8>((nsec + idx * 13 + (sec >> (idx * 2))) % 16);
+        
+        # Append the hex chars to the ID using our helper function
+        id += getHexChar(byte1);
+        id += getHexChar(byte2);
+    }
+    
+    return id;
+}
 
 public function uintToHexString(data: uint64): string {
     return "0x%02x" % data;
 }
 
 public function bytesToHexString(data: bytes): string {
-    local bytesAsHexString : string;
-    bytesAsHexString = "";
+    # local bytesAsHexString : string;
+    # bytesAsHexString = "";
 
-    for (byte in data) {
-        bytesAsHexString = bytesAsHexString + ("%02x" % byte);
-    }
+    # for (byte in data) {
+    #     bytesAsHexString = bytesAsHexString + ("%02x" % byte);
+    # }
     
-    return bytesAsHexString;
+    # return bytesAsHexString;
+    return spicy::bytes_to_hexstring(data);
 }
 
 public function dataTypeSize(dataType : ROC_PLUS_ENUMS::ReadTransactionDataType): uint8 {
