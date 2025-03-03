@@ -66,9 +66,9 @@ public type ROC_Message = unit {
     sourceUnit        : uint8;
     sourceGroup       : uint8;
     opcode            : uint8 &convert=ROC_PLUS_ENUMS::Opcode($$);
-    on opcode {
-        print "Got opcode: %s" % self.opcode;
-    }
+    # on opcode {
+    #     print "Got opcode: %s" % self.opcode;
+    # }
     dataLength        : uint8;
 
     dataBytes         : DataBytes(self);
