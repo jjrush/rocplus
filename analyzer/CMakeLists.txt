@@ -5,7 +5,6 @@ spicy_add_analyzer(
             roc_plus_enums.spicy
             roc_plus_functions.spicy
             roc_plus_globals.spicy
-            roc_plus_functions.cc
             roc_plus.spicy
             roc_plus.evt
             roc_plus_opcode_006.spicy
