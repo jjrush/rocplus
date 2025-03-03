@@ -18,7 +18,7 @@ testing/.tmp/
 testing/.btest.failed.dat
 testing/*.log
 testing/tools/*.pcap
-testing/tools/payloads/__pycache__/
+__pycache__/
 
 # Build Files
 build/
