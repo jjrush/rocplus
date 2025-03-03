@@ -8,6 +8,7 @@ import sys
 import logging
 from payloads import OPCODE_PAYLOADS
 import struct
+import os
 
 # Configure logging
 logging.basicConfig(
@@ -1074,9 +1075,255 @@ class ROCPlusPacketBuilder:
             logger.error(f"Unexpected error while creating PCAP: {str(e)}")
             raise
 
+    def build_comprehensive_pcap(self, output_file):
+        """Build a single PCAP with all opcode types in sequence with proper TCP flow"""
+        packets = []
+        
+        # Initialize TCP sequence counters
+        seq_client = 100
+        seq_server = 101
+        
+        # Start with TCP 3-way handshake
+        # SYN
+        syn = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+            sport=self.src_port, 
+            dport=self.dst_port, 
+            flags="S", 
+            seq=seq_client
+        )
+        packets.append(syn)
+        seq_client += 1
+        
+        # SYN-ACK
+        syn_ack = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+            sport=self.dst_port, 
+            dport=self.src_port, 
+            flags="SA", 
+            seq=seq_server, 
+            ack=seq_client
+        )
+        packets.append(syn_ack)
+        seq_server += 1
+        
+        # ACK
+        ack = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+            sport=self.src_port, 
+            dport=self.dst_port, 
+            flags="A", 
+            seq=seq_client, 
+            ack=seq_server
+        )
+        packets.append(ack)
+        
+        # Add a small delay between packets
+        timestamp = 1500000000  # Starting timestamp (seconds since epoch)
+        
+        # Build packets for each opcode
+        for opcode in sorted(OPCODE_PAYLOADS.keys()):
+            opcode_info = OPCODE_PAYLOADS[opcode]
+            
+            # Add a request if supported
+            if "request" in opcode_info:
+                try:
+                    # Handle variants for request
+                    if opcode in OPCODE_VARIANTS and isinstance(opcode_info["request"], dict):
+                        for variant in OPCODE_VARIANTS[opcode]["variants"]:
+                            if variant in opcode_info["request"]:
+                                try:
+                                    # Build request payload
+                                    payload = self.build_payload(opcode, False, variant)
+                                    header = self.build_header(opcode, payload)
+                                    message = header + payload
+                                    message_with_crc = message + self.calculate_crc(message)
+                                    
+                                    # Create packet with proper sequence numbers
+                                    request_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                                        sport=self.src_port, 
+                                        dport=self.dst_port, 
+                                        flags="PA", 
+                                        seq=seq_client, 
+                                        ack=seq_server
+                                    ) / message_with_crc
+                                    request_packet.time = timestamp
+                                    timestamp += 0.25  # Add 250ms between packets
+                                    
+                                    packets.append(request_packet)
+                                    seq_client += len(message_with_crc)
+                                    
+                                    # ACK from server
+                                    ack_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                                        sport=self.dst_port, 
+                                        dport=self.src_port, 
+                                        flags="A", 
+                                        seq=seq_server, 
+                                        ack=seq_client
+                                    )
+                                    ack_packet.time = timestamp
+                                    timestamp += 0.01
+                                    packets.append(ack_packet)
+                                except Exception as e:
+                                    logger.warning(f"Skipping request variant {variant} for opcode {opcode}: {str(e)}")
+                    else:
+                        # Standard request without variants
+                        try:
+                            payload = self.build_payload(opcode, False)
+                            header = self.build_header(opcode, payload)
+                            message = header + payload
+                            message_with_crc = message + self.calculate_crc(message)
+                            
+                            request_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                                sport=self.src_port, 
+                                dport=self.dst_port, 
+                                flags="PA", 
+                                seq=seq_client, 
+                                ack=seq_server
+                            ) / message_with_crc
+                            request_packet.time = timestamp
+                            timestamp += 0.25
+                            
+                            packets.append(request_packet)
+                            seq_client += len(message_with_crc)
+                            
+                            # ACK from server
+                            ack_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                                sport=self.dst_port, 
+                                dport=self.src_port, 
+                                flags="A", 
+                                seq=seq_server, 
+                                ack=seq_client
+                            )
+                            ack_packet.time = timestamp
+                            timestamp += 0.01
+                            packets.append(ack_packet)
+                        except Exception as e:
+                            logger.warning(f"Skipping standard request for opcode {opcode}: {str(e)}")
+                except Exception as e:
+                    logger.warning(f"Skipping request for opcode {opcode}: {str(e)}")
+            
+            # Add a response if supported
+            if "response" in opcode_info:
+                try:
+                    # Handle variants for response
+                    if opcode in OPCODE_VARIANTS and isinstance(opcode_info["response"], dict):
+                        for variant in OPCODE_VARIANTS[opcode]["variants"]:
+                            if variant in opcode_info["response"]:
+                                try:
+                                    # Build response payload
+                                    payload = self.build_payload(opcode, True, variant)
+                                    header = self.build_header(opcode, payload)
+                                    message = header + payload
+                                    message_with_crc = message + self.calculate_crc(message)
+                                    
+                                    # Create packet with proper sequence numbers
+                                    response_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                                        sport=self.dst_port, 
+                                        dport=self.src_port, 
+                                        flags="PA", 
+                                        seq=seq_server, 
+                                        ack=seq_client
+                                    ) / message_with_crc
+                                    response_packet.time = timestamp
+                                    timestamp += 0.25
+                                    
+                                    packets.append(response_packet)
+                                    seq_server += len(message_with_crc)
+                                    
+                                    # ACK from client
+                                    ack_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                                        sport=self.src_port, 
+                                        dport=self.dst_port, 
+                                        flags="A", 
+                                        seq=seq_client, 
+                                        ack=seq_server
+                                    )
+                                    ack_packet.time = timestamp
+                                    timestamp += 0.01
+                                    packets.append(ack_packet)
+                                except Exception as e:
+                                    logger.warning(f"Skipping response variant {variant} for opcode {opcode}: {str(e)}")
+                    else:
+                        # Standard response without variants
+                        try:
+                            payload = self.build_payload(opcode, True)
+                            header = self.build_header(opcode, payload)
+                            message = header + payload
+                            message_with_crc = message + self.calculate_crc(message)
+                            
+                            response_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                                sport=self.dst_port, 
+                                dport=self.src_port, 
+                                flags="PA", 
+                                seq=seq_server, 
+                                ack=seq_client
+                            ) / message_with_crc
+                            response_packet.time = timestamp
+                            timestamp += 0.25
+                            
+                            packets.append(response_packet)
+                            seq_server += len(message_with_crc)
+                            
+                            # ACK from client
+                            ack_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                                sport=self.src_port, 
+                                dport=self.dst_port, 
+                                flags="A", 
+                                seq=seq_client, 
+                                ack=seq_server
+                            )
+                            ack_packet.time = timestamp
+                            timestamp += 0.01
+                            packets.append(ack_packet)
+                        except Exception as e:
+                            logger.warning(f"Skipping standard response for opcode {opcode}: {str(e)}")
+                except Exception as e:
+                    logger.warning(f"Skipping response for opcode {opcode}: {str(e)}")
+        
+        # End with TCP teardown
+        # FIN from client
+        fin = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+            sport=self.src_port, 
+            dport=self.dst_port, 
+            flags="FA", 
+            seq=seq_client, 
+            ack=seq_server
+        )
+        fin.time = timestamp
+        timestamp += 0.1
+        packets.append(fin)
+        seq_client += 1
+        
+        # FIN-ACK from server
+        fin_ack = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+            sport=self.dst_port, 
+            dport=self.src_port, 
+            flags="FA", 
+            seq=seq_server, 
+            ack=seq_client
+        )
+        fin_ack.time = timestamp
+        timestamp += 0.1
+        packets.append(fin_ack)
+        seq_server += 1
+        
+        # ACK from client
+        last_ack = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+            sport=self.src_port, 
+            dport=self.dst_port, 
+            flags="A", 
+            seq=seq_client, 
+            ack=seq_server
+        )
+        last_ack.time = timestamp
+        packets.append(last_ack)
+        
+        # Write all packets to the output file
+        wrpcap(output_file, packets)
+        logger.info(f"Successfully created comprehensive PCAP with {len(packets)} packets: {output_file}")
+        return len(packets)
+
 def main():
     parser = argparse.ArgumentParser(description="Build ROC Plus PCAP files")
-    parser.add_argument('--opcode', type=int, required=True, help='ROC Plus opcode to use')
+    parser.add_argument('--opcode', type=int, help='ROC Plus opcode to use')
     parser.add_argument('--output', type=str, help='Output PCAP filename')
     parser.add_argument('--req', action='store_true', help='Generate request packet')
     parser.add_argument('--res', action='store_true', help='Generate response packet')
@@ -1086,15 +1333,45 @@ def main():
     parser.add_argument('--dst-ip', type=str, help='Destination IP address (default: 192.168.1.200)')
     parser.add_argument('--src-port', type=int, help='Source port (default: 32107)')
     parser.add_argument('--dst-port', type=int, help='Destination port (default: 4000)')
+    parser.add_argument('--comprehensive', action='store_true', help='Generate a comprehensive PCAP with all opcodes')
     args = parser.parse_args()
 
+    # Configure debug logging if requested
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+
+    # Create builder with network params directly passed to constructor
+    builder = ROCPlusPacketBuilder(
+        debug=args.debug,
+        src_ip=args.src_ip,
+        dst_ip=args.dst_ip,
+        src_port=args.src_port,
+        dst_port=args.dst_port
+    )
+
+    # Handle comprehensive mode
+    if args.comprehensive:
+        output_file = args.output or f"rocplus_all_opcodes_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pcap"
+        try:
+            packet_count = builder.build_comprehensive_pcap(output_file)
+            logger.info(f"Created comprehensive PCAP with {packet_count} packets: {output_file}")
+            sys.exit(0)
+        except Exception as e:
+            logger.error(f"Error creating comprehensive PCAP: {str(e)}")
+            sys.exit(1)
+
+    # Check for required args in single opcode mode
+    if not args.opcode:
+        parser.error('Must specify --opcode when not in comprehensive mode')
+        
     if not args.req and not args.res:
         parser.error('Must specify either --req or --res')
+        
     if args.req and args.res:
         parser.error('Cannot specify both --req and --res')
         
     try:
-        # Check if opcode is valid first
+        # Check if opcode is valid
         if args.opcode not in OPCODE_PAYLOADS:
             logger.error(f"Error: Invalid opcode {args.opcode}")
             logger.info("\nValid opcodes:")
@@ -1129,15 +1406,6 @@ def main():
         msg_type = "response" if args.res else "request"
         variant_suffix = f"_{args.variant}" if args.variant else ""
         output_file = args.output or f"rocplus_opcode_{args.opcode:03d}{variant_suffix}_{msg_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pcap"
-
-        # Build the PCAP with network params directly passed to constructor
-        builder = ROCPlusPacketBuilder(
-            debug=args.debug,
-            src_ip=args.src_ip,
-            dst_ip=args.dst_ip,
-            src_port=args.src_port,
-            dst_port=args.dst_port
-        )
         
         builder.build_pcap(args.opcode, output_file, is_response=args.res, variant=args.variant)
     except Exception as e:
