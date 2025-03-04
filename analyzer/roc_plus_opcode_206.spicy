@@ -55,10 +55,10 @@ type ReadTransactionResponse = unit(dataLength: uint8) {
     var types  : vector<uint8>;
     var values : vector<uint8>;
 
-    messageDataSize  : uint8;
-    moreData         : uint8;
+    messageDataSize : uint8;
+    moreData        : uint8;
 
-    data             : bytes &size=(dataLength - 3);
+    data            : bytes &size=(dataLength - 3);
 
     on data {
         local counter : uint8 = 0;
