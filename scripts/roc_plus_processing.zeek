@@ -78,7 +78,7 @@ module ROC_PLUS;
                 process_transaction_history(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_SRBX_SIGNAL:
-# RESERVED
+                process_srbx_signal(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_ACKNOWLEDGE_SRBX:
                 process_acknowledge_srbx(c, data, roc_plus_link_id);
