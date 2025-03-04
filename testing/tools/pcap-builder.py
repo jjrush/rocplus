@@ -119,11 +119,6 @@ OPCODE_VARIANTS = {
         'description': 'Read Transaction History Data',
         'required': True
     },
-    224: {
-        'variants': ['single', 'max'],
-        'description': 'SRBX Signal',
-        'required': 'request_only'
-    },
     255: {
         'variants': ['single', 'max'],
         'description': 'Invalid Parameters',
@@ -160,7 +155,7 @@ def validate_variant(opcode, variant, is_response):
     return True
 
 class ROCPlusPacketBuilder:
-    def __init__(self, debug=False, src_ip=None, dst_ip=None, src_port=None, dst_port=None):
+    def __init__(self, debug=False, src_ip=None, dst_ip=None, src_port=None, dst_port=None, protocol='tcp'):
         # Enable debug logging if requested
         if debug:
             logger.setLevel(logging.DEBUG)
@@ -171,6 +166,11 @@ class ROCPlusPacketBuilder:
         self.src_port = src_port or 32107
         self.dst_port = dst_port or 4000
         self.initial_seq = 100
+        self.protocol = protocol.lower()
+        
+        # Hardcoded MAC addresses to avoid ARP lookup warnings
+        self.src_mac = "00:11:22:33:44:55"
+        self.dst_mac = "66:77:88:99:aa:bb"
 
         # ROC Plus Header configuration
         self.roc_unit = 1
@@ -1016,11 +1016,19 @@ class ROCPlusPacketBuilder:
         return crc.to_bytes(2, byteorder='little')
 
     def create_packet(self, message_bytes, is_response=False):
-        """Create a single TCP packet"""
-        logger.debug(f"Creating packet with {len(message_bytes)} bytes")
+        """Create a single packet (TCP or UDP)"""
+        logger.debug(f"Creating {self.protocol.upper()} packet with {len(message_bytes)} bytes")
+        
+        if self.protocol == 'tcp':
+            return self._create_tcp_packet(message_bytes, is_response)
+        else:  # UDP
+            return self._create_udp_packet(message_bytes, is_response)
+    
+    def _create_tcp_packet(self, message_bytes, is_response=False):
+        """Create a single TCP packet with explicit Ethernet header"""
         if is_response:
             # Response packet (from dst to src)
-            packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+            packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / TCP(
                 sport=self.dst_port,
                 dport=self.src_port,
                 seq=self.initial_seq,
@@ -1028,12 +1036,34 @@ class ROCPlusPacketBuilder:
             ) / message_bytes
         else:
             # Request packet (from src to dst)
-            packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+            packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
                 sport=self.src_port,
                 dport=self.dst_port,
                 seq=self.initial_seq,
                 flags="PA"
             ) / message_bytes
+        
+        return packet
+    
+    def _create_udp_packet(self, message_bytes, is_response=False):
+        """Create a single UDP packet with explicit Ethernet header"""
+        if is_response:
+            # Response packet (from dst to src)
+            packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / UDP(
+                sport=self.dst_port,
+                dport=self.src_port
+            ) / message_bytes
+        else:
+            # Request packet (from src to dst)
+            packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / UDP(
+                sport=self.src_port,
+                dport=self.dst_port
+            ) / message_bytes
+        
+        # Explicitly calculate and set length fields to avoid Wireshark warnings
+        # This forces Scapy to recalculate all length fields properly
+        if hasattr(packet, 'len'):
+            del packet.len  # Remove any existing len field so Scapy recalculates it
         
         return packet
 
@@ -1063,7 +1093,7 @@ class ROCPlusPacketBuilder:
             # Create and save packet
             packet = self.create_packet(message_with_crc, is_response)
             wrpcap(output_file, [packet])
-            logger.info(f"Successfully created PCAP file: {output_file}")
+            logger.info(f"Successfully created {self.protocol.upper()} PCAP file: {output_file}")
             
         except ValueError as e:
             logger.error(f"Invalid input or configuration: {str(e)}")
@@ -1076,7 +1106,18 @@ class ROCPlusPacketBuilder:
             raise
 
     def build_comprehensive_pcap(self, output_file):
-        """Build a single PCAP with all opcode types in sequence with proper TCP flow"""
+        """Build a single PCAP with all opcode types in sequence with proper TCP/UDP flow"""
+        packets = []
+        
+        if self.protocol == 'tcp':
+            # TCP requires handshake, sequence numbers, etc.
+            return self._build_comprehensive_tcp_pcap(output_file)
+        else:
+            # UDP is connectionless - simpler implementation
+            return self._build_comprehensive_udp_pcap(output_file)
+    
+    def _build_comprehensive_tcp_pcap(self, output_file):
+        """Build a comprehensive PCAP with all opcodes using TCP"""
         packets = []
         
         # Initialize TCP sequence counters
@@ -1085,7 +1126,7 @@ class ROCPlusPacketBuilder:
         
         # Start with TCP 3-way handshake
         # SYN
-        syn = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+        syn = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
             sport=self.src_port, 
             dport=self.dst_port, 
             flags="S", 
@@ -1095,7 +1136,7 @@ class ROCPlusPacketBuilder:
         seq_client += 1
         
         # SYN-ACK
-        syn_ack = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+        syn_ack = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / TCP(
             sport=self.dst_port, 
             dport=self.src_port, 
             flags="SA", 
@@ -1106,7 +1147,7 @@ class ROCPlusPacketBuilder:
         seq_server += 1
         
         # ACK
-        ack = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+        ack = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
             sport=self.src_port, 
             dport=self.dst_port, 
             flags="A", 
@@ -1137,7 +1178,7 @@ class ROCPlusPacketBuilder:
                                     message_with_crc = message + self.calculate_crc(message)
                                     
                                     # Create packet with proper sequence numbers
-                                    request_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                                    request_packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
                                         sport=self.src_port, 
                                         dport=self.dst_port, 
                                         flags="PA", 
@@ -1151,7 +1192,7 @@ class ROCPlusPacketBuilder:
                                     seq_client += len(message_with_crc)
                                     
                                     # ACK from server
-                                    ack_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                                    ack_packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / TCP(
                                         sport=self.dst_port, 
                                         dport=self.src_port, 
                                         flags="A", 
@@ -1171,7 +1212,7 @@ class ROCPlusPacketBuilder:
                             message = header + payload
                             message_with_crc = message + self.calculate_crc(message)
                             
-                            request_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                            request_packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
                                 sport=self.src_port, 
                                 dport=self.dst_port, 
                                 flags="PA", 
@@ -1185,7 +1226,7 @@ class ROCPlusPacketBuilder:
                             seq_client += len(message_with_crc)
                             
                             # ACK from server
-                            ack_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                            ack_packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / TCP(
                                 sport=self.dst_port, 
                                 dport=self.src_port, 
                                 flags="A", 
@@ -1215,7 +1256,7 @@ class ROCPlusPacketBuilder:
                                     message_with_crc = message + self.calculate_crc(message)
                                     
                                     # Create packet with proper sequence numbers
-                                    response_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                                    response_packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / TCP(
                                         sport=self.dst_port, 
                                         dport=self.src_port, 
                                         flags="PA", 
@@ -1229,7 +1270,7 @@ class ROCPlusPacketBuilder:
                                     seq_server += len(message_with_crc)
                                     
                                     # ACK from client
-                                    ack_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                                    ack_packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
                                         sport=self.src_port, 
                                         dport=self.dst_port, 
                                         flags="A", 
@@ -1249,7 +1290,7 @@ class ROCPlusPacketBuilder:
                             message = header + payload
                             message_with_crc = message + self.calculate_crc(message)
                             
-                            response_packet = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+                            response_packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / TCP(
                                 sport=self.dst_port, 
                                 dport=self.src_port, 
                                 flags="PA", 
@@ -1263,7 +1304,7 @@ class ROCPlusPacketBuilder:
                             seq_server += len(message_with_crc)
                             
                             # ACK from client
-                            ack_packet = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+                            ack_packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
                                 sport=self.src_port, 
                                 dport=self.dst_port, 
                                 flags="A", 
@@ -1280,7 +1321,7 @@ class ROCPlusPacketBuilder:
         
         # End with TCP teardown
         # FIN from client
-        fin = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+        fin = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
             sport=self.src_port, 
             dport=self.dst_port, 
             flags="FA", 
@@ -1293,7 +1334,7 @@ class ROCPlusPacketBuilder:
         seq_client += 1
         
         # FIN-ACK from server
-        fin_ack = IP(src=self.dst_ip, dst=self.src_ip) / TCP(
+        fin_ack = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / TCP(
             sport=self.dst_port, 
             dport=self.src_port, 
             flags="FA", 
@@ -1306,7 +1347,7 @@ class ROCPlusPacketBuilder:
         seq_server += 1
         
         # ACK from client
-        last_ack = IP(src=self.src_ip, dst=self.dst_ip) / TCP(
+        last_ack = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
             sport=self.src_port, 
             dport=self.dst_port, 
             flags="A", 
@@ -1318,7 +1359,139 @@ class ROCPlusPacketBuilder:
         
         # Write all packets to the output file
         wrpcap(output_file, packets)
-        logger.info(f"Successfully created comprehensive PCAP with {len(packets)} packets: {output_file}")
+        logger.info(f"Successfully created comprehensive TCP PCAP with {len(packets)} packets: {output_file}")
+        return len(packets)
+    
+    def _build_comprehensive_udp_pcap(self, output_file):
+        """Build a comprehensive PCAP with all opcodes using UDP"""
+        packets = []
+        
+        # Add a small delay between packets
+        timestamp = 1500000000  # Starting timestamp (seconds since epoch)
+        
+        # Build packets for each opcode
+        for opcode in sorted(OPCODE_PAYLOADS.keys()):
+            opcode_info = OPCODE_PAYLOADS[opcode]
+            
+            # Add a request if supported
+            if "request" in opcode_info:
+                try:
+                    # Handle variants for request
+                    if opcode in OPCODE_VARIANTS and isinstance(opcode_info["request"], dict):
+                        for variant in OPCODE_VARIANTS[opcode]["variants"]:
+                            if variant in opcode_info["request"]:
+                                try:
+                                    # Build request payload
+                                    payload = self.build_payload(opcode, False, variant)
+                                    header = self.build_header(opcode, payload)
+                                    message = header + payload
+                                    message_with_crc = message + self.calculate_crc(message)
+                                    
+                                    # Create UDP packet
+                                    request_packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / UDP(
+                                        sport=self.src_port, 
+                                        dport=self.dst_port
+                                    ) / message_with_crc
+                                    
+                                    # Explicitly recalculate length fields
+                                    if hasattr(request_packet, 'len'):
+                                        del request_packet.len
+                                    
+                                    request_packet.time = timestamp
+                                    timestamp += 0.25  # Add 250ms between packets
+                                    
+                                    packets.append(request_packet)
+                                    
+                                except Exception as e:
+                                    logger.warning(f"Skipping request variant {variant} for opcode {opcode}: {str(e)}")
+                    else:
+                        # Standard request without variants
+                        try:
+                            payload = self.build_payload(opcode, False)
+                            header = self.build_header(opcode, payload)
+                            message = header + payload
+                            message_with_crc = message + self.calculate_crc(message)
+                            
+                            request_packet = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / UDP(
+                                sport=self.src_port, 
+                                dport=self.dst_port
+                            ) / message_with_crc
+                            
+                            # Explicitly recalculate length fields
+                            if hasattr(request_packet, 'len'):
+                                del request_packet.len
+                                
+                            request_packet.time = timestamp
+                            timestamp += 0.25
+                            
+                            packets.append(request_packet)
+                            
+                        except Exception as e:
+                            logger.warning(f"Skipping standard request for opcode {opcode}: {str(e)}")
+                except Exception as e:
+                    logger.warning(f"Skipping request for opcode {opcode}: {str(e)}")
+            
+            # Add a response if supported
+            if "response" in opcode_info:
+                try:
+                    # Handle variants for response
+                    if opcode in OPCODE_VARIANTS and isinstance(opcode_info["response"], dict):
+                        for variant in OPCODE_VARIANTS[opcode]["variants"]:
+                            if variant in opcode_info["response"]:
+                                try:
+                                    # Build response payload
+                                    payload = self.build_payload(opcode, True, variant)
+                                    header = self.build_header(opcode, payload)
+                                    message = header + payload
+                                    message_with_crc = message + self.calculate_crc(message)
+                                    
+                                    # Create UDP packet
+                                    response_packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / UDP(
+                                        sport=self.dst_port, 
+                                        dport=self.src_port
+                                    ) / message_with_crc
+                                    
+                                    # Explicitly recalculate length fields
+                                    if hasattr(response_packet, 'len'):
+                                        del response_packet.len
+                                        
+                                    response_packet.time = timestamp
+                                    timestamp += 0.25
+                                    
+                                    packets.append(response_packet)
+                                    
+                                except Exception as e:
+                                    logger.warning(f"Skipping response variant {variant} for opcode {opcode}: {str(e)}")
+                    else:
+                        # Standard response without variants
+                        try:
+                            payload = self.build_payload(opcode, True)
+                            header = self.build_header(opcode, payload)
+                            message = header + payload
+                            message_with_crc = message + self.calculate_crc(message)
+                            
+                            response_packet = Ether(src=self.dst_mac, dst=self.src_mac) / IP(src=self.dst_ip, dst=self.src_ip) / UDP(
+                                sport=self.dst_port, 
+                                dport=self.src_port
+                            ) / message_with_crc
+                            
+                            # Explicitly recalculate length fields
+                            if hasattr(response_packet, 'len'):
+                                del response_packet.len
+                                
+                            response_packet.time = timestamp
+                            timestamp += 0.25
+                            
+                            packets.append(response_packet)
+                            
+                        except Exception as e:
+                            logger.warning(f"Skipping standard response for opcode {opcode}: {str(e)}")
+                except Exception as e:
+                    logger.warning(f"Skipping response for opcode {opcode}: {str(e)}")
+        
+        # Write all packets to the output file
+        wrpcap(output_file, packets)
+        logger.info(f"Successfully created comprehensive UDP PCAP with {len(packets)} packets: {output_file}")
         return len(packets)
 
 def main():
@@ -1333,7 +1506,8 @@ def main():
     parser.add_argument('--dst-ip', type=str, help='Destination IP address (default: 192.168.1.200)')
     parser.add_argument('--src-port', type=int, help='Source port (default: 32107)')
     parser.add_argument('--dst-port', type=int, help='Destination port (default: 4000)')
-    parser.add_argument('--comprehensive', action='store_true', help='Generate a comprehensive PCAP with all opcodes')
+    parser.add_argument('--comprehensive', '--all', action='store_true', help='Generate a comprehensive PCAP with all opcodes')
+    parser.add_argument('--protocol', choices=['tcp', 'udp'], default='tcp', help='Protocol to use (default: tcp)')
     args = parser.parse_args()
 
     # Configure debug logging if requested
@@ -1346,15 +1520,32 @@ def main():
         src_ip=args.src_ip,
         dst_ip=args.dst_ip,
         src_port=args.src_port,
-        dst_port=args.dst_port
+        dst_port=args.dst_port,
+        protocol=args.protocol
     )
 
     # Handle comprehensive mode
     if args.comprehensive:
-        output_file = args.output or f"rocplus_all_opcodes_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pcap"
+        # Create output directory if it doesn't exist (for default output path)
+        default_dir = '../traces'
+        if args.output:
+            output_dir = os.path.dirname(args.output)
+        else:
+            output_dir = default_dir
+            
+        if output_dir and not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            logger.info(f"Created output directory: {output_dir}")
+            
+        protocol_suffix = args.protocol
+        output_file = args.output or f"{output_dir}/all_opcodes_{protocol_suffix}.pcap"
+        
         try:
+            logger.info(f"Generating comprehensive ROCplus {args.protocol.upper()} PCAP with all opcodes...")
+            logger.info(f"Output file: {output_file}")
             packet_count = builder.build_comprehensive_pcap(output_file)
-            logger.info(f"Created comprehensive PCAP with {packet_count} packets: {output_file}")
+            logger.info(f"Successfully generated PCAP with {packet_count} packets")
+            logger.info(f"PCAP file created: {output_file}")
             sys.exit(0)
         except Exception as e:
             logger.error(f"Error creating comprehensive PCAP: {str(e)}")
@@ -1405,7 +1596,8 @@ def main():
         # Generate default filename if none provided
         msg_type = "response" if args.res else "request"
         variant_suffix = f"_{args.variant}" if args.variant else ""
-        output_file = args.output or f"rocplus_opcode_{args.opcode:03d}{variant_suffix}_{msg_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pcap"
+        protocol_suffix = args.protocol
+        output_file = args.output or f"rocplus_opcode_{args.opcode:03d}{variant_suffix}_{msg_type}_{protocol_suffix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pcap"
         
         builder.build_pcap(args.opcode, output_file, is_response=args.res, variant=args.variant)
     except Exception as e:
