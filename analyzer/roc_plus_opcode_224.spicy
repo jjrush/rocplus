@@ -1,0 +1,12 @@
+module ROC_PLUS_OPCODE_224;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+
+type SRBXSignal = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
+    switch(packetType) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SRBXSignal_Request;
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SRBXSignal_Response;
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SRBXSignal_Unknown;
+    };
+};

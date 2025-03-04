@@ -27,6 +27,7 @@ spicy_add_analyzer(
         #     roc_plus_opcode_180.spicy
             roc_plus_opcode_203.spicy
             roc_plus_opcode_206.spicy
+            roc_plus_opcode_224.spicy
             roc_plus_opcode_255.spicy
     SCRIPTS __load__.zeek
             main.zeek
@@ -56,6 +57,7 @@ spicy_add_analyzer(
         #     roc_plus_opcode_181.zeek
             roc_plus_opcode_203.zeek
             roc_plus_opcode_206.zeek
+            roc_plus_opcode_224.zeek
             roc_plus_opcode_255.zeek
     ENV HILTI_CXX_FLAGS=-fno-var-tracking-assignments
 )
