@@ -121,7 +121,8 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
         ROC_PLUS_ENUMS::Opcode::READ_TRANSACTION_HISTORY_DATA            -> readTransactionHistory               : ROC_PLUS_OPCODE_206::ReadTransactionHistory(self.dataLength);
         # ROC_PLUS_ENUMS::Opcode::SRBX_SIGNAL                              -> srbxSignal                           : ROC_PLUS_OPCODE_224::SRBXSignal(self.dataLength);
         ROC_PLUS_ENUMS::Opcode::ACKNOWLEDGE_SRBX                         -> ackSRBX                              : ROC_PLUS_OPCODE_225::AcknowledgeSRBX(self.dataLength);
-        ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR                          -> errorIndicator                       : ROC_PLUS_OPCODE_255::ErrorIndicator(self.dataLength); 
+        ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR                          -> errorIndicator                       : ROC_PLUS_OPCODE_255::ErrorIndicator(self.dataLength);
+        *                                                                -> _default                             : _Default(self.dataLength, rocMessage.opcode);
     };
 
     on %init {
@@ -144,4 +145,10 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
     # on %error(msg: string) {
     #     print "ERROR in DataBytes: " % msg;
     # }
+};
+
+type _Default = unit(dataLength: uint8, opcode: ROC_PLUS_ENUMS::Opcode) {
+    on %init {
+        throw "Unknown opcode: " % opcode;
+    }
 };

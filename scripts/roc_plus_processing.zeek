@@ -86,6 +86,9 @@ module ROC_PLUS;
             case ROC_PLUS_ENUMS::Opcode_ERROR_INDICATOR:
                 process_error_codes(c, data, roc_plus_link_id);
                 break;
+            default:
+                print "Unknown opcode: ", opcode;
+                break;
         }
     }
 
