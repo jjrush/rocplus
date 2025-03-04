@@ -32,7 +32,7 @@ spicy_add_analyzer(
             roc_plus_opcode_203.spicy
             roc_plus_opcode_205.spicy
             roc_plus_opcode_206.spicy
-            roc_plus_opcode_224.spicy
+            # roc_plus_opcode_224.spicy
             roc_plus_opcode_225.spicy
             roc_plus_opcode_255.spicy
 )
