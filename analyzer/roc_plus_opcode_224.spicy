@@ -5,8 +5,12 @@ import ROC_PLUS_ENUMS;
 
 type SRBXSignal = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
     switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SRBXSignal_Request;
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SRBXSignal_Request(dataLength);
         ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SRBXSignal_Response;
         ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SRBXSignal_Unknown;
     };
+};
+
+type SRBXSignal_Request = unit(dataLength: uint8) {
+    data           : bytes &size=(self.dataLength);
 };
