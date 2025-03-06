@@ -2,15 +2,20 @@ module ROC_PLUS_OPCODE_224;
 
 import spicy;
 import ROC_PLUS_ENUMS;
+import ROC_PLUS_GLOBALS;
 
-type SRBXSignal = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
+type SRBXSignal = unit (dataLength: uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
         ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SRBXSignal_Request(dataLength);
         ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SRBXSignal_Response;
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : SRBXSignal_Unknown;
     };
 };
 
 type SRBXSignal_Request = unit(dataLength: uint8) {
-    data           : bytes &size=(self.dataLength);
+    alarmIndex : uint16;
+    # data           : bytes &size=(dataLength);
+};
+
+type SRBXSignal_Response = unit {
+    # SRBX Signal response does not contain any data
 };

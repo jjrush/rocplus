@@ -111,16 +111,6 @@ module ROC_PLUS;
         return c;
     }
 
-    function set_srbx_signal_log(c: connection): connection {
-        if ( ! c?$roc_plus_srbx_signal_log )
-            c$roc_plus_srbx_signal_log = roc_plus_srbx_signal_log(
-                $ts=network_time(),
-                $uid=c$uid,
-                $id=c$id);
-
-        return c;
-    }
-
     function set_transaction_history_log(c: connection): connection {
         if ( ! c?$roc_plus_transaction_history_log )
             c$roc_plus_transaction_history_log = roc_plus_transaction_history_log(
