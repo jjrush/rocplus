@@ -2,20 +2,51 @@ module ROC_PLUS_OPCODE_224;
 
 import spicy;
 import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
 import ROC_PLUS_GLOBALS;
 
 type SRBXSignal = unit (dataLength: uint8) {
     switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SRBXSignal_Request(dataLength);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : SRBXSignal_Response;
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : SRBXSignalRequest(dataLength);
+        *                                    -> unknown  : SRBXSignalUnknown(dataLength);
     };
 };
 
-type SRBXSignal_Request = unit(dataLength: uint8) {
-    alarmIndex : uint16;
-    # data           : bytes &size=(dataLength);
+# ROC Plus Protocol Specifications Manual 2-44a
+# Body for opcode 225
+type SRBXSignalRequest = unit (dataLength: uint8) {
+    var alarmIndexValid : bool = False;
+    var currentAlarmLogIndex : uint16;
+    var unknown : string;
+
+    data : bytes &size=(dataLength);
+
+    on data {
+        # We are expecting 2 bytes representing an alarm log index
+        # Need to convert spicy bytes to uint16 for logging on the zeek side
+        if (dataLength == 2) {
+            local i : uint8 = 0;
+            local highByte : uint16 = 0;
+            local lowByte : uint16 = 0;
+
+            for (byte in self.data) {
+                if (i == 0) {
+                    highByte = cast<uint16>(byte);
+                } else if (i == 1) {
+                    lowByte = cast<uint16>(byte);
+                }
+                i = i + 1;
+            }
+
+            self.currentAlarmLogIndex = highByte * 256 + lowByte;
+            self.alarmIndexValid = True;
+        } else {
+            # If we don't have 2 bytes, we have unknown data
+            self.unknown = ROC_PLUS_FUNCTIONS::bytesToHexString(self.data);
+        }
+    }
 };
 
-type SRBXSignal_Response = unit {
-    # SRBX Signal response does not contain any data
+type SRBXSignalUnknown = unit (dataLength: uint8) {
+    data : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
