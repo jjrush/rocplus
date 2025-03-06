@@ -16,18 +16,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "empty": {
-            "payload": {
-                "history_segment": 0,      # History Segment (0-10) [UINT8]
-                "point_number": 0,         # Point number [UINT8]
-                "day": 1,                  # Day requested [UINT8]
-                "month": 1,                # Month requested [UINT8]
-                "num_periodic": 0,         # Number of periodic entries [UINT16]
-                "num_daily": 0,           # Number of daily entries [UINT16]
-                "periodic_values": [],     # Empty array since num_periodic = 0
-                "daily_values": []         # Empty array since num_daily = 0
-            }
-        },
         "single": {
             "payload": {
                 "history_segment": 0,      # History Segment (0-10) [UINT8]

@@ -16,15 +16,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "empty": {
-            "payload": {
-                "history_segment": 0,      # History Segment (0-10) [UINT8]
-                "point_number": 0,         # Point number [UINT8]
-                "current_index": 0,        # Current history segment index [UINT16]
-                "num_values": 0,           # Number of values being sent [UINT8]
-                "history_values": []       # Empty array since num_values = 0
-            }
-        },
         "single": {
             "payload": {
                 "history_segment": 0,      # History Segment (0-10) [UINT8]

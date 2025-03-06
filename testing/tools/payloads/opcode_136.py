@@ -41,15 +41,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "empty": {
-            "payload": {
-                "history_segment": 1,
-                "segment_index": 0,
-                "current_index": 0,
-                "num_elements": 0,
-                "periods": []
-            }
-        },
         "single": {
             "payload": {
                 "history_segment": 1,

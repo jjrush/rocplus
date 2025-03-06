@@ -14,14 +14,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "empty": {  # Example with no points
-            "payload": {
-                "command": 11,             # Command (11) [UINT8]
-                "start_point": 0,          # Start Point # (0-255) [UINT8]
-                "num_points": 0,           # Number of Points (0-245) [UINT8]
-                "point_types": []          # Empty array since num_points = 0
-            }
-        },
         "single": {  # Example with one point
             "payload": {
                 "command": 11,             # Command (11) [UINT8]

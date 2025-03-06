@@ -13,14 +13,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "empty": {
-            "payload": {
-                "num_events": 0,           # Number of events being sent [UINT8]
-                "start_index": 1,          # Starting Event Log index [UINT16]
-                "current_index": 1,        # Current Event Log index [UINT16]
-                "event_data": []           # Empty array since num_events = 0
-            }
-        },
         "single": {
             "payload": {
                 "num_events": 1,           # Number of events being sent [UINT8]

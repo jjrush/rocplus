@@ -15,8 +15,7 @@ Response format:
 - Data (a contiguous block) [1-230 bytes]
 
 Variants (response only):
-- empty: One data byte (0)
-- single: Two data bytes (1,2)
+- single: One data byte (1)
 - max: 230 data bytes (0-229)
 """
 

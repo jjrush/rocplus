@@ -7,12 +7,6 @@ Response includes alarm data blocks of 23 bytes each, up to 10 alarms maximum.
 
 PAYLOAD = {
     "request": {
-        "empty": {
-            "payload": {
-                "num_alarms": 0,           # Number of alarms requested (0-10) [UINT8]
-                "start_index": 1           # Starting Alarm Log index [UINT16]
-            }
-        },
         "single": {
             "payload": {
                 "num_alarms": 1,           # Number of alarms requested (0-10) [UINT8]
@@ -27,14 +21,6 @@ PAYLOAD = {
         }
     },
     "response": {
-        "empty": {
-            "payload": {
-                "num_alarms": 0,           # Number of alarms being sent [UINT8]
-                "start_index": 1,          # Starting Alarm Log index [UINT16]
-                "current_index": 1,        # Current Alarm Log index [UINT16]
-                "alarm_data": []           # Empty array since num_alarms = 0
-            }
-        },
         "single": {
             "payload": {
                 "num_alarms": 1,           # Number of alarms being sent [UINT8]

@@ -13,7 +13,6 @@ Response:
 - Acknowledgment sent back
 
 Variants:
-- empty: One data byte (0)
 - single: One data byte (1)
 - max: 230 data bytes
 """
@@ -26,7 +25,7 @@ PAYLOAD = {
                 "point_number": 1,         # Point/Logic Number [UINT8]
                 "num_parameters": 1,       # Number of Parameters [UINT8]
                 "start_param": 0,          # Starting parameter Number [UINT8]
-                "data": [1]             # Two bytes of data (1, 2)
+                "data": [1]                # Two bytes of data (1, 2)
             }
         },
         "max": {
