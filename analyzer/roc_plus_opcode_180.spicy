@@ -3,6 +3,7 @@ module ROC_PLUS_OPCODE_180;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
 type Parameter = unit {
     pointType        : uint8;
@@ -10,29 +11,32 @@ type Parameter = unit {
     parameterNumber  : uint8;
 };
 
-type ParameterWithData = unit {
+type ParameterWithData = unit(dataLength : uint8) {
     parameter : Parameter;
-    data      : bytes &eod; # TODO: figure out if it is possible to know how large this is for a given parameter
+    data      : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type RequestParameters = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestParameters_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestParameters_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestParameters_Unknown();
+type RequestParameters = unit(dataLength : uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestParametersRequest(dataLength);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestParametersResponse(dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestParametersUnknown(dataLength);
     };
 };
 
-type RequestParameters_Unknown = unit {
-    # This opcode should always be a request or a response
+type RequestParametersUnknown = unit(dataLength : uint8) {
+    data : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type RequestParameters_Request = unit {
+type RequestParametersRequest = unit(dataLength : uint8) {
     numParameters       : uint8;
     requestedParameters : Parameter[self.numParameters];
 };
 
-type RequestParameters_Response = unit {
+type RequestParametersResponse = unit(dataLength : uint8) {
     numParameters     : uint8;
-    responseParameter : ParameterWithData[self.numParameters];
+    # TODO: sending this the datalength does not work as there is a double repeating data portion
+    # We would have to build structures for every Point/Logic Number defined in the spec which numbers 300 pages
+    # This is not feasible so we are considering all opcode 180 packets to be unknown and dumping the data
+    responseParameter : ParameterWithData(dataLength)[self.numParameters];
 };

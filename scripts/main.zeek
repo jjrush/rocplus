@@ -10,7 +10,7 @@ module ROC_PLUS;
 
 export {
     const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
-    # const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
+    const roc_plus_ports_tcp: set[port] = { 4000/tcp } &redef;
 
     redef enum Log::ID += { LOG_ROC_PLUS_LOG, 
                             LOG_ROC_PLUS_SYS_CFG_LOG,
@@ -23,8 +23,12 @@ export {
                             LOG_ROC_PLUS_USER_DEFINED_INFO_LOG,
                             LOG_ROC_PLUS_SINGLE_POINT_PARAMETERS_LOG,
                             LOG_ROC_PLUS_FILE_TRANSFER_LOG,
-                            LOG_ROC_PLUS_SRBX_SIGNAL_LOG,
-                            LOG_ROC_PLUS_TRANSACTION_HISTORY_LOG };
+                            LOG_ROC_PLUS_TRANSACTION_HISTORY_LOG,
+                            LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG,
+                            LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
+                            LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG,
+                            LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG,
+                            LOG_ROC_PLUS_UNKNOWN_DATA_LOG };
 
     # Callback event for integrating with the file analysis framework
     global get_file_handle: function(c: connection, is_orig: bool): string;
@@ -43,6 +47,11 @@ export {
     global log_policy_roc_plus_file_transfer: Log::PolicyHook;
     global log_policy_roc_plus_srbx_signal: Log::PolicyHook;
     global log_policy_roc_plus_transaction_history: Log::PolicyHook;
+    global log_policy_roc_plus_history_point_data: Log::PolicyHook;
+    global log_policy_roc_plus_history_information: Log::PolicyHook;
+    global log_policy_roc_plus_peer_to_peer_network_messages: Log::PolicyHook;
+    global log_policy_roc_plus_time_period_history_points: Log::PolicyHook;
+    global log_policy_roc_plus_unknown_data: Log::PolicyHook;
 
     global log_roc_plus_log: event(rec: roc_plus_log);
     global log_roc_plus_sys_cfg_log: event(rec: roc_plus_sys_cfg_log);
@@ -57,6 +66,11 @@ export {
     global log_roc_plus_file_transfer_log: event(rec: roc_plus_file_transfer_log);
     global log_roc_plus_srbx_signal_log: event(rec: roc_plus_srbx_signal_log);
     global log_roc_plus_transaction_history_log: event(rec: roc_plus_transaction_history_log);
+    global log_roc_plus_history_point_data_log: event(rec: roc_plus_history_point_data_log);
+    global log_roc_plus_history_information_log: event(rec: roc_plus_history_information_log);
+    global log_roc_plus_peer_to_peer_network_messages_log: event(rec: roc_plus_peer_to_peer_network_messages_log);
+    global log_roc_plus_time_period_history_points_log: event(rec: roc_plus_time_period_history_points_log);
+    global log_roc_plus_unknown_data_log: event(rec: roc_plus_unknown_data_log);
 
     global emit_roc_plus_log: function(c: connection);
     global emit_roc_plus_sys_cfg_log: function(c: connection);
@@ -70,7 +84,12 @@ export {
     global emit_roc_plus_single_point_parameters_log: function(c: connection);
     global emit_roc_plus_file_transfer_log: function(c: connection);
     global emit_roc_plus_srbx_signal_log: function(c: connection);
-    global emit_roc_plus_transaction_history_log: function(c: connection); 
+    global emit_roc_plus_transaction_history_log: function(c: connection);
+    global emit_roc_plus_history_point_data_log: function(c: connection);
+    global emit_roc_plus_history_information_log: function(c: connection);
+    global emit_roc_plus_peer_to_peer_network_messages_log: function(c: connection);
+    global emit_roc_plus_time_period_history_points_log: function(c: connection);
+    global emit_roc_plus_unknown_data_log: function(c: connection); 
 }
 
 # redefine connection record to contain one of each of the ROC_PLUS records
@@ -89,21 +108,27 @@ redef record connection += {
     roc_plus_file_transfer_log: roc_plus_file_transfer_log &optional;
     roc_plus_srbx_signal_log: roc_plus_srbx_signal_log &optional;
     roc_plus_transaction_history_log: roc_plus_transaction_history_log &optional;
+    roc_plus_history_point_data_log: roc_plus_history_point_data_log &optional;
+    roc_plus_history_information_log: roc_plus_history_information_log &optional;
+    roc_plus_peer_to_peer_network_messages_log: roc_plus_peer_to_peer_network_messages_log &optional;
+    roc_plus_time_period_history_points_log: roc_plus_time_period_history_points_log &optional;
+    roc_plus_unknown_data_log: roc_plus_unknown_data_log &optional;
 };
 
-redef likely_server_ports += { roc_plus_ports_udp };
+redef likely_server_ports += { roc_plus_ports_tcp, roc_plus_ports_udp };
 
 #Put protocol detection information here
 event zeek_init() &priority=5 {
+    print "ROCplus analyzer initialized";
 
     # register with the file analysis framework
     Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_UDP,
                             [$get_file_handle = ROC_PLUS::get_file_handle]);
-    # Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_TCP,
-    #                         [$get_file_handle = ROC_PLUS::get_file_handle]);
+    Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_TCP,
+                            [$get_file_handle = ROC_PLUS::get_file_handle]);
 
     Analyzer::register_for_ports(Analyzer::ANALYZER_ROC_PLUS_UDP, roc_plus_ports_udp);
-    # Analyzer::register_for_ports(Analyzer::ANALYZER_ROC_PLUS_TCP, roc_plus_ports_tcp);
+    Analyzer::register_for_ports(Analyzer::ANALYZER_ROC_PLUS_TCP, roc_plus_ports_tcp);
 
     # initialize logging streams for all ROC_PLUS logs
     Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_LOG,
@@ -183,6 +208,37 @@ event zeek_init() &priority=5 {
                       $ev=log_roc_plus_transaction_history_log,
                       $path="roc_plus_transaction_history",
                       $policy=log_policy_roc_plus_transaction_history]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG,
+                      [$columns=roc_plus_history_point_data_log,
+                      $ev=log_roc_plus_history_point_data_log,
+                      $path="roc_plus_history_point_data",
+                      $policy=log_policy_roc_plus_history_point_data]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG,
+                      [$columns=roc_plus_peer_to_peer_network_messages_log,
+                      $ev=log_roc_plus_peer_to_peer_network_messages_log,
+                      $path="roc_plus_peer_to_peer_network_messages",
+                      $policy=log_policy_roc_plus_peer_to_peer_network_messages]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_HISTORY_INFORMATION_LOG,
+                      [$columns=roc_plus_history_information_log,
+                      $ev=log_roc_plus_history_information_log,
+                      $path="roc_plus_history_information",
+                      $policy=log_policy_roc_plus_history_information]);
+
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG,
+                      [$columns=roc_plus_time_period_history_points_log,
+                      $ev=log_roc_plus_time_period_history_points_log,
+                      $path="roc_plus_time_period_history_points",
+                      $policy=log_policy_roc_plus_time_period_history_points]);
+
+    # Create all log streams
+    Log::create_stream(ROC_PLUS::LOG_ROC_PLUS_UNKNOWN_DATA_LOG,
+                      [$columns=roc_plus_unknown_data_log,
+                      $ev=log_roc_plus_unknown_data_log,
+                      $path="roc_plus_unknown_data",
+                      $policy=log_policy_roc_plus_unknown_data]);
 }
 
 function emit_roc_plus_log(c: connection) {
@@ -220,8 +276,8 @@ function emit_roc_plus_realtime_clock_log(c: connection) {
 function emit_roc_plus_configurable_opcode_log(c: connection) {
     if (! c?$roc_plus_configurable_opcode_log )
         return;
-    if ( c?$roc_plus_protocol )
-        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    if ( c?$roc_plus_protocol ) # this syntax with the ?$ specifically means "Does field exist"
+        c$roc_plus_log$protocol = c$roc_plus_protocol; # if it does, set the protocol field to the protocol value. This will set the higher level roc_plus_log.log's protocol value to rocplus
     Log::write(ROC_PLUS::LOG_ROC_PLUS_CONFIGURABLE_OPCODE_LOG, c$roc_plus_configurable_opcode_log);
 }
 
@@ -287,6 +343,46 @@ function emit_roc_plus_transaction_history_log(c: connection) {
     if ( c?$roc_plus_protocol )
         c$roc_plus_log$protocol = c$roc_plus_protocol;
     Log::write(ROC_PLUS::LOG_ROC_PLUS_TRANSACTION_HISTORY_LOG, c$roc_plus_transaction_history_log);
+}
+
+function emit_roc_plus_history_point_data_log(c: connection) {
+    if (! c?$roc_plus_history_point_data_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_HISTORY_POINT_DATA_LOG, c$roc_plus_history_point_data_log);
+}
+
+function emit_roc_plus_peer_to_peer_network_messages_log(c: connection) {
+    if (! c?$roc_plus_peer_to_peer_network_messages_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_PEER_TO_PEER_NETWORK_MESSAGES_LOG, c$roc_plus_peer_to_peer_network_messages_log);
+}
+
+function emit_roc_plus_history_information_log(c: connection) {
+    if (! c?$roc_plus_history_information_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_HISTORY_INFORMATION_LOG, c$roc_plus_history_information_log);
+}
+
+function emit_roc_plus_time_period_history_points_log(c: connection) {
+    if (! c?$roc_plus_time_period_history_points_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_TIME_PERIOD_HISTORY_POINTS_LOG, c$roc_plus_time_period_history_points_log);
+}
+
+function emit_roc_plus_unknown_data_log(c: connection) {
+    if (! c?$roc_plus_unknown_data_log )
+        return;
+    if ( c?$roc_plus_protocol )
+        c$roc_plus_log$protocol = c$roc_plus_protocol;
+    Log::write(ROC_PLUS::LOG_ROC_PLUS_UNKNOWN_DATA_LOG, c$roc_plus_unknown_data_log);
 }
 
 # 

@@ -3,10 +3,10 @@ module ROC_PLUS_ENUMS;
 import spicy;
 
 # ROC Plus does not provide a packet-level indication if something is a REQUEST or a RESPONSE.
-# As a result, there exist edge cases where a given packet's REQ size and RES size can be equivalent. 
-# (See Opcode 206's Read Transaction Command. The request is 6 bytes. If the response Data Type at offset 9 is a U16 or S16 then the response will also be 6 bytes.)
+# As a result, there exist edge cases where a packet's REQ size and RES size can be equivalent. 
+# (See Opcode 205 for the clearest example of this. Both the request and response can be the same length with no way to tell them apart.
 # Without more information it is impossible to know how to treat the given packet.
-# Such packets are UNKNOWN and will be dropped instead of parsed.
+# Such packets are UNKNOWN and will be parsed as-is to an unknown data log where possible.
 #
 # Section 1.2 General Message Format Details
 #
@@ -106,6 +106,8 @@ public type Opcode17Type = enum {
     ENHANCED_LOGIN      = 3,
     ENHANCED_LOGOUT     = 4,
     WRAPPED_SESSION_KEY = 5,
+    RESPONSE            = 6, # any response message other than wrapped session key
+    UNKNOWN             = 7
 };
 
 #
@@ -133,6 +135,21 @@ public type PointType = enum {
     NO_POINT_TYPE  = 255
 };
 
+# ROS Plus Protocol Specifications Manual 2-32
+public type HistoryType = enum {
+    MINUTE               = 0,
+    PERIODIC             = 1,
+    DAILY                = 2,
+    PERIODIC_TIMESTAMPS = 3,
+    DAILY_TIMESTAMPS    = 4
+};
+
+# ROS Plus Protocol Specifications Manual 2-36
+public type HistorySubCommands = enum {
+    REQUEST_CONFIGURED_POINTS    = 0,
+    REQUEST_SPECIFIED_POINT_DATA = 1
+};
+
 # Chapter 2 - Table 2-27 - Opcode 203, General File Transfer
 public type FileTransfer = enum {
     OPEN              = 1,
@@ -154,35 +171,28 @@ public type FileOpenOptions = enum {
 
 #
 # Chapter 2 - Table 2-29 - Opcode 206, Read Transaction History Data
-# Note: offsets are re-used for different 
-public type Opcode206Type = enum {
-    LIST_REQ = 0,
-    LIST_RES = 1, # always 21 bytes but READ_RES could also be 21 bytes rendering this unparse-able
-    READ_REQ = 2, # always 6 bytes but the response could also be 6 bytes rendering this unparse-able
-    READ_RES = 3  # unparse-able if between 6 bytes and 21 bytes 
-};
-
 #
-# Chapter 2 - Table 2-29 - Opcode 206, Read Transaction History Data
-#
-public type DataType = enum {
-    U8         = 1,
-    S8         = 2,
-    U16        = 3,
-    S16        = 4,
-    U32        = 5,
-    S32        = 6,
-    FLOAT      = 7,
-    DOUBLE     = 8,
-    STRING3    = 9,
-    STRING7    = 10,
-    STRING10   = 11,
-    STRING20   = 12,
-    STRING30   = 14,
-    T_STRING40 = 15,
-    BINARY     = 17, # 1 byte
-    TLP        = 18, # 3 bytes
-    TIME       = 20  # 4 bytes
+public type ReadTransactionDataType = enum {
+    DATA_TYPE_U8         = 1,
+    DATA_TYPE_S8         = 2,
+    DATA_TYPE_U16        = 3,
+    DATA_TYPE_S16        = 4,
+    DATA_TYPE_U32        = 5,
+    DATA_TYPE_S32        = 6,
+    DATA_TYPE_FLOAT      = 7,
+    DATA_TYPE_DOUBLE     = 8,
+    DATA_TYPE_STRING3    = 9,
+    DATA_TYPE_STRING7    = 10,
+    DATA_TYPE_STRING10   = 11,
+    DATA_TYPE_STRING20   = 12,
+    # skip 13
+    DATA_TYPE_STRING30   = 14,
+    DATA_TYPE_T_STRING40 = 15, 
+    # skip 16
+    DATA_TYPE_BINARY     = 17, # 1 byte
+    DATA_TYPE_TLP        = 18, # 3 bytes
+    # skip 19
+    DATA_TYPE_TIME       = 20  # 4 bytes
 };
 
 #

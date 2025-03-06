@@ -1,0 +1,23 @@
+module ROC_PLUS_OPCODE_225;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
+
+type AcknowledgeSRBX = unit (dataLength: uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : AcknowledgeSRBXRequest();
+        *                                    -> unknown  : AckSRBXUnknown(dataLength);
+    };
+};
+
+# ROC Plus Protocol Specifications Manual 2-44a
+# Body for opcode 225
+type AcknowledgeSRBXRequest = unit {
+    currentAlarmLogIndex : uint16;
+};
+
+type AckSRBXUnknown = unit (dataLength: uint8) {
+    data : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+};

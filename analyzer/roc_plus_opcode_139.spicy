@@ -1,0 +1,80 @@
+module ROC_PLUS_OPCODE_139;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
+
+type HistoryInformationData = unit(dataLength: uint8) {
+    command : uint8 &convert=ROC_PLUS_ENUMS::HistorySubCommands($$);
+    on command {
+        ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL = ROC_PLUS_FUNCTIONS::determineOpcode139PacketType(self.command, dataLength);
+    }
+
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : HistoryInformationDataRequest(self.command);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : HistoryInformationDataResponse(self.command);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : HistoryInformationDataUnknown(dataLength);
+        *                                    ->          : void;
+    };
+};
+
+# Body for opcode 139
+type HistoryInformationDataRequest = unit (command: ROC_PLUS_ENUMS::HistorySubCommands) {
+    switch(command) {
+        ROC_PLUS_ENUMS::HistorySubCommands::REQUEST_CONFIGURED_POINTS    -> configuredPointsRequest   : HistoryConfiguredPointsRequest;
+        ROC_PLUS_ENUMS::HistorySubCommands::REQUEST_SPECIFIED_POINT_DATA -> specifiedPointDataRequest : HistorySpecifiedPointDataRequest;
+        *                                                                ->                           : void;
+    };
+};
+
+type HistoryConfiguredPointsRequest = unit {
+    historySegment : uint8;
+};
+
+type HistorySpecifiedPointDataRequest = unit {
+    historySegment               : uint8;
+    # History segment index {Minute 0 - 59, Periodic 0 - (#periodic entries in history point - 1), or Daily 0 - (#daily entries in history point - 1)}
+    historySegmentIndex          : uint16;
+    typeOfHistory                : uint8 &convert=ROC_PLUS_ENUMS::HistoryType($$);
+    numTimePeriods               : uint8;
+    requestTimestamps            : uint8;
+    numPoints                    : uint8;
+    # Repeat above as necessary.
+    requestedHistoryPoints       : uint8[self.numPoints];
+};
+
+# ROC Plus Protocol Specifications Manual 2-36
+type HistoryInformationDataResponse = unit (command: ROC_PLUS_ENUMS::HistorySubCommands) {
+    switch(command) {
+        ROC_PLUS_ENUMS::HistorySubCommands::REQUEST_CONFIGURED_POINTS    -> configuredPointsResponse   : HistoryConfiguredPointsResponse;
+        ROC_PLUS_ENUMS::HistorySubCommands::REQUEST_SPECIFIED_POINT_DATA -> specifiedPointDataResponse : HistorySpecifiedPointDataResponse;
+        *                                                                ->                            : void;
+    };
+};
+
+type HistoryConfiguredPointsResponse = unit {
+    historySegment                   : uint8;
+    numConfiguredPoints              : uint8;
+    # Repeat above as necessary.
+    configuredPoints                 : uint8[self.numConfiguredPoints];
+};
+
+type HistorySpecifiedPointDataResponse = unit {
+    historySegment                   : uint8;
+    currentHistorySegmentIndex       : uint16;
+    numTimePeriods                   : uint8;
+    requestTimestamps                : uint8;
+    numPoints                        : uint8;
+    timePeriodHistoryPointsList      : (OptionalTimePeriodHistoryPoints(self.requestTimestamps, self.numPoints))[self.numTimePeriods];
+};
+
+# ROC Plus Protocol Specifications Manual 2-36
+type OptionalTimePeriodHistoryPoints = unit (requestTimestamp : uint8, numPoints : uint8) {
+    timestampForIndex                : uint32 if (requestTimestamp != 0);
+    historyPointValues               : (uint32)[numPoints];
+};
+
+type HistoryInformationDataUnknown = unit(dataLength: uint8) {
+    data : bytes &size=(dataLength - 1) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+};

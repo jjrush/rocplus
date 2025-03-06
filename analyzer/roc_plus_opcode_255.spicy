@@ -3,7 +3,7 @@ module ROC_PLUS_OPCODE_255;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
-
+import ROC_PLUS_GLOBALS;
 #
 # Opcode 255 - Error Indicator
 #
@@ -12,24 +12,19 @@ type Error = unit() {
     errorOffset : uint8;
 };
 
-type ErrorIndicator = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ErrorIndicator_Request(dataLength);
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ErrorIndicator_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ErrorIndicator_Unknown();
+type ErrorIndicator = unit(dataLength : uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ErrorIndicatorResponse(dataLength);
+        *                                    -> unknown  : ErrorIndicatorUnknown(dataLength);
     };
 };
 
-type ErrorIndicator_Unknown = unit {
-    # This opcode should always be a response
+type ErrorIndicatorUnknown = unit(dataLength: uint8) {
+    # The spec says the request is reserved for ROC use but if there ends up being data in this request we have to parse it because of how spicy works
+    data : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type ErrorIndicator_Request = unit(dataLength: uint8) {
-    # The spec says this is reserved for ROC use but if there ends up being data in this response we have to parse it because of how spicy works
-    data : bytes &size=(dataLength);
-};
-
-type ErrorIndicator_Response = unit(dataLength: uint8) {
+type ErrorIndicatorResponse = unit(dataLength: uint8) {
     errors : Error[(dataLength / 2)];
 
     # on %done {

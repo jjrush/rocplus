@@ -3,27 +3,23 @@ module ROC_PLUS_OPCODE_167;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type RequestSinglePointParameters = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestSinglePointParameters_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestSinglePointParameters_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestSinglePointParameters_Unknown();
+type RequestSinglePointParameters = unit(dataLength : uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestSinglePointParametersRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestSinglePointParametersResponse(dataLength);
     };
 };
 
-type RequestSinglePointParameters_Unknown = unit {
-    # This opcode should always be a request or a response
-};
-
-type RequestSinglePointParameters_Request = unit {
+type RequestSinglePointParametersRequest = unit {
     pointType           : uint8;
     pointLogicNumber    : uint8;
     numParameters       : uint8;
     startParameterNum   : uint8;
 };
 
-type RequestSinglePointParameters_Response = unit(dataLength : uint8) {
+type RequestSinglePointParametersResponse = unit(dataLength : uint8) {
     pointType           : uint8;
     pointLogicNumber    : uint8;
     numParameters       : uint8;

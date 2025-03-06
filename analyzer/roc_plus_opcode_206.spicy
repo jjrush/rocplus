@@ -3,35 +3,37 @@ module ROC_PLUS_OPCODE_206;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type ReadTransactionHistory = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadTransactionHistory_Request;
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadTransactionHistory_Response;
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadTransactionHistory_Unknown;
+type ReadTransactionHistory = unit(dataLength: uint8) {
+    command : uint8 &convert=ROC_PLUS_ENUMS::TransactionHistoryCommand($$);
+    on command {
+        ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL = ROC_PLUS_FUNCTIONS::determineOpcode206PacketType(dataLength, self.command);
+    }
+
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : ReadTransactionHistoryRequest(self.command);
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ReadTransactionHistoryResponse(self.command, dataLength);
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : ReadTransactionHistoryUnknown(dataLength);
     };
 };
 
-type ReadTransactionHistory_Unknown = unit {
-    # For ambiguous packets
-};
-
-type ReadTransactionHistory_Request = unit{
-    command : uint8 &convert=ROC_PLUS_ENUMS::TransactionHistoryCommand($$);
-
-    switch(self.command) {
+type ReadTransactionHistoryRequest = unit(command: ROC_PLUS_ENUMS::TransactionHistoryCommand) {
+    switch(command) {
         ROC_PLUS_ENUMS::TransactionHistoryCommand::LIST_TRANSACTION -> listt : ListTransactionRequest; # list is a reserved word so using listt
         ROC_PLUS_ENUMS::TransactionHistoryCommand::READ_TRANSACTION -> read  : ReadTransactionRequest;
     };
 };
 
-type ReadTransactionHistory_Response = unit {
-    command : uint8 &convert=ROC_PLUS_ENUMS::TransactionHistoryCommand($$);
-
-    switch(self.command) {
+type ReadTransactionHistoryResponse = unit(command: ROC_PLUS_ENUMS::TransactionHistoryCommand, dataLength: uint8) {
+    switch(command) {
         ROC_PLUS_ENUMS::TransactionHistoryCommand::LIST_TRANSACTION -> listt : ListTransactionResponse;
-        ROC_PLUS_ENUMS::TransactionHistoryCommand::READ_TRANSACTION -> read  : ReadTransactionResponse;
+        ROC_PLUS_ENUMS::TransactionHistoryCommand::READ_TRANSACTION -> read  : ReadTransactionResponse(dataLength);
     };
+};
+
+type ReadTransactionHistoryUnknown = unit(dataLength: uint8) {
+    data : bytes &size=(dataLength - 1) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
 type ListTransactionRequest = unit {
@@ -45,29 +47,55 @@ type ReadTransactionRequest = unit {
     dataOffset        : uint16;
 };
 
-type ReadTransactionResponse = unit {
-    command          : uint8;
-    messageDataSize  : uint8;
-    moreData         : uint8;
+type ReadTransactionResponse = unit(dataLength: uint8) {
+    # Note: https://github.com/zeek/zeek/issues/4250
+    # spicy doesn't support vectors of enums as of the time of this comment
+    # as a result we have to collect the data as-is and convert it manually when needed
+    # var types  : vector<ROC_PLUS_ENUMS::ReadTransactionDataType>;
+    var types  : vector<uint8>;
+    var values : vector<uint8>;
 
-    readTransactions : ReadTransaction[self.messageDataSize];
+    messageDataSize : uint8;
+    moreData        : uint8;
+
+    data            : bytes &size=(dataLength - 3);
+
+    on data {
+        local counter : uint8 = 0;
+        for (byte in self.data) {
+            # if the counter has been incremented we need to collect the data corresponding to the type
+            if( counter > 0 ) {
+                self.values.push_back(byte);
+                counter = counter - 1;
+                continue;
+            }
+
+            # need to extract data type byte in order to know how many bytes to read next
+            # self.types.push_back(ROC_PLUS_ENUMS::ReadTransactionDataType(byte));
+            self.types.push_back(byte);
+            # need to convert data type byte to actual size and increment index by that amount so we can read next type + value
+            counter = counter + ROC_PLUS_FUNCTIONS::dataTypeSize(ROC_PLUS_ENUMS::ReadTransactionDataType(byte));
+        }
+    }
+    # readTransactions : ReadTransaction[self.messageDataSize];
+
 };
 
 type ListTransactionResponse = unit {
     numTransactions : uint8;
     moreData        : uint8;
     description     : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+    payloadSize     : uint16;
 
     listTransactions : ListTransaction[self.numTransactions];
 };
 
 type ReadTransaction = unit {
-    dataType         : uint8 &convert=ROC_PLUS_ENUMS::DataType($$);
+    dataType         : uint8 &convert=ROC_PLUS_ENUMS::ReadTransactionDataType($$);
     data             : bytes &size=ROC_PLUS_FUNCTIONS::dataTypeSize(self.dataType) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
 type ListTransaction = unit {
-    payloadSize       : uint16;
     transactionNumber : uint16;
     dateCreated       : uint32;
 };

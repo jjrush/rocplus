@@ -3,23 +3,23 @@ module ROC_PLUS_OPCODE_138;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type RequestDailyAndPeriodicHistory = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestDailyAndPeriodicHistory_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestDailyAndPeriodicHistory_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestDailyAndPeriodicHistory_Unknown();
+type RequestDailyAndPeriodicHistory = unit {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestDailyAndPeriodicHistoryRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestDailyAndPeriodicHistoryResponse();
     };
 };
 
-type RequestDailyAndPeriodicHistory_Request = unit {
+type RequestDailyAndPeriodicHistoryRequest = unit {
     historySegment : uint8;
     historyPoint   : uint8;
     dayRequested   : uint8;
     monthRequested : uint8;
 };
 
-type RequestDailyAndPeriodicHistory_Response = unit {
+type RequestDailyAndPeriodicHistoryResponse = unit {
     historySegment      : uint8;
     historyPoint        : uint8;
     dayRequested        : uint8;
@@ -28,8 +28,4 @@ type RequestDailyAndPeriodicHistory_Response = unit {
     numDailyEntries     : uint16;
     periodicValues      : uint32[self.numPeriodicEntries];
     dailyValues         : uint32[self.numDailyEntries];    
-};
-
-type RequestDailyAndPeriodicHistory_Unknown = unit {
-    # This opcode should always be a request or a response
 };
