@@ -29,7 +29,7 @@ const OPCODE_050_REQ_DATA_LENGTH : uint8 = 1;
 const OPCODE_100_REQ_DATA_LENGTH : uint8 = 3;
 const OPCODE_105_REQ_DATA_LENGTH : uint8 = 2;
 
-# In the case of opcode 108 it is possible for the REQ and RES data lengths to match. 
+# In the case of opcode 108 it is possible for the REQ and RES data lengths to match.
 # We can only parse this opcode if the REQ < 15 bytes (the minimum size of a response)
 # or if the RES > 23 bytes (the maximum size of a REQ)
 const OPCODE_108_REQ_MIN_DATA_LENGTH : uint8 = 3;
@@ -51,9 +51,9 @@ const OPCODE_139_RES_COMMAND_1_MIN_DATA_LENGTH : uint8 = 10; # Timestamp byte is
 const OPCODE_139_RES_COMMAND_1_MAX_DATA_LENGTH : uint8 = 246; # See Table 2-22 for more details
 
 const OPCODE_166_RES_DATA_LENGTH : uint8 = 0; # Opcode 166's RESPONSE contains no data
-const OPCODE_167_REQ_DATA_LENGTH : uint8 = 4; 
+const OPCODE_167_REQ_DATA_LENGTH : uint8 = 4;
 
-const OPCODE_180_REQ_DATA_LENGTH_MIN : uint8 = 5; 
+const OPCODE_180_REQ_DATA_LENGTH_MIN : uint8 = 5;
 
 const OPCODE_181_RES_DATA_LENGTH : uint8 = 0; # Opcode 181's RESPONSE contains no data
 
@@ -76,7 +76,7 @@ const OPCODE_203_RES_READ_DIR_V305_DATA_LENGTH  : int8 = -1;
 const OPCODE_203_RES_READ_DIR_V310_DATA_LENGTH  : int8 = -1;
 
 # Opcode 205 has variable lengths for both response and request and is therefore unparseable
-#const OPCODE_205_REQ_DATA_LENGTH : int8 = -1; 
+#const OPCODE_205_REQ_DATA_LENGTH : int8 = -1;
 
 const OPCODE_206_REQ_LIST_DATA_LENGTH     : uint8 = 4;
 const OPCODE_206_REQ_READ_DATA_LENGTH     : uint8 = 6;
@@ -86,7 +86,7 @@ const OPCODE_206_RES_READ_MIN_DATA_LENGTH : uint8 = 5;
 const OPCODE_224_RES_DATA_LENGTH : uint8 = 0; # Opcode 224's RESPONSE contains no data
 const OPCODE_225_REQ_DATA_LENGTH : uint8 = 2; # Opcode 225's RESPONSE contains no data
 
-# const OPCODE_255_REQ_DATA_LENGTH : int8 = -1; # The REQUEST is reserved for ROC800 use. This opcode will always be a RESPONSE. 
+# const OPCODE_255_REQ_DATA_LENGTH : int8 = -1; # The REQUEST is reserved for ROC800 use. This opcode will always be a RESPONSE.
 ####################################################
 ####################################################
 ####################################################
@@ -121,7 +121,7 @@ public function determineOpcode139PacketType(command: ROC_PLUS_ENUMS::HistorySub
         else {
             return ROC_PLUS_ENUMS::PacketType::RESPONSE;
         }
-    } 
+    }
     else if (command == ROC_PLUS_ENUMS::HistorySubCommands::REQUEST_SPECIFIED_POINT_DATA) {
         if( dataLength < OPCODE_139_RES_COMMAND_1_MIN_DATA_LENGTH) {
             return ROC_PLUS_ENUMS::PacketType::REQUEST;
@@ -142,7 +142,7 @@ public function determineOpcode203PacketType(dataLength: uint8, command_raw: uin
     # See Table 2-27 for more details
     if (dataLength == OPCODE_203_REQ_DELETE_DATA_LENGTH && command_raw == 6) {
         command = ROC_PLUS_ENUMS::FileTransfer::DELETE;
-    } 
+    }
     else if (dataLength == OPCODE_203_REQ_READ_DIR_V305_DATA_LENGTH && command_raw == cast<uint8>(ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY)) {
         command = ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY;
     }
@@ -236,88 +236,88 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
     switch (opcode) {
         case ROC_PLUS_ENUMS::Opcode::SYSTEM_CONFIG:
             return dataLength == OPCODE_006_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::READ_REALTIME_CLOCK:
             return dataLength == OPCODE_007_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::SET_REALTIME_CLOCK:
             return dataLength > OPCODE_008_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::READ_CONFIGURABLE_OPCODE_POINT_DATA:
             return dataLength == OPCODE_010_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::WRITE_CONFIGURABLE_OPCODE_POINT_DATA:
             return dataLength > OPCODE_011_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-        
+
         case ROC_PLUS_ENUMS::Opcode::LOGIN_REQUEST:
             return determineOpcode17PacketType(opcode, dataLength);
-            
+
         case ROC_PLUS_ENUMS::Opcode::STORE_AND_FORWARD:
             return dataLength == OPCODE_024_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::RESPONSE : ROC_PLUS_ENUMS::PacketType::REQUEST;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_IO_POINT_POSITION:
             return dataLength == OPCODE_050_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::ACCESS_USER_DEFINED_INFORMATION:
             return dataLength == OPCODE_100_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_TODAY_YESTERDAY_MIN_MAX_VALUES:
             return dataLength == OPCODE_105_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_HISTORY_TAG_AND_PERIODIC_INDEX:
             return determineOpcode108PacketType(opcode, dataLength);
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_ALARM_DATA:
             return dataLength == OPCODE_118_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_EVENT_DATA:
             return dataLength == OPCODE_119_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_HISTORY_POINT_DATA:
             return dataLength == OPCODE_135_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_MULTIPLE_HISTORY_POINT_DATA:
             return dataLength == OPCODE_136_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_HISTORY_INDEX:
             return dataLength == OPCODE_137_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_DAILY_AND_PERIODIC_HISTORY:
             return dataLength == OPCODE_138_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         # Special case for opcode 139 HistoryInformationData
         # Need next byte in stream to determine packet type so handle that in opcode 139 directly
-            
+
         case ROC_PLUS_ENUMS::Opcode::SET_SINGLE_POINT_PARAMETERS:
             return dataLength != OPCODE_166_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_SINGLE_POINT_PARAMETERS:
             return dataLength == OPCODE_167_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::REQUEST_PARAMETERS:
             # TODO: figure out if this is parseable
             return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
-            
+
         case ROC_PLUS_ENUMS::Opcode::WRITE_PARAMETERS:
             # TODO: figure out if this is parseable
             return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
             # return dataLength != OPCODE_181_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
-        # Special case for opcode 203 GeneralFileTransfer 
+
+        # Special case for opcode 203 GeneralFileTransfer
         # Need next byte in stream to determine packet type so handle that in opcode 203 directly
-            
+
         case ROC_PLUS_ENUMS::Opcode::PEER_TO_PEER_NETWORK_MESSAGES:
             return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
-            
+
         # Special case for opcode 206 ReadTransactionHistory
         # Need next byte in stream to determine packet type so handle that in opcode 206 directly
-            
+
         case ROC_PLUS_ENUMS::Opcode::SRBX_SIGNAL:
             return dataLength != OPCODE_224_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::ACKNOWLEDGE_SRBX:
             return dataLength == OPCODE_225_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
-            
+
         case ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR:
             return ROC_PLUS_ENUMS::PacketType::RESPONSE;  # Error indicators are always responses
         default:
@@ -356,6 +356,8 @@ public function determineOpcode17SubType(dataLength: uint8) : ROC_PLUS_ENUMS::Op
     }
 }
 
+
+
 # Helper function to convert a number 0-15 to a hex character
 function getHexChar(n: uint8): string {
     if (n < 10)
@@ -368,31 +370,52 @@ function getHexChar(n: uint8): string {
     else return "f";
 }
 
-# Generate a random ID string 
+# public function generateId() : string &cxxname="ROC_PLUS_FUNCTIONS::generateId";
+
+# Generate a random ID string
 public function generateId(): string {
     local id = "";
-    
-    # Get the current time
+
+    # Character set containing all alphanumeric characters (a-z, A-Z, 0-9)
+    local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    local chars_length = 62;  # Length of the character set
+
+    # Get the current time for randomness
     local timestamp = spicy::current_time();
-    
-    # Extract time components for randomness and convert to integers
     local sec = cast<uint64>(timestamp.seconds());
     local nsec = cast<uint64>(timestamp.nanoseconds());
-    
-    # Use different parts of the time as a source of entropy
-    for ( i in [0, 1, 2, 3, 4, 5, 6, 7, 8] ) {
-        # Convert loop index to integer
-        local idx = cast<uint64>(i);
-        
-        # Use different calculations for each position to create variation
-        local byte1 = cast<uint8>((sec + idx * 7 + (nsec >> (idx * 3))) % 16);
-        local byte2 = cast<uint8>((nsec + idx * 13 + (sec >> (idx * 2))) % 16);
-        
-        # Append the hex chars to the ID using our helper function
-        id += getHexChar(byte1);
-        id += getHexChar(byte2);
+
+    # Generate 18 random characters
+    for (i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]) {
+        # Create a different random value for each position
+        local random_val: uint64;
+
+        # Use different combinations of the time components for randomness
+        if (i % 3 == 0) {
+            random_val = (nsec + (i * 17) + (sec % 97)) % chars_length;
+        } else if (i % 3 == 1) {
+            random_val = (sec + (i * 23) + (nsec % 83)) % chars_length;
+        } else {
+            random_val = ((sec ^ nsec) + (i * 31)) % chars_length;
+        }
+
+        # Extract characters for our set of possible chars
+        # Convert to int8 since Spicy doesn't support indexing with uint64
+        local idx = cast<int8>(random_val);
+
+        # Use substring to extract the character at the random position
+        if (idx < 26) {
+            # Lowercase letters (a-z: ASCII 97-122)
+            id += "%c" % (97 + idx);
+        } else if (idx < 52) {
+            # Uppercase letters (A-Z: ASCII 65-90)
+            id += "%c" % (65 + (idx - 26));
+        } else {
+            # Numbers (0-9: ASCII 48-57)
+            id += "%c" % (48 + (idx - 52));
+        }
     }
-    
+
     return id;
 }
 
@@ -407,7 +430,7 @@ public function bytesToHexString(data: bytes): string {
     # for (byte in data) {
     #     bytesAsHexString = bytesAsHexString + ("%02x" % byte);
     # }
-    
+
     # return bytesAsHexString;
     return spicy::bytes_to_hexstring(data);
 }
@@ -422,7 +445,7 @@ public function dataTypeSize(dataType : ROC_PLUS_ENUMS::ReadTransactionDataType)
         case ROC_PLUS_ENUMS::ReadTransactionDataType::DATA_TYPE_TIME:       return 4;
 
         case ROC_PLUS_ENUMS::ReadTransactionDataType::DATA_TYPE_TLP:        return 3;
- 
+
         case ROC_PLUS_ENUMS::ReadTransactionDataType::DATA_TYPE_U16:        return 2;
         case ROC_PLUS_ENUMS::ReadTransactionDataType::DATA_TYPE_S16:        return 2;
 
@@ -436,5 +459,5 @@ public function dataTypeSize(dataType : ROC_PLUS_ENUMS::ReadTransactionDataType)
         case ROC_PLUS_ENUMS::ReadTransactionDataType::DATA_TYPE_STRING20:   return 20;
         case ROC_PLUS_ENUMS::ReadTransactionDataType::DATA_TYPE_STRING30:   return 30;
         case ROC_PLUS_ENUMS::ReadTransactionDataType::DATA_TYPE_T_STRING40: return 40;
-    } 
+    }
 }
