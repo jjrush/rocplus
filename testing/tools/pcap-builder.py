@@ -177,7 +177,17 @@ class ROCPlusPacketBuilder:
         self.roc_group = 2
         self.host_unit = 3
         self.host_group = 4
-
+        
+        # Initialize the base timestamp (a fixed date for consistency)
+        self.base_time = datetime(2023, 6, 15, 12, 0, 0)  # June 15, 2023 at noon
+        self.current_timestamp = self.base_time.timestamp()
+    
+    def get_next_timestamp(self, increment=2.0):
+        """Get the next timestamp and increment by the specified amount"""
+        ts = self.current_timestamp
+        self.current_timestamp += increment
+        return ts
+    
     def validate_ascii_field(self, value, length, field_name, fixed=True, min_length=None):
         """Validate an ASCII field length
         
@@ -1124,6 +1134,9 @@ class ROCPlusPacketBuilder:
         seq_client = 100
         seq_server = 101
         
+        # Reset timestamp to the base
+        self.current_timestamp = self.base_time.timestamp()
+        
         # Start with TCP 3-way handshake
         # SYN
         syn = Ether(src=self.src_mac, dst=self.dst_mac) / IP(src=self.src_ip, dst=self.dst_ip) / TCP(
@@ -1132,6 +1145,7 @@ class ROCPlusPacketBuilder:
             flags="S", 
             seq=seq_client
         )
+        syn.time = self.get_next_timestamp(0.1)  # Small increment for handshake packets
         packets.append(syn)
         seq_client += 1
         
@@ -1143,6 +1157,7 @@ class ROCPlusPacketBuilder:
             seq=seq_server, 
             ack=seq_client
         )
+        syn_ack.time = self.get_next_timestamp(0.1)
         packets.append(syn_ack)
         seq_server += 1
         
@@ -1154,10 +1169,8 @@ class ROCPlusPacketBuilder:
             seq=seq_client, 
             ack=seq_server
         )
+        ack.time = self.get_next_timestamp(0.5)  # Slightly larger gap before data packets start
         packets.append(ack)
-        
-        # Add a small delay between packets
-        timestamp = 1500000000  # Starting timestamp (seconds since epoch)
         
         # Build packets for each opcode
         for opcode in sorted(OPCODE_PAYLOADS.keys()):
@@ -1185,8 +1198,7 @@ class ROCPlusPacketBuilder:
                                         seq=seq_client, 
                                         ack=seq_server
                                     ) / message_with_crc
-                                    request_packet.time = timestamp
-                                    timestamp += 0.25  # Add 250ms between packets
+                                    request_packet.time = self.get_next_timestamp(2.0)  # 2.0 seconds between packets
                                     
                                     packets.append(request_packet)
                                     seq_client += len(message_with_crc)
@@ -1199,8 +1211,7 @@ class ROCPlusPacketBuilder:
                                         seq=seq_server, 
                                         ack=seq_client
                                     )
-                                    ack_packet.time = timestamp
-                                    timestamp += 0.01
+                                    ack_packet.time = self.get_next_timestamp(0.1)  # Minimal increment for ACK
                                     packets.append(ack_packet)
                                 except Exception as e:
                                     logger.warning(f"Skipping request variant {variant} for opcode {opcode}: {str(e)}")
@@ -1219,8 +1230,7 @@ class ROCPlusPacketBuilder:
                                 seq=seq_client, 
                                 ack=seq_server
                             ) / message_with_crc
-                            request_packet.time = timestamp
-                            timestamp += 0.25
+                            request_packet.time = self.get_next_timestamp(2.0)
                             
                             packets.append(request_packet)
                             seq_client += len(message_with_crc)
@@ -1233,8 +1243,7 @@ class ROCPlusPacketBuilder:
                                 seq=seq_server, 
                                 ack=seq_client
                             )
-                            ack_packet.time = timestamp
-                            timestamp += 0.01
+                            ack_packet.time = self.get_next_timestamp(0.1)
                             packets.append(ack_packet)
                         except Exception as e:
                             logger.warning(f"Skipping standard request for opcode {opcode}: {str(e)}")
@@ -1244,6 +1253,7 @@ class ROCPlusPacketBuilder:
             # Add a response if supported
             if "response" in opcode_info:
                 try:
+                    # ... Response code stays the same but use self.get_next_timestamp() instead of timestamp += ...
                     # Handle variants for response
                     if opcode in OPCODE_VARIANTS and isinstance(opcode_info["response"], dict):
                         for variant in OPCODE_VARIANTS[opcode]["variants"]:
@@ -1263,8 +1273,7 @@ class ROCPlusPacketBuilder:
                                         seq=seq_server, 
                                         ack=seq_client
                                     ) / message_with_crc
-                                    response_packet.time = timestamp
-                                    timestamp += 0.25
+                                    response_packet.time = self.get_next_timestamp(2.0)
                                     
                                     packets.append(response_packet)
                                     seq_server += len(message_with_crc)
@@ -1277,8 +1286,7 @@ class ROCPlusPacketBuilder:
                                         seq=seq_client, 
                                         ack=seq_server
                                     )
-                                    ack_packet.time = timestamp
-                                    timestamp += 0.01
+                                    ack_packet.time = self.get_next_timestamp(0.1)
                                     packets.append(ack_packet)
                                 except Exception as e:
                                     logger.warning(f"Skipping response variant {variant} for opcode {opcode}: {str(e)}")
@@ -1297,8 +1305,7 @@ class ROCPlusPacketBuilder:
                                 seq=seq_server, 
                                 ack=seq_client
                             ) / message_with_crc
-                            response_packet.time = timestamp
-                            timestamp += 0.25
+                            response_packet.time = self.get_next_timestamp(2.0)
                             
                             packets.append(response_packet)
                             seq_server += len(message_with_crc)
@@ -1311,8 +1318,7 @@ class ROCPlusPacketBuilder:
                                 seq=seq_client, 
                                 ack=seq_server
                             )
-                            ack_packet.time = timestamp
-                            timestamp += 0.01
+                            ack_packet.time = self.get_next_timestamp(0.1)
                             packets.append(ack_packet)
                         except Exception as e:
                             logger.warning(f"Skipping standard response for opcode {opcode}: {str(e)}")
@@ -1328,8 +1334,7 @@ class ROCPlusPacketBuilder:
             seq=seq_client, 
             ack=seq_server
         )
-        fin.time = timestamp
-        timestamp += 0.1
+        fin.time = self.get_next_timestamp(0.1)
         packets.append(fin)
         seq_client += 1
         
@@ -1341,8 +1346,7 @@ class ROCPlusPacketBuilder:
             seq=seq_server, 
             ack=seq_client
         )
-        fin_ack.time = timestamp
-        timestamp += 0.1
+        fin_ack.time = self.get_next_timestamp(0.1)
         packets.append(fin_ack)
         seq_server += 1
         
@@ -1354,7 +1358,7 @@ class ROCPlusPacketBuilder:
             seq=seq_client, 
             ack=seq_server
         )
-        last_ack.time = timestamp
+        last_ack.time = self.get_next_timestamp(0.1)
         packets.append(last_ack)
         
         # Write all packets to the output file
@@ -1366,8 +1370,8 @@ class ROCPlusPacketBuilder:
         """Build a comprehensive PCAP with all opcodes using UDP"""
         packets = []
         
-        # Add a small delay between packets
-        timestamp = 1500000000  # Starting timestamp (seconds since epoch)
+        # Reset timestamp to the base
+        self.current_timestamp = self.base_time.timestamp()
         
         # Build packets for each opcode
         for opcode in sorted(OPCODE_PAYLOADS.keys()):
@@ -1397,8 +1401,7 @@ class ROCPlusPacketBuilder:
                                     if hasattr(request_packet, 'len'):
                                         del request_packet.len
                                     
-                                    request_packet.time = timestamp
-                                    timestamp += 0.25  # Add 250ms between packets
+                                    request_packet.time = self.get_next_timestamp(2.0)
                                     
                                     packets.append(request_packet)
                                     
@@ -1421,8 +1424,7 @@ class ROCPlusPacketBuilder:
                             if hasattr(request_packet, 'len'):
                                 del request_packet.len
                                 
-                            request_packet.time = timestamp
-                            timestamp += 0.25
+                            request_packet.time = self.get_next_timestamp(2.0)
                             
                             packets.append(request_packet)
                             
@@ -1455,8 +1457,7 @@ class ROCPlusPacketBuilder:
                                     if hasattr(response_packet, 'len'):
                                         del response_packet.len
                                         
-                                    response_packet.time = timestamp
-                                    timestamp += 0.25
+                                    response_packet.time = self.get_next_timestamp(2.0)
                                     
                                     packets.append(response_packet)
                                     
@@ -1479,8 +1480,7 @@ class ROCPlusPacketBuilder:
                             if hasattr(response_packet, 'len'):
                                 del response_packet.len
                                 
-                            response_packet.time = timestamp
-                            timestamp += 0.25
+                            response_packet.time = self.get_next_timestamp(2.0)
                             
                             packets.append(response_packet)
                             
