@@ -55,10 +55,6 @@ public type ROC_Message_TCP = unit {
 };
 
 public type ROC_Message = unit {
-    on %init {
-        self.rocPlusLinkId = ROC_PLUS_FUNCTIONS::generateId();
-    }
-
     var rocPlusLinkId : string;
 
     destinationUnit   : uint8; 
@@ -86,6 +82,11 @@ public type ROC_Message = unit {
     #     print "Got lsbCRC: ", self.lsbCRC;
     #     print "Got msbCRC: ", self.msbCRC;
     # }
+
+    on %init {
+        self.rocPlusLinkId = ROC_PLUS_FUNCTIONS::generateId();
+        print "Got rocPlusLinkId: ", self.rocPlusLinkId;
+    }
 };
 
 public type DataBytes = unit(rocMessage: ROC_Message) {
@@ -122,7 +123,7 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
         ROC_PLUS_ENUMS::Opcode::SRBX_SIGNAL                              -> srbxSignal                           : ROC_PLUS_OPCODE_224::SRBXSignal(self.dataLength);
         ROC_PLUS_ENUMS::Opcode::ACKNOWLEDGE_SRBX                         -> ackSRBX                              : ROC_PLUS_OPCODE_225::AcknowledgeSRBX(self.dataLength);
         ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR                          -> errorIndicator                       : ROC_PLUS_OPCODE_255::ErrorIndicator(self.dataLength);
-        *                                                                -> _default                             : _Default(self.dataLength, rocMessage.opcode);
+        # *                                                                -> _default                             : _Default(self.dataLength, rocMessage.opcode);
     };
 
     on %init {
@@ -147,8 +148,8 @@ public type DataBytes = unit(rocMessage: ROC_Message) {
     # }
 };
 
-type _Default = unit(dataLength: uint8, opcode: ROC_PLUS_ENUMS::Opcode) {
-    on %init {
-        throw "Unknown opcode: " % opcode;
-    }
-};
+# type _Default = unit(dataLength: uint8, opcode: ROC_PLUS_ENUMS::Opcode) {
+#     on %init {
+#         throw "Unknown opcode: " % opcode;
+#     }
+# };

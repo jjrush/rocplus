@@ -18,7 +18,7 @@ module ROC_PLUS;
         # Set sesssion rocplus log object
         c = set_roc_plus_log(c);
 
-        # Process the UDP msg
+        # Process the TCP msg
         c = process_message_tcp(c, c$roc_plus_log, tcpMessage);
 
         # Fire the event and tidy up
