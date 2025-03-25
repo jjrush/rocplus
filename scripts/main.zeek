@@ -115,7 +115,6 @@ redef likely_server_ports += { roc_plus_ports_tcp, roc_plus_ports_udp };
 
 #Put protocol detection information here
 event zeek_init() &priority=5 {
-    print "ROCplus analyzer initialized";
 
     # register with the file analysis framework
     Files::register_protocol(Analyzer::ANALYZER_ROC_PLUS_UDP,
