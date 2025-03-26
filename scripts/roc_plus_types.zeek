@@ -50,12 +50,10 @@ export {
         roc_plus_link_id               : string  &log &optional;
 
         # request
-        history_segment               : count &log &optional; # Re-used for response
-        historical_point_number       : count &log &optional; # Re-used for response
+        history_segment               : count &log &optional; # Re-use for response
+        historical_point_number       : count &log &optional; # Re-use for response
 
         # Response
-        # history_segment                    : count  &log &optional;
-        # historical_point_number            : count  &log &optional;
         historical_archival_method         : count  &log &optional;
         point_type                         : count  &log &optional;
         point_logic_number                 : count  &log &optional;
@@ -79,6 +77,7 @@ export {
         roc_plus_link_id    : string  &log &optional;
 
         ######### Opcode 7 - Read Real-time Clock
+        ######### Opcode 8 - Set Real-time Clock
 
         # Response (request is empty)
         current_second      : count  &log &optional; # Re-use for opcode 8
@@ -88,16 +87,6 @@ export {
         current_month       : count  &log &optional; # Re-use for opcode 8
         current_year        : count  &log &optional; # Re-use for opcode 8
         current_day_of_week : string &log &optional;
-
-        ######### Opcode 8 - Set Real-time Clock
-
-        # Request (response is empty)
-        # current_second    : count &log &optional;
-        # current_minute    : count &log &optional;
-        # current_hour      : count &log &optional;
-        # current_day       : count &log &optional;
-        # current_month     : count &log &optional;
-        # current_year      : count &log &optional;
     };
 
     type roc_plus_configurable_opcode_log: record {
@@ -114,9 +103,6 @@ export {
         num_table_locations     : count &log &optional; # Re-use for response and opcode 11
 
         # Response
-        # table_number            : count  &log &optional;
-        # starting_table_location : count  &log &optional;
-        # num_table_locations     : count  &log &optional;
         table_version_number    : count  &log &optional;
         data                    : string &log &optional; # Re-use for opcode 11
 
@@ -188,10 +174,7 @@ export {
         historical_points : vector of string &log &optional; # Re-used for response
 
         # Response
-        # history_segment : count &log &optional;
-        # num_points      : count &log &optional;
         periodic_index    : count &log &optional;
-        # historical_points : vector of string &log &optional;
         tag               : string &log &optional;
         ##################
 
@@ -201,8 +184,6 @@ export {
         starting_alarm_log_idx : count &log &optional; # Re-used for response
 
         # Response
-        # num_alarms             : count &log &optional;
-        # starting_alarm_log_idx : count &log &optional;
         current_alarm_log_idx    : count &log &optional;  # Re-used for opcode 119 response
         alarm_data               : vector of string &log &optional;
         ##################
@@ -214,19 +195,16 @@ export {
 
         # Response
         num_events_sent          : count &log &optional;
-        # starting_event_log_idx : count &log &optional;
         current_event_log_idx    : count &log &optional;
         event_data               : vector of string &log &optional;
         ##################
 
         ### Opcode 137 ###
         # Request
-        # history_segment : count &log &optional;
         day_requested        : count &log &optional; # Re-use for opcode 138
         month_requested      : count &log &optional; # Re-use for opcode 138
 
         # Response
-        # history_segment : count &log &optional;
         starting_periodic_idx : count &log &optional; # Re-use for opcode 138
         num_periodic_entries  : count &log &optional; # Re-use for opcode 138
         daily_index           : count &log &optional; # Re-use for opcode 138
@@ -235,18 +213,9 @@ export {
 
         ### Opcode 138 ###
         # Request
-        # history_segment : count &log &optional;
         history_point     : count &log &optional; # Re-use for response
-        # day_requested   : count &log &optional;
-        # month_requested : count &log &optional;
 
         # Response
-        # history_segment      : count &log &optional;
-        # history_point         : count &log &optional;
-        # day_requested        : count &log &optional;
-        # month_requested      : count &log &optional;
-        # num_periodic_entries : count &log &optional;
-        # num_daily_entries    : count &log &optional;
         periodic_values      : vector of count &log &optional;
         daily_values         : vector of count &log &optional;  
         ##################
@@ -263,10 +232,6 @@ export {
         start_point : count  &log &optional; # Re-use for response
         num_points  : count  &log &optional; # Re-use for response
 
-        # Response
-        # command     : count  &log &optional;
-        # start_point : count  &log &optional;
-        # num_points  : count  &log &optional;
         point_types : vector of string &log &optional;
     };
 
@@ -283,24 +248,6 @@ export {
         num_parameters      : count  &log &optional;
         start_parameter_num : count  &log &optional;
         parameter_data      : string &log &optional;
-
-        # No response
-        ##################
-        ##################
-
-        ### Opcode 167 ###
-        # Request
-        # point_type          : count  &log &optional; 
-        # point_logic_number  : count  &log &optional;
-        # num_parameters      : count  &log &optional;
-        # start_parameter_num : count  &log &optional;
-
-        # Response
-        # point_typeReq       : count  &log &optional;
-        # point_logic_number  : count  &log &optional;
-        # num_parameters      : count  &log &optional;
-        # start_parameter_num : count  &log &optional;
-        # parameter_data      : string &log &optional;
     };
 
     type roc_plus_file_transfer_log: record {
