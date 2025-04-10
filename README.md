@@ -33,7 +33,7 @@ This log file contains the core fields for all ROC Plus protocol traffic.
 | ts | time | Timestamp |
 | uid | string | Unique identifier for the connection |
 | id | conn_id | Connection identifier |
-| protocol | string | Protocol name ("ROC_PLUS") |
+| protocol | transport_proto | Transport protocol |
 | roc_plus_link_id | string | Unique identifier for the ROC Plus connection |
 | packet_type | string | Type of packet (e.g., "REQUEST", "RESPONSE", "UNKNOWN") |
 | destination_unit | count | Destination unit address |
