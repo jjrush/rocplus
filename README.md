@@ -1,14 +1,14 @@
-ICSNPP-ROC-PLUS
+# ICSNPP-ROC-PLUS
 Industrial Control Systems Network Protocol Parsers (ICSNPP) - Emerson ROC Plus
 
-Overview
+## Overview
 ICSNPP-ROC-PLUS is a Spicy based Zeek plugin for parsing and logging fields within the ROC Plus protocol.
 
 ROC Plus is a protocol created by Emerson for communication between Emerson devices in industrial automation systems. It is widely used in industrial applications such as oil and gas operations.
 
 This parser targets the ROC Plus commands specified in the publicly available 2022 version of the spec.
 
-Installation
+## Installation
 Package Manager
 This script is available as a package for Zeek Package Manager. It requires Spicy and the Zeek Spicy plugin.
 
@@ -20,7 +20,7 @@ If users have ZKG configured to load packages (see @load packages in the( ZKG Qu
 
 If users are compiling the code manually, use clang as the compiler by compiling zeek with clang. Installing the package with zkg is not impacted.
 
-Log Files
+## Log Files
 The ROC Plus analyzer generates several log files based on the type of ROC Plus traffic observed. 
 
 ## Main ROC Plus Log (roc_plus.log)
