@@ -5,7 +5,7 @@ export {
         ts                : time    &log;
         uid               : string  &log;
         id                : conn_id &log;
-        protocol          : string  &log;
+        protocol          : transport_proto &log;
         roc_plus_link_id  : string  &log &optional;
 
         packet_type       : string  &log &optional;

@@ -91,7 +91,7 @@ export {
 
 # redefine connection record to contain one of each of the ROC_PLUS records
 redef record connection += {
-    roc_plus_protocol: string &optional;
+    roc_plus_protocol: transport_proto &optional;
     roc_plus_log: roc_plus_log &optional;
     roc_plus_sys_cfg_log: roc_plus_sys_cfg_log  &optional;
     roc_plus_historical_min_max_vals_log: roc_plus_historical_min_max_vals_log  &optional;

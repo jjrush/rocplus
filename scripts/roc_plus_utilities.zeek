@@ -6,7 +6,7 @@ module ROC_PLUS;
                 $ts=network_time(),
                 $uid=c$uid,
                 $id=c$id,
-                $protocol="roc_plus");
+                $protocol=get_conn_transport_proto(c$id));
 
         return c;
     }
