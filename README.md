@@ -115,23 +115,23 @@ This log captures user-defined information and logs it to `roc_plus_user_defined
 
 ### History Point Data (roc_plus_history_point_data.log)
 
-This log captures history information data and logs it to `roc_plus_history_information.log`.
+This log captures history information data and logs it to `roc_plus_history_point_data.log`.
 
-* See the `ROC_PLUS::roc_plus_history_information_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
+* See the `ROC_PLUS::roc_plus_history_point_data_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
 * This log is associated with ROC Plus Opcodes 135 (SINGLE HISTORY POINT DATA) and 136 (MULTIPLE HISTORY POINT DATA).
 
 ### History Information (roc_plus_history_information.log)
 
-This log captures history point data and logs it to `roc_plus_history_point_data.log`.
+This log captures history point data and logs it to `roc_plus_history_information.log`.
 
-* See the `ROC_PLUS::roc_plus_time_period_history_points_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
+* See the `ROC_PLUS::roc_plus_history_information_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
 * This log is associated with ROC Plus Opcode 139 (READ HISTORY INFORMATION).
 
 ### Time Period History Points (roc_plus_time_period_history_points.log)
 
 This log captures time period history points data and logs it to `roc_plus_time_period_history_points.log`.
 
-* See the `ROC_PLUS::roc_plus_history_point_data_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
+* See the `ROC_PLUS::roc_plus_time_period_history_points_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
 * This log is associated with ROC Plus Opcode 139 (READ HISTORY INFORMATION).
 
 ### Single Point Parameters (roc_plus_single_point_parameters.log)
