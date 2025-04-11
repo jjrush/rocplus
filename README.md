@@ -96,15 +96,15 @@ This log captures store and forward messaging data and logs it to `roc_plus_stor
 This log captures various data request operations and logs it to `roc_plus_data_request.log`.
 
 * See the `ROC_PLUS::roc_plus_data_request_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
-* This log is associated with ROC Plus Opcodes 
+* This log is associated with ROC Plus Opcodes:
 - 50 (I/O DATA REQUEST)
-- 108 (HISTORICAL DATABASE READ)
-- 118 (READ ALARM LOG)
-- 119 (READ EVENT LOG)
-- 137 (READ HISTORY SETUP)
-- 138 (READ HISTORY POINT INFO)
-- 224 (SRBX Signal)
-- 225 (SRBX Acknowledgement)
+  - 108 (HISTORICAL DATABASE READ)
+  - 118 (READ ALARM LOG)
+  - 119 (READ EVENT LOG)
+  - 137 (READ HISTORY SETUP)
+  - 138 (READ HISTORY POINT INFO)
+  - 224 (SRBX Signal)
+  - 225 (SRBX Acknowledgement)
 
 ### User Defined Info (roc_plus_user_defined_info.log)
 
