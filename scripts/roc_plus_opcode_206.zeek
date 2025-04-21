@@ -40,19 +40,22 @@ module ROC_PLUS;
         else if( dataType == 12 ) {
             return "STRING20";
         } 
-        else if( dataType == 13 ) {
+        # skip 13
+        else if( dataType == 14 ) {
             return "STRING30";
         }
-        else if( dataType == 14 ) {
+        else if( dataType == 15 ) {
             return "T_STRING40";
         } 
-        else if( dataType == 15 ) {
+        # skip 16
+        else if( dataType == 17 ) {
             return "BINARY";
         }
-        else if( dataType == 16 ) {
+        else if( dataType == 18 ) {
             return "TLP";
         } 
-        else if( dataType == 17 ) {
+        # skip 19
+        else if( dataType == 20 ) {
             return "TIME";
         }
         else {
@@ -95,7 +98,7 @@ module ROC_PLUS;
             if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_LIST_TRANSACTION) {
                 # List Transaction Response
                 log_response$num_transactions = data$readTransactionHistory$response$listt$numTransactions;
-                log_response$more_data        = (data$readTransactionHistory$response$listt$moreData == 1) ? "Yes" : "No";
+                log_response$more_data        = (data$readTransactionHistory$response$listt$moreData == T) ? "Yes" : "No";
                 log_response$description      = data$readTransactionHistory$response$listt$description;
                 log_response$payload_size     = data$readTransactionHistory$response$listt$payloadSize;
 
@@ -112,7 +115,7 @@ module ROC_PLUS;
             else if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION) {
                 # Read Transaction Response
                 log_response$msg_data_size = data$readTransactionHistory$response$read$messageDataSize;
-                log_response$more_data     = (data$readTransactionHistory$response$read$moreData == 1) ? "Yes" : "No";
+                log_response$more_data     = (data$readTransactionHistory$response$read$moreData == T) ? "Yes" : "No";
 
                 log_response$data_type = vector();
                 log_response$data = vector();
