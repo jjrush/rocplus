@@ -1273,7 +1273,6 @@ class ROCPlusPacketBuilder:
             # Add a response if supported
             if "response" in opcode_info:
                 try:
-                    # ... Response code stays the same but use self.get_next_timestamp() instead of timestamp += ...
                     # Handle variants for response
                     if opcode in OPCODE_VARIANTS and isinstance(opcode_info["response"], dict):
                         for variant in OPCODE_VARIANTS[opcode]["variants"]:

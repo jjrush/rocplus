@@ -17,7 +17,7 @@ Repeating for each error:
 PAYLOAD = {
     "request": {
         "payload": {
-            "raw_data": bytes([0x01, 0x02, 0x03, 0x04])  # Example data, can be any bytes
+            "raw_data": bytes([0x02, 0x04, 0x06, 0x08])  # This is technically reserved for ROC use but if there is data we have to parse and dump it
         }
     },
     "response": {
