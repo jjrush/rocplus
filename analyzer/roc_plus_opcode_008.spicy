@@ -13,6 +13,8 @@ type SetRealtimeClock = unit {
 };
 
 type SetRealtimeClockRequest = unit {
+    var timestamp : bytes;
+
     currentSecond    : uint8;
     currentMinute    : uint8;
     currentHour      : uint8;
@@ -20,9 +22,15 @@ type SetRealtimeClockRequest = unit {
     currentMonth     : uint8;
     currentYear      : uint16;
 
-    # on %done {
-    #     print self;
-    # }
+    on %done {
+        # Use pack to convert integers to bytes
+        self.timestamp = pack(self.currentYear, spicy::ByteOrder::Little) +
+                         pack(self.currentMonth, spicy::ByteOrder::Little) +
+                         pack(self.currentDay, spicy::ByteOrder::Little) +
+                         pack(self.currentHour, spicy::ByteOrder::Little) +
+                         pack(self.currentMinute, spicy::ByteOrder::Little) +
+                         pack(self.currentSecond, spicy::ByteOrder::Little);
+    }
 };
 
 type SetRealtimeClockResponse = unit {
