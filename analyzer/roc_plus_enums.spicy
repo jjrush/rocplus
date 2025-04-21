@@ -51,27 +51,42 @@ public type Opcode = enum {
     ERROR_INDICATOR                              = 255
 };
 
+#
+# Chapter 2 - Table 2-2 - Opcode 6, System Configuration
+#
 public type SystemMode = enum {
     FIRMWARE_UPDATE = 0,
     RUN_MODE        = 1
 };
 
+#
+# Chapter 2 - Table 2-2 - Opcode 6, System Configuration
+#
 public type LogicalCompatabilityStatus = enum {
     NINE_MAX_MODULE_SLOTS         = 0,
     FOURTEEN_MAX_MODULE_SLOTS     = 1,
     TWENTY_SEVEN_MAX_MODULE_SLOTS = 2
 };
 
+#
+# Chapter 2 - Table 2-2 - Opcode 6, System Configuration
+#
 public type Revision = enum {
     ORIGINAL = 0,
     EXTENDED = 1
 };
 
+#
+# Chapter 2 - Table 2-2 - Opcode 6, System Configuration
+#
 public type Subtype = enum {
     SERIES_ONE = 0,
     SERIES_TWO = 1
 };
 
+#
+# Chapter 2 - Table 2-2 - Opcode 6, System Configuration
+#
 public type TypeOfROC = enum {
     ROCPAC_ROC300   =  1, # 0-index is not used
     FLOBOSS_407     =  2,
@@ -135,22 +150,28 @@ public type PointType = enum {
     NO_POINT_TYPE  = 255
 };
 
-# ROS Plus Protocol Specifications Manual 2-32
+#
+# Chapter 2 - Table 2-18 - Opcodes 135, 136, 139
+#
 public type HistoryType = enum {
-    MINUTE               = 0,
-    PERIODIC             = 1,
-    DAILY                = 2,
+    MINUTE              = 0,
+    PERIODIC            = 1,
+    DAILY               = 2,
     PERIODIC_TIMESTAMPS = 3,
     DAILY_TIMESTAMPS    = 4
 };
 
-# ROS Plus Protocol Specifications Manual 2-36
+#
+# Chapter 2 - Table 2-22 - Opcode 139, History Information Data
+#
 public type HistorySubCommands = enum {
     REQUEST_CONFIGURED_POINTS    = 0,
     REQUEST_SPECIFIED_POINT_DATA = 1
 };
 
+#
 # Chapter 2 - Table 2-27 - Opcode 203, General File Transfer
+#
 public type FileTransfer = enum {
     OPEN              = 1,
     READ              = 2,
@@ -161,6 +182,9 @@ public type FileTransfer = enum {
     READ_DIRECTORY_64 = 64  # Version 3.10 or greater response
 };
 
+#
+# Chapter 2 - Table 2-27 - Opcode 203, General File Transfer
+#
 public type FileOpenOptions = enum {
     OPEN_READ      = 0,
     OPEN_WRITE     = 1,
