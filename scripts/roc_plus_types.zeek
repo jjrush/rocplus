@@ -61,12 +61,12 @@ export {
         current_value                      : count  &log &optional;
         minimum_value_since_contract       : count  &log &optional;
         maximum_value_since_contract       : count  &log &optional;
-        time_of_min_value_occurrence       : string &log &optional;
-        time_of_max_value_occurrence       : string &log &optional;
+        time_of_min_value_occurrence       : time   &log &optional;
+        time_of_max_value_occurrence       : time   &log &optional;
         minimum_value_yesterday            : count  &log &optional;
         maximum_value_yesterday            : count  &log &optional;
-        time_of_yesterday_min_value        : string &log &optional;
-        time_of_yesterday_max_value        : string &log &optional;
+        time_of_yesterday_min_value        : time   &log &optional;
+        time_of_yesterday_max_value        : time   &log &optional;
         value_during_last_completed_period : count  &log &optional;
     };
 
@@ -87,6 +87,7 @@ export {
         current_month       : count  &log &optional; # Re-use for opcode 8
         current_year        : count  &log &optional; # Re-use for opcode 8
         current_day_of_week : string &log &optional;
+        timestamp           : time &log &optional;
     };
 
     type roc_plus_configurable_opcode_log: record {
@@ -184,8 +185,8 @@ export {
         starting_alarm_log_idx : count &log &optional; # Re-used for response
 
         # Response
-        current_alarm_log_idx    : count &log &optional;  # Re-used for opcode 119 response
-        alarm_data               : vector of string &log &optional;
+        current_alarm_log_idx  : count &log &optional;  # Re-used for opcode 119 response
+        alarm_data             : vector of string &log &optional;
         ##################
 
         ### Opcode 119 ###
@@ -194,15 +195,15 @@ export {
         starting_event_log_idx : count &log &optional;  # Re-used for response
 
         # Response
-        num_events_sent          : count &log &optional;
-        current_event_log_idx    : count &log &optional;
-        event_data               : vector of string &log &optional;
+       num_events_sent         : count &log &optional;
+       current_event_log_idx   : count &log &optional;
+       event_data              : vector of string &log &optional;
         ##################
 
         ### Opcode 137 ###
         # Request
-        day_requested        : count &log &optional; # Re-use for opcode 138
-        month_requested      : count &log &optional; # Re-use for opcode 138
+        day_requested         : count &log &optional; # Re-use for opcode 138
+        month_requested       : count &log &optional; # Re-use for opcode 138
 
         # Response
         starting_periodic_idx : count &log &optional; # Re-use for opcode 138
@@ -221,6 +222,7 @@ export {
         ##################
     };
 
+    # Opcode 100
     type roc_plus_user_defined_info_log: record {
         ts               : time    &log;
         uid              : string  &log;
@@ -241,7 +243,7 @@ export {
         id               : conn_id &log;
         roc_plus_link_id : string  &log &optional;
 
-        ### Opcode 166 ###
+        ### Opcode 166 & 167 ###
         # Request
         point_type          : count  &log &optional; # Re-use all of these for Opcode 167
         point_logic_number  : count  &log &optional;
@@ -250,6 +252,7 @@ export {
         parameter_data      : string &log &optional;
     };
 
+    # Opcode 203
     type roc_plus_file_transfer_log: record {
         ts               : time    &log;
         uid              : string  &log;
@@ -276,6 +279,7 @@ export {
         file_names       : string &log &optional;
     };
 
+    # Opcode 206
     type roc_plus_transaction_history_log: record {
         ts               : time    &log;
         uid              : string  &log;
@@ -291,12 +295,11 @@ export {
         # command            : string &log &optional; 
         # segment            : count  &log &optional;
         transaction_number : count &log &optional;
-        num_transactions   : count &log &optional; # Re-use
         data_offset        : count &log &optional;
 
         # List Response
-        # command            : string &log &optional; 
-        # num_transactions   : count  &log &optional;
+        # command            : string &log &optional;
+        num_transactions   : count &log &optional;
         more_data          : string &log &optional; # Re-use
         description        : string &log &optional;
         payload_size       : count &log &optional;
@@ -340,7 +343,7 @@ export {
         num_history_points                  : count &log &optional;
         num_time_periods                    : count &log &optional;
         num_data_elements_sent              : count &log &optional;
-        history_timestamps                  : vector of count &log &optional;
+        history_timestamps                  : vector of time &log &optional;
         history_values                      : vector of count &log &optional;
     };
 
@@ -376,7 +379,7 @@ export {
         id                                  : conn_id &log;
 
         roc_plus_link_id                    : string  &log &optional;
-        timestamp_for_index                 : count &log &optional;
+        timestamp_for_index                 : time &log &optional;
         history_point_values                : vector of count &log &optional;
     };
 
