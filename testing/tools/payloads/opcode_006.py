@@ -12,7 +12,7 @@ PAYLOAD = {
             "comm_port": 2,             # Port number this request arrived on
             "security_mode": 0,         # Security Access Mode for the port
             "compatibility_status": 2,   # Logical Compatibility Status - Version 2.00
-            "revision": 0,              # Opcode 6 Revision (Version 2.02) - 0=Original
+            "revision": 1,              # Opcode 6 Revision (Version 2.02) - 0=Original
             "roc_subtype": 1,           # 1=Series 1, 0=Series 2
             "reserved": 0,              # Reserved for future use (always 0)
             # Type of ROC:
