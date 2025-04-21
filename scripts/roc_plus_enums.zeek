@@ -176,7 +176,6 @@ export{
         [ROC_PLUS_ENUMS::HistorySubCommands_REQUEST_CONFIGURED_POINTS]    = "Request Configured Points",
         [ROC_PLUS_ENUMS::HistorySubCommands_REQUEST_SPECIFIED_POINT_DATA] = "Request Specified Point Data"
     } &default="Unknown";
-    # function(i: ROCPLUS_ENUM::HistorySubCommands):string{return fmt("unknown-0x%x", i); } &redef;
 
     const ERROR_CODE = {
         [ROC_PLUS_ENUMS::ErrorCode_INVALID_OPCODE_REQUEST]              = "Invalid Opcode Request",
