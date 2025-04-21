@@ -21,6 +21,11 @@ type RequestTodayYesterdayMinMaxValsRequest = unit {
 };
 
 type RequestTodayYesterdayMinMaxValsResponse = unit {
+    var timeOfMinValueOccurrence : time;
+    var timeOfMaxValueOccurrence : time;
+    var timeOfYesterdayMinValue  : time;
+    var timeOfYesterdayMaxValue  : time;
+
     historySegment                 : uint8;
     historicalPointNumber          : uint8;
     historicalArchivalMethod       : uint8;
@@ -30,12 +35,24 @@ type RequestTodayYesterdayMinMaxValsResponse = unit {
     currentValue                   : uint32;
     minimumValueSinceContract      : uint32;
     maximumValueSinceContract      : uint32;
-    timeOfMinValueOccurrence       : bytes &size=5;
-    timeOfMaxValueOccurrence       : bytes &size=5;
+    minValueOccurenceTime          : bytes &size=5;
+    on minValueOccurenceTime {
+        self.timeOfMinValueOccurrence = spicy::strptime(ROC_PLUS_FUNCTIONS::bytesToHexString(self.minValueOccurenceTime), "%s,%m,%h,%d,%M");
+    }
+    maxValueOccurenceTime          : bytes &size=5;
+    on maxValueOccurenceTime {
+        self.timeOfMaxValueOccurrence = spicy::strptime(ROC_PLUS_FUNCTIONS::bytesToHexString(self.maxValueOccurenceTime), "%s,%m,%h,%d,%M");
+    }
     minimumValueYesterday          : uint32;
     maximumValueYesterday          : uint32;
-    timeOfYesterdayMinValue        : bytes &size=5;
-    timeOfYesterdayMaxValue        : bytes &size=5;
+    minValueTimeYesterday          : bytes &size=5;
+    on minValueTimeYesterday {
+        self.timeOfYesterdayMinValue = spicy::strptime(ROC_PLUS_FUNCTIONS::bytesToHexString(self.minValueTimeYesterday), "%s,%m,%h,%d,%M");
+    }
+    maxValueTimeYesterday          : bytes &size=5;
+    on maxValueTimeYesterday {
+        self.timeOfYesterdayMaxValue = spicy::strptime(ROC_PLUS_FUNCTIONS::bytesToHexString(self.maxValueTimeYesterday), "%s,%m,%h,%d,%M");
+    }
     valueDuringLastCompletedPeriod : uint32;
 
     # on %done {

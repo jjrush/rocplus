@@ -14,7 +14,11 @@ type MultipleHistoryPointData = unit {
 };
 
 type HistoryValues = unit {
-    timestamp : uint32;
+    var timestamp : time;
+    ts : bytes &size=4;
+    on ts {
+        self.timestamp = spicy::strptime(ROC_PLUS_FUNCTIONS::bytesToHexString(self.ts), "%s,%m,%h,%d,%M");
+    }
     value     : uint32;
 };
 

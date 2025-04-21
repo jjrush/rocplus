@@ -71,7 +71,11 @@ type HistorySpecifiedPointDataResponse = unit {
 
 # ROC Plus Protocol Specifications Manual 2-36
 type OptionalTimePeriodHistoryPoints = unit (requestTimestamp : uint8, numPoints : uint8) {
-    timestampForIndex                : uint32 if (requestTimestamp != 0);
+    var timestampForIndex : time;
+    tsIndex : bytes &size=4 if (requestTimestamp != 0);
+    on tsIndex {
+        self.timestampForIndex = spicy::strptime(ROC_PLUS_FUNCTIONS::bytesToHexString(self.tsIndex), "%s,%m,%h,%d,%M");
+    }
     historyPointValues               : (uint32)[numPoints];
 };
 
