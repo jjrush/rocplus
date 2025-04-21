@@ -55,8 +55,14 @@ type ReadTransactionResponse = unit(dataLength: uint8) {
     var types  : vector<uint8>;
     var values : vector<uint8>;
 
+    var moreData : bool;
+
     messageDataSize : uint8;
-    moreData        : bool;
+
+    moreDataRaw     : bytes &size=1;
+    on moreDataRaw {
+        self.moreData = cast<bool>(self.moreDataRaw.to_uint());
+    }
 
     data            : bytes &size=(dataLength - 3);
 
@@ -82,8 +88,15 @@ type ReadTransactionResponse = unit(dataLength: uint8) {
 };
 
 type ListTransactionResponse = unit {
+    var moreData : bool;
+
     numTransactions : uint8;
-    moreData        : uint8;
+
+    moreDataRaw     : bytes &size=1;
+    on moreDataRaw {
+        self.moreData = cast<bool>(self.moreDataRaw.to_uint());
+    }
+
     description     : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
     payloadSize     : uint16;
 
