@@ -21,7 +21,7 @@ module ROC_PLUS;
             {
                 log$operator_id  = data$login$request$standardLogin$operatorId;
                 if (!default_capture_password) {
-                    log$password     = "****";
+                    log$password     = "";
                 }
                 else {
                     log$password     = data$login$request$standardLogin$password;
@@ -32,7 +32,7 @@ module ROC_PLUS;
             {
                 log$operator_id  = data$login$request$enhancedLogin$operatorId;
                 if (!default_capture_password) {
-                    log$password     = "****";
+                    log$password     = "";
                 }
                 else {
                     log$password     = data$login$request$enhancedLogin$password;
@@ -43,7 +43,7 @@ module ROC_PLUS;
             {
                 log$operator_id   = data$login$request$standardLogout$operatorId;
                 if (!default_capture_password) {
-                    log$password      = "****"; 
+                    log$password      = ""; 
                 }
                 else {
                     log$password      = data$login$request$standardLogout$password;
@@ -54,7 +54,7 @@ module ROC_PLUS;
             {
                 log$operator_id   = data$login$request$enhancedLogout$operatorId;
                 if (!default_capture_password) {
-                    log$password      = "****";
+                    log$password      = "";
                 }
                 else {
                     log$password      = data$login$request$enhancedLogout$password;
@@ -67,19 +67,17 @@ module ROC_PLUS;
         } 
         else if(data$packetType == ROC_PLUS_ENUMS::PacketType_RESPONSE) 
         {
-            c = set_login_log(c);
-            local log = c$roc_plus_login_log;
-
-            log$roc_plus_link_id = link_id;
-
             if (data$login$response?$wrappedSessionKey) 
             {
+                c = set_login_log(c);
+                local log = c$roc_plus_login_log;
+
+                log$roc_plus_link_id = link_id;
+
                 log$wrapped_session_key = data$login$response$wrappedSessionKey$wrappedSessionKey;
+
+                ROC_PLUS::emit_roc_plus_login_log(c);
+                delete c$roc_plus_login_log;
             }
-
-            ROC_PLUS::emit_roc_plus_login_log(c);
-            delete c$roc_plus_login_log;
         }
-
-
     }
