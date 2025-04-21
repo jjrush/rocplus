@@ -4,6 +4,8 @@ module ROC_PLUS;
         c = set_data_request_log(c);
         local log = c$roc_plus_data_request_log;
 
+        log$roc_plus_link_id = link_id;
+
         if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST)
         {
             log$history_segment = data$requestDailyAndPeriodicHistory$request$historySegment;
