@@ -56,7 +56,7 @@ type ReadTransactionResponse = unit(dataLength: uint8) {
     var values : vector<uint8>;
 
     messageDataSize : uint8;
-    moreData        : uint8;
+    moreData        : bool;
 
     data            : bytes &size=(dataLength - 3);
 
