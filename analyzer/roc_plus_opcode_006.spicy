@@ -18,18 +18,30 @@ type SystemConfigurationRequest = unit {
 };
 
 type SystemConfigurationResponse = unit {
+    var numPointTypes : uint8;
+
+
     systemMode                 : uint8 &convert=ROC_PLUS_ENUMS::SystemMode($$);
     portNumber                 : uint16;
     securityAccessMode         : uint8;
     logicalCompatabilityStatus : uint8 &convert=ROC_PLUS_ENUMS::LogicalCompatabilityStatus($$);
     opcodeRevision             : uint8 &convert=ROC_PLUS_ENUMS::Revision($$);
+    on opcodeRevision {
+        if (self.opcodeRevision == ROC_PLUS_ENUMS::Revision::ORIGINAL) {
+            # See table 2-2
+            self.numPointTypes = 78;
+        } else {
+            # See table 2-2
+            self.numPointTypes = 196;
+        }
+    }
     subtype                    : uint8 &convert=ROC_PLUS_ENUMS::Subtype($$);
 
     reserved                   : bytes &size=11;
 
     typeOfROC                  : uint8 &convert=ROC_PLUS_ENUMS::TypeOfROC($$);
 
-    pointTypes                 : uint8[196]; #Point Type 60 - Point Type 255 - see Table 2-2
+    pointTypes                 : uint8[self.numPointTypes]; #Point Type 60 - Point Type 255 - see Table 2-2
 
     # on %done {
     #     print self;
