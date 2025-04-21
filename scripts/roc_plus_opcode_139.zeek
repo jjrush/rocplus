@@ -53,12 +53,8 @@ module ROC_PLUS;
                 log_response$num_points         = data$historyInformationData$response$specifiedPointDataResponse$numPoints;
                 
                 local counter = 0;
-                local timestamp = 0;
                 # for each time period
                 while(counter < data$historyInformationData$response$specifiedPointDataResponse$numTimePeriods) {
-                    if(data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]?$timestampForIndex) {
-                        timestamp = data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$timestampForIndex;
-                    }
                     local history_points = data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$historyPointValues;
 
                     # Set sesssion rocplus log object
@@ -66,8 +62,8 @@ module ROC_PLUS;
                     local listLog = conn$roc_plus_time_period_history_points_log;
 
                     listLog$roc_plus_link_id = link_id;
-                    if (timestamp != 0) {
-                        listLog$timestamp_for_index = timestamp;
+                    if (data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]?$timestampForIndex) {
+                        listLog$timestamp_for_index = data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$timestampForIndex;
                     }
 
                     listLog$history_point_values = vector();
