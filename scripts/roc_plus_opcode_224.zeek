@@ -33,7 +33,6 @@ module ROC_PLUS;
             log_res_unknown$roc_plus_link_id = link_id;
 
             log_res_unknown$data = data$srbxSignal$unknown$data;
-            # print(data);
 
             # Fire the event and tidy up
             ROC_PLUS::emit_roc_plus_unknown_data_log(conn_res_unknown);
