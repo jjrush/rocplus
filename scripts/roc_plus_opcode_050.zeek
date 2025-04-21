@@ -14,6 +14,10 @@ module ROC_PLUS;
         {
             log$io_data = data$ioPointPosition$response$ioData;
         }
+        else 
+        {
+            return;
+        }
 
         ROC_PLUS::emit_roc_plus_data_request_log(c);
         delete c$roc_plus_data_request_log;

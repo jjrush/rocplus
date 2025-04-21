@@ -1,13 +1,13 @@
 module ROC_PLUS;
 
     function process_realtime_clock_set(c: connection, data: ROC_PLUS::DataBytes, link_id: string) {
+        c = set_realtime_clock_log(c);
+        local log = c$roc_plus_realtime_clock_log;
+
+        log$roc_plus_link_id = link_id;
+
         if (data$packetType  == ROC_PLUS_ENUMS::PacketType_REQUEST)
         {
-            c = set_realtime_clock_log(c);
-            local log = c$roc_plus_realtime_clock_log;
-
-            log$roc_plus_link_id = link_id;
-
             log$current_second    = data$setRealtimeClock$request$currentSecond;
             log$current_minute    = data$setRealtimeClock$request$currentMinute;
             log$current_hour      = data$setRealtimeClock$request$currentHour;
@@ -23,8 +23,7 @@ module ROC_PLUS;
         else if(data$packetType  == ROC_PLUS_ENUMS::PacketType_RESPONSE)
         {
             # Response is empty for opcode 8
+            return;
         }
-
-
     }
     

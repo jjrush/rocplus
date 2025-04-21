@@ -6,13 +6,13 @@ module ROC_PLUS;
     }
 
     function process_login(c: connection, data: ROC_PLUS::DataBytes, link_id: string) {
+        c = set_login_log(c);
+        local log = c$roc_plus_login_log;
+        
+        log$roc_plus_link_id = link_id;
+
         if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST) 
         {
-            c = set_login_log(c);
-            local log = c$roc_plus_login_log;
-
-            log$roc_plus_link_id = link_id;
-
             if (data$login$request?$sessionKeyReq) 
             {
                 log$session_key_string = data$login$request$sessionKeyReq$sessionKeyString;
@@ -69,11 +69,6 @@ module ROC_PLUS;
         {
             if (data$login$response?$wrappedSessionKey) 
             {
-                c = set_login_log(c);
-                local log = c$roc_plus_login_log;
-
-                log$roc_plus_link_id = link_id;
-
                 log$wrapped_session_key = data$login$response$wrappedSessionKey$wrappedSessionKey;
 
                 ROC_PLUS::emit_roc_plus_login_log(c);

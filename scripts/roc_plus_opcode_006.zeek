@@ -1,19 +1,18 @@
 module ROC_PLUS;
 
     function process_system_config(c: connection, data: ROC_PLUS::DataBytes, link_id: string) {
+        c = set_sys_cfg_log(c);
+        local log = c$roc_plus_sys_cfg_log;
+
+        log$roc_plus_link_id = link_id;
 
         if (data$packetType  == ROC_PLUS_ENUMS::PacketType_REQUEST) 
         {
             # no data in opcode 6 request
+            return;
         }
         else if(data$packetType  == ROC_PLUS_ENUMS::PacketType_RESPONSE)
         {
-            c = set_sys_cfg_log(c);
-            local log = c$roc_plus_sys_cfg_log;
-
-            log$roc_plus_link_id = link_id;
-
-
             log$system_mode                  = ROC_PLUS_ENUMS::SYSTEM_MODE[data$systemConfiguration$response$systemMode];
             log$port_number                  = data$systemConfiguration$response$portNumber;
             log$security_access_mode         = data$systemConfiguration$response$securityAccessMode;
@@ -32,7 +31,4 @@ module ROC_PLUS;
             ROC_PLUS::emit_roc_plus_sys_cfg_log(c);
             delete c$roc_plus_sys_cfg_log;
         }
-
-
     }
-    

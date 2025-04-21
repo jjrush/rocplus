@@ -20,15 +20,18 @@ module ROC_PLUS;
         }
         else # either request or unknown
         {
-            # The spec says this is reserved for ROC use but if there ends up being data in this response we have to parse it because of how spicy works
-            local conn_req_unk = set_unknown_data_log(c);
-            local unknown_data_log = conn_req_unk$roc_plus_unknown_data_log;
+            if( data$errorIndicator$unknown?$data)
+            {
+                # The spec says this is reserved for ROC use but if there ends up being data in this response we have to parse it because of how spicy works
+                local conn_req_unk = set_unknown_data_log(c);
+                local unknown_data_log = conn_req_unk$roc_plus_unknown_data_log;
 
-            unknown_data_log$data = data$errorIndicator$unknown$data;
+                unknown_data_log$data = data$errorIndicator$unknown$data;
 
-            # Fire the event and tidy up
-            ROC_PLUS::emit_roc_plus_unknown_data_log(conn_req_unk);
-            delete conn_req_unk$roc_plus_unknown_data_log;
+                # Fire the event and tidy up
+                ROC_PLUS::emit_roc_plus_unknown_data_log(conn_req_unk);
+                delete conn_req_unk$roc_plus_unknown_data_log;
+            }
         }
     }
     
