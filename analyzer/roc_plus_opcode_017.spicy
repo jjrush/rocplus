@@ -67,16 +67,8 @@ type Enhanced_Logout = unit {
 
 type Session_Key_Req = unit {
     sessionKeyString : bytes &size=13 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-
-    # on %done {
-    #     print self;
-    # }
 };
 
 type Wrapped_Session_Key = unit {
     wrappedSessionKey : bytes &size=24 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-
-    # on %done {
-    #     print self;
-    # }
 };

@@ -322,7 +322,7 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
             return ROC_PLUS_ENUMS::PacketType::RESPONSE;  # Error indicators are always responses
         default:
         {
-            print "Unknown opcode: %s while determining packet type" % opcode;
+            # print "Unknown opcode: %s while determining packet type" % opcode;
             return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
         }
     }
@@ -351,7 +351,7 @@ public function determineOpcode17SubType(dataLength: uint8) : ROC_PLUS_ENUMS::Op
         return ROC_PLUS_ENUMS::Opcode17Type::RESPONSE;
     }
     else {
-        print "Unknown opcode 17 subtype: ", dataLength;
+        # print "Unknown opcode 17 subtype: ", dataLength;
         return ROC_PLUS_ENUMS::Opcode17Type::UNKNOWN;
     }
 }
