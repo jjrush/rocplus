@@ -28,7 +28,7 @@ module ROC_PLUS;
                 log$history_values = vector();
                 for (_, history_value in data$multipleHistoryPointData$response$historyValues)
                 {
-                    log$history_timestamps += history_value$timestamp;
+                    log$history_timestamps += double_to_time(count_to_double(history_value$timestamp));
                     log$history_values += history_value$value;
                 }
             }

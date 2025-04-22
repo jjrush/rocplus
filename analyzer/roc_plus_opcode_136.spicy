@@ -14,11 +14,7 @@ type MultipleHistoryPointData = unit {
 };
 
 type HistoryValues = unit {
-    var timestamp : time;
-    ts : bytes &size=4;
-    on ts {
-        self.timestamp = spicy::strptime(ROC_PLUS_FUNCTIONS::bytesToHexString(self.ts), "%s,%m,%h,%d,%M");
-    }
+    timestamp : uint32;
     value     : uint32;
 };
 
@@ -44,6 +40,5 @@ type MultipleHistoryPointDataResponse = unit {
     currentHistorySegmentIndex       : uint16;
     # # of data elements being sent ((# history points + 1) *# time periods). Value is 0 if the request is invalid.
     numDataElementsSent              : uint8;
-
     historyValues                    : HistoryValues[(self.numDataElementsSent / 2)];
 };

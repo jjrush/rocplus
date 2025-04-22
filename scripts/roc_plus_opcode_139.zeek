@@ -63,7 +63,7 @@ module ROC_PLUS;
 
                     listLog$roc_plus_link_id = link_id;
                     if (data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]?$timestampForIndex) {
-                        listLog$timestamp_for_index = data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$timestampForIndex;
+                        listLog$timestamp_for_index = double_to_time(count_to_double(data$historyInformationData$response$specifiedPointDataResponse$timePeriodHistoryPointsList[counter]$timestampForIndex));
                     }
 
                     listLog$history_point_values = vector();
@@ -83,14 +83,16 @@ module ROC_PLUS;
             delete conn_response$roc_plus_history_information_log;
         }
         else {
-            local unknown_connection = set_unknown_data_log(c);
-            local unknown_data_log = unknown_connection$roc_plus_unknown_data_log;
+            if ( data$historyInformationData$unknown?$data && data$historyInformationData$unknown$data != "" ) {
+                local unknown_connection = set_unknown_data_log(c);
+                local unknown_data_log = unknown_connection$roc_plus_unknown_data_log;
 
-            unknown_data_log$roc_plus_link_id = link_id;
+                unknown_data_log$roc_plus_link_id = link_id;
 
-            unknown_data_log$data = ROC_PLUS_ENUMS::HISTORY_SUB_COMMANDS[data$historyInformationData$command] + data$historyInformationData$unknown$data;
-            
-            ROC_PLUS::emit_roc_plus_unknown_data_log(unknown_connection);
-            delete unknown_connection$roc_plus_unknown_data_log;
+                unknown_data_log$data = ROC_PLUS_ENUMS::HISTORY_SUB_COMMANDS[data$historyInformationData$command] + "," + data$historyInformationData$unknown$data;
+                
+                ROC_PLUS::emit_roc_plus_unknown_data_log(unknown_connection);
+                delete unknown_connection$roc_plus_unknown_data_log;
+            }
         }
     }
