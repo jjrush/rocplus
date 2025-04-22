@@ -18,6 +18,4 @@ module ROC_PLUS;
             delete c$roc_plus_single_point_parameters_log;
         }
         # Response is empty - just acknowledgment
-
-
     }

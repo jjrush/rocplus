@@ -33,13 +33,15 @@ module ROC_PLUS;
         }
         else if (data$packetType == ROC_PLUS_ENUMS::PacketType_UNKNOWN)
         {
-            local conn_unknown = set_unknown_data_log(c);
-            local log_unknown = conn_unknown$roc_plus_unknown_data_log;
-            log_unknown$roc_plus_link_id = link_id;
+            if ( data$peerToPeerNetworkMessages$unknown?$data && data$peerToPeerNetworkMessages$unknown$data != "" ) {
+                local conn_unknown = set_unknown_data_log(c);
+                local log_unknown = conn_unknown$roc_plus_unknown_data_log;
+                log_unknown$roc_plus_link_id = link_id;
 
-            log_unknown$data = data$peerToPeerNetworkMessages$unknown$data;
-         
-            ROC_PLUS::emit_roc_plus_unknown_data_log(conn_unknown);
-            delete conn_unknown$roc_plus_unknown_data_log;
+                log_unknown$data = data$peerToPeerNetworkMessages$unknown$data;
+            
+                ROC_PLUS::emit_roc_plus_unknown_data_log(conn_unknown);
+                delete conn_unknown$roc_plus_unknown_data_log;
+            }
         }
     }

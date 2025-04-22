@@ -22,6 +22,7 @@ module ROC_PLUS;
         }
         else 
         {
+            delete c$roc_plus_configurable_opcode_log;
             return;
         }
 

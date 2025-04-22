@@ -1,5 +1,4 @@
 module ROC_PLUS;
-
     function process_io_point_position(c: connection, data: ROC_PLUS::DataBytes, link_id: string) {
         c = set_data_request_log(c);
         local log = c$roc_plus_data_request_log;
@@ -13,10 +12,6 @@ module ROC_PLUS;
         else if(data$packetType == ROC_PLUS_ENUMS::PacketType_RESPONSE) 
         {
             log$io_data = data$ioPointPosition$response$ioData;
-        }
-        else 
-        {
-            return;
         }
 
         ROC_PLUS::emit_roc_plus_data_request_log(c);

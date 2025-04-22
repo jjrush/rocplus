@@ -135,13 +135,15 @@ module ROC_PLUS;
             delete conn_response$roc_plus_transaction_history_log;
         }
         else if(data$packetType == ROC_PLUS_ENUMS::PacketType_UNKNOWN) {
-            local conn_unknown = set_unknown_data_log(c);
-            local unknown_log = conn_unknown$roc_plus_unknown_data_log;
+            if ( data$readTransactionHistory$unknown?$data && data$readTransactionHistory$unknown$data != "" ) {
+                local conn_unknown = set_unknown_data_log(c);
+                local unknown_log = conn_unknown$roc_plus_unknown_data_log;
 
-            unknown_log$roc_plus_link_id = link_id;
-            unknown_log$data = data$readTransactionHistory$unknown$data;
+                unknown_log$roc_plus_link_id = link_id;
+                unknown_log$data = data$readTransactionHistory$unknown$data;
 
-            ROC_PLUS::emit_roc_plus_unknown_data_log(conn_unknown);
-            delete conn_unknown$roc_plus_unknown_data_log;
+                ROC_PLUS::emit_roc_plus_unknown_data_log(conn_unknown);
+                delete conn_unknown$roc_plus_unknown_data_log;
+            }
         }
     }

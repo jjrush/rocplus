@@ -14,18 +14,19 @@ module ROC_PLUS;
         }
         else # either response or unknown 
         { 
-            local conn_res_unknown = set_unknown_data_log(c);
-            local log_res_unknown = conn_res_unknown$roc_plus_unknown_data_log;
+            if ( data$ackSRBX$unknown?$data && data$ackSRBX$unknown$data != "" ) {
+                local conn_res_unknown = set_unknown_data_log(c);
+                local log_res_unknown = conn_res_unknown$roc_plus_unknown_data_log;
 
-            log_res_unknown$roc_plus_link_id = link_id;
+                log_res_unknown$roc_plus_link_id = link_id;
 
-            log_res_unknown$data = data$ackSRBX$unknown$data;
-            
-            # Fire the event and tidy up
-            ROC_PLUS::emit_roc_plus_unknown_data_log(conn_res_unknown);
-            delete conn_res_unknown$roc_plus_unknown_data_log;
+                log_res_unknown$data = data$ackSRBX$unknown$data;
+                
+                # Fire the event and tidy up
+                ROC_PLUS::emit_roc_plus_unknown_data_log(conn_res_unknown);
+                delete conn_res_unknown$roc_plus_unknown_data_log;
+            }
         }
-        
     }
 
     

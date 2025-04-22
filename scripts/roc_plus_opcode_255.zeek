@@ -15,12 +15,18 @@ module ROC_PLUS;
                 log_response$error_offset += error$errorOffset;
             }
 
-            ROC_PLUS::emit_roc_plus_log(conn_response);
-            delete conn_response$roc_plus_log;
+            # if there are no error codes, don't emit the log
+            if ( |log_response$error_code| == 0 ) {
+                delete conn_response$roc_plus_log;
+            }
+            else {
+                ROC_PLUS::emit_roc_plus_log(conn_response);
+                delete conn_response$roc_plus_log;
+            }
         }
         else # either request or unknown
         {
-            if( data$errorIndicator$unknown?$data)
+            if(data$errorIndicator$unknown?$data && data$errorIndicator$unknown$data != "")
             {
                 # The spec says this is reserved for ROC use but if there ends up being data in this response we have to parse it because of how spicy works
                 local conn_req_unk = set_unknown_data_log(c);
