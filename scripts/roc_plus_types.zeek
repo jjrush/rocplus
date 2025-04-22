@@ -43,6 +43,7 @@ export {
         point_types                  : vector of count &log &optional;
     };
 
+    # Opcode 105
     type roc_plus_historical_min_max_vals_log: record {
         ts                             : time    &log;
         uid                            : string  &log;
@@ -124,7 +125,7 @@ export {
 
         operator_id      : string &log &optional;
         password         : string &log &optional;
-        access_level     : string &log &optional;
+        access_level     : count &log &optional;
         logout_string    : string &log &optional;
 
         # Session Key
@@ -195,9 +196,9 @@ export {
         starting_event_log_idx : count &log &optional;  # Re-used for response
 
         # Response
-       num_events_sent         : count &log &optional;
-       current_event_log_idx   : count &log &optional;
-       event_data              : vector of string &log &optional;
+        num_events_sent        : count &log &optional;
+        current_event_log_idx  : count &log &optional;
+        event_data             : vector of string &log &optional;
         ##################
 
         ### Opcode 137 ###
