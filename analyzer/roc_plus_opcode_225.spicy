@@ -13,7 +13,6 @@ type AcknowledgeSRBX = unit (dataLength: uint8) {
 };
 
 # ROC Plus Protocol Specifications Manual 2-44a
-# Body for opcode 225
 type AcknowledgeSRBXRequest = unit {
     currentAlarmLogIndex : uint16;
 };

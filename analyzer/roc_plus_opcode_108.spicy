@@ -33,5 +33,6 @@ type RequestHistoryTagAndPeriodicIndexResponse = unit {
 
 type RequestHistoryTagAndPeriodicIndexUnknown = unit(dataLength: uint8) {
     # If data length field is less than 23 but greater than 15 we are UNKNOWN, dump data
+    # See roc_plus_functions.spicy for more details
     data : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
