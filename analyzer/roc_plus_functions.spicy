@@ -91,7 +91,7 @@ const OPCODE_225_REQ_DATA_LENGTH : uint8 = 2; # Opcode 225's RESPONSE contains n
 ####################################################
 ####################################################
 
-public function determineOpcode17PacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
+public function determineOpcode17PacketType(dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
     if ( dataLength == OPCODE_017_WRAPPED_SESSION_KEY_DATA_LENGTH || dataLength == 0 ) {
         return ROC_PLUS_ENUMS::PacketType::RESPONSE;
     }
@@ -99,7 +99,7 @@ public function determineOpcode17PacketType(opcode: ROC_PLUS_ENUMS::Opcode, data
     return ROC_PLUS_ENUMS::PacketType::REQUEST;
 }
 
-public function determineOpcode108PacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
+public function determineOpcode108PacketType(dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
     if (dataLength >= OPCODE_108_REQ_MIN_DATA_LENGTH &&
        dataLength <  OPCODE_108_RES_MIN_DATA_LENGTH)
     {
@@ -232,6 +232,17 @@ public function determineOpcode206PacketType(dataLength: uint8, command: ROC_PLU
     return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
 }
 
+public function determineOpcode255PacketType(dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
+    # Spec implies responses are even length while requests are "reserved for ROC use"
+    # If we see any odd length data we will assume it is unknown and log it as such
+    if ( dataLength % 2 != 0 ) {
+        return ROC_PLUS_ENUMS::PacketType::UNKNOWN;
+    }
+    else {
+        return ROC_PLUS_ENUMS::PacketType::RESPONSE;
+    }
+}
+
 public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: uint8) : ROC_PLUS_ENUMS::PacketType {
     switch (opcode) {
         case ROC_PLUS_ENUMS::Opcode::SYSTEM_CONFIG:
@@ -250,7 +261,7 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
             return dataLength > OPCODE_011_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
 
         case ROC_PLUS_ENUMS::Opcode::LOGIN_REQUEST:
-            return determineOpcode17PacketType(opcode, dataLength);
+            return determineOpcode17PacketType(dataLength);
 
         case ROC_PLUS_ENUMS::Opcode::STORE_AND_FORWARD:
             return dataLength == OPCODE_024_RES_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::RESPONSE : ROC_PLUS_ENUMS::PacketType::REQUEST;
@@ -265,7 +276,7 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
             return dataLength == OPCODE_105_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
 
         case ROC_PLUS_ENUMS::Opcode::REQUEST_HISTORY_TAG_AND_PERIODIC_INDEX:
-            return determineOpcode108PacketType(opcode, dataLength);
+            return determineOpcode108PacketType(dataLength);
 
         case ROC_PLUS_ENUMS::Opcode::REQUEST_ALARM_DATA:
             return dataLength == OPCODE_118_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
@@ -319,7 +330,7 @@ public function determinePacketType(opcode: ROC_PLUS_ENUMS::Opcode, dataLength: 
             return dataLength == OPCODE_225_REQ_DATA_LENGTH ? ROC_PLUS_ENUMS::PacketType::REQUEST : ROC_PLUS_ENUMS::PacketType::RESPONSE;
 
         case ROC_PLUS_ENUMS::Opcode::ERROR_INDICATOR:
-            return ROC_PLUS_ENUMS::PacketType::RESPONSE;  # Error indicators are always responses
+            return determineOpcode255PacketType(dataLength);
         default:
         {
             # print "Unknown opcode: %s while determining packet type" % opcode;

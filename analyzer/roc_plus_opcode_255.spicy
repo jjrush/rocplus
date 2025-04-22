@@ -13,10 +13,8 @@ type Error = unit() {
 };
 
 type ErrorIndicator = unit(dataLength : uint8) {
-    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : ErrorIndicatorResponse(dataLength);
-        *                                    -> unknown  : ErrorIndicatorUnknown(dataLength);
-    };
+    response : ErrorIndicatorResponse(dataLength) if ( dataLength % 2 == 0 && ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL == ROC_PLUS_ENUMS::PacketType::RESPONSE );
+    unknown  : ErrorIndicatorUnknown(dataLength)  if ( dataLength % 2 != 0 || ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL != ROC_PLUS_ENUMS::PacketType::RESPONSE );
 };
 
 type ErrorIndicatorUnknown = unit(dataLength: uint8) {
@@ -26,8 +24,4 @@ type ErrorIndicatorUnknown = unit(dataLength: uint8) {
 
 type ErrorIndicatorResponse = unit(dataLength: uint8) {
     errors : Error[(dataLength / 2)];
-
-    # on %done {
-    #     print self;
-    # }
 };

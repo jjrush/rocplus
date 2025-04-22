@@ -17,7 +17,9 @@ Repeating for each error:
 PAYLOAD = {
     "request": {
         "payload": {
-            "raw_data": bytes([0x02, 0x04, 0x06, 0x08])  # This is technically reserved for ROC use but if there is data we have to parse and dump it
+            # This is technically reserved for ROC use according to the spec. 
+            # We can reason that if the response must be even length then if this is ever odd length we can log it to the unknown log. 
+            "raw_data": bytes([0x02, 0x04, 0x06, 0x08, 0x0A])  
         }
     },
     "response": {
