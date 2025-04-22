@@ -43,20 +43,20 @@ type Unknown = unit(dataLength: uint8) {
 
 type Standard_Login = unit {
     operatorId  : bytes &size=3 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-    password    : bytes &size=2 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-    accessLevel : bytes &size=1 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+    password    : uint16;
+    accessLevel : uint8;
 };
 
 type Standard_Logout = unit {
     operatorId   : bytes &size=3 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-    password     : bytes &size=2 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+    password     : uint16;
     logoutString : bytes &size=6 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
 type Enhanced_Login = unit {
     operatorId  : bytes &size=30 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
     password    : bytes &size=40 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
-    accessLevel : bytes &size=1 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
+    accessLevel : uint8;
 };
 
 type Enhanced_Logout = unit {
