@@ -59,9 +59,9 @@ type ReadTransactionResponse = unit(dataLength: uint8) {
 
     messageDataSize : uint8;
 
-    moreDataRaw     : bytes &size=1;
+    moreDataRaw     : uint8;
     on moreDataRaw {
-        self.moreData = cast<bool>(self.moreDataRaw.to_uint());
+        self.moreData = cast<bool>(self.moreDataRaw);
     }
 
     data            : bytes &size=(dataLength - 3);
@@ -92,9 +92,9 @@ type ListTransactionResponse = unit {
 
     numTransactions : uint8;
 
-    moreDataRaw     : bytes &size=1;
+    moreDataRaw     : uint8;
     on moreDataRaw {
-        self.moreData = cast<bool>(self.moreDataRaw.to_uint());
+        self.moreData = cast<bool>(self.moreDataRaw);
     }
 
     description     : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
