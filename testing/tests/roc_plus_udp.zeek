@@ -34,6 +34,7 @@
 # @TEST-EXEC: zeek-cut -n uid ts roc_plus_link_id < roc_plus_history_information.log > log.tmp && mv log.tmp roc_plus_history_information.log
 # @TEST-EXEC: zeek-cut -n uid ts roc_plus_link_id < roc_plus_time_period_history_points.log > log.tmp && mv log.tmp roc_plus_time_period_history_points.log
 #
+# @TEST-EXEC: btest-diff roc_plus.log
 # @TEST-EXEC: btest-diff roc_plus_sys_cfg.log
 # @TEST-EXEC: btest-diff roc_plus_historical_min_max_vals.log
 # @TEST-EXEC: btest-diff roc_plus_realtime_clock.log
