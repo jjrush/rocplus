@@ -3,33 +3,36 @@ module ROC_PLUS_OPCODE_108;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
-type RequestHistoryTagAndPeriodicIndex_HistoricalPoints = unit {
+type RequestHistoryTagAndPeriodicIndexHistoricalPoints = unit {
     historicalPoint : uint8 &convert=ROC_PLUS_FUNCTIONS::uintToHexString($$);
 };
 
-type RequestHistoryTagAndPeriodicIndex = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestHistoryTagAndPeriodicIndex_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestHistoryTagAndPeriodicIndex_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestHistoryTagAndPeriodicIndex_Unknown();
+type RequestHistoryTagAndPeriodicIndex = unit(dataLength : uint8) {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestHistoryTagAndPeriodicIndexRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestHistoryTagAndPeriodicIndexResponse();
+        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestHistoryTagAndPeriodicIndexUnknown(dataLength);
     };
 };
 
-type RequestHistoryTagAndPeriodicIndex_Request = unit {
+type RequestHistoryTagAndPeriodicIndexRequest = unit {
     historySegment   : uint8;
     numPoints        : uint8;
-    historicalPoints : RequestHistoryTagAndPeriodicIndex_HistoricalPoints[self.numPoints];
+    historicalPoints : RequestHistoryTagAndPeriodicIndexHistoricalPoints[self.numPoints];
 };
 
-type RequestHistoryTagAndPeriodicIndex_Response = unit {
+type RequestHistoryTagAndPeriodicIndexResponse = unit {
     historySegment   : uint8;
     numPoints        : uint8;
     periodicIndex    : uint16;
-    historicalPoints : RequestHistoryTagAndPeriodicIndex_HistoricalPoints[self.numPoints];
+    historicalPoints : RequestHistoryTagAndPeriodicIndexHistoricalPoints[self.numPoints];
     tag              : bytes &size=10 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type RequestHistoryTagAndPeriodicIndex_Unknown = unit {
-    # If data length field is less than 23 but greater than 15 we are UNKNOWN 
+type RequestHistoryTagAndPeriodicIndexUnknown = unit(dataLength: uint8) {
+    # If data length field is less than 23 but greater than 15 we are UNKNOWN, dump data
+    # See roc_plus_functions.spicy for more details
+    data : bytes &size=(dataLength) &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };

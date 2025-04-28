@@ -20,6 +20,11 @@ module ROC_PLUS;
             log$table_version_number    = data$readConfigurableOpcodePointData$response$tableVersionNumber;
             log$data                    = data$readConfigurableOpcodePointData$response$data;
         }
+        else 
+        {
+            delete c$roc_plus_configurable_opcode_log;
+            return;
+        }
 
         # Fire the event and tidy up
         ROC_PLUS::emit_roc_plus_configurable_opcode_log(c);

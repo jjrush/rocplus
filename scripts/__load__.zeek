@@ -18,20 +18,20 @@
 @load ./roc_plus_opcode_108
 @load ./roc_plus_opcode_118
 @load ./roc_plus_opcode_119
-# @load ./roc_plus_opcode_135
-# @load ./roc_plus_opcode_136
+@load ./roc_plus_opcode_135
+@load ./roc_plus_opcode_136
 @load ./roc_plus_opcode_137
 @load ./roc_plus_opcode_138
-# @load ./roc_plus_opcode_139
+@load ./roc_plus_opcode_139
 @load ./roc_plus_opcode_166
 @load ./roc_plus_opcode_167
-# @load ./roc_plus_opcode_180
-# @load ./roc_plus_opcode_181
+@load ./roc_plus_opcode_180
+@load ./roc_plus_opcode_181
 @load ./roc_plus_opcode_203
-# @load ./roc_plus_opcode_205
+@load ./roc_plus_opcode_205
 @load ./roc_plus_opcode_206
-# @load ./roc_plus_opcode_224
-# @load ./roc_plus_opcode_225
+@load ./roc_plus_opcode_224
+@load ./roc_plus_opcode_225
 @load ./roc_plus_opcode_255
 @load ./roc_plus_processing
 @load ./roc_plus_event_processing

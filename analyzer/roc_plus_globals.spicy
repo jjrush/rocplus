@@ -1,0 +1,8 @@
+module ROC_PLUS_GLOBALS;
+
+import ROC_PLUS_ENUMS;
+import spicy;
+
+# Need to make this global due to edge cases where we have to determine the packet type 
+# while in the middle of parsing a message and somehow get that value back up to the top level to be logged
+public global PACKET_TYPE_GLOBAL : ROC_PLUS_ENUMS::PacketType;

@@ -56,9 +56,9 @@ export{
     }&default = "Unknown";
 
     const LOGICAL_COMPATABILITY_STATUS = {
-        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_NINE_MAX_MODULE_SLOTS]         = "Compatability Mode: 0 | 16 points per slot | 160 bytes total | 9  module slots max)",
-        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_FOURTEEN_MAX_MODULE_SLOTS]     = "Compatability Mode: 1 | 16 points per slot | 240 bytes total | 14 module slots max)",
-        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_TWENTY_SEVEN_MAX_MODULE_SLOTS] = "Compatability Mode: 2 | 9 points per slot  | 224 bytes total | 27 module slots max)"
+        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_NINE_MAX_MODULE_SLOTS]         = "Compatability Mode: 0 | 16 points per slot | 160 bytes total | 9  module slots max",
+        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_FOURTEEN_MAX_MODULE_SLOTS]     = "Compatability Mode: 1 | 16 points per slot | 240 bytes total | 14 module slots max",
+        [ROC_PLUS_ENUMS::LogicalCompatabilityStatus_TWENTY_SEVEN_MAX_MODULE_SLOTS] = "Compatability Mode: 2 | 9 points per slot  | 224 bytes total | 27 module slots max"
     }&default = "Unknown";
 
     const REVISION = {
@@ -138,29 +138,43 @@ export{
         [ROC_PLUS_ENUMS::FileOpenOptions_TRUNCATE_WRITE] = "Truncate Write"
     } &default="Unknown";
 
-    const DATA_TYPE = {
-        [ROC_PLUS_ENUMS::DataType_U8]         = "U8",
-        [ROC_PLUS_ENUMS::DataType_S8]         = "S8",
-        [ROC_PLUS_ENUMS::DataType_U16]        = "U16",
-        [ROC_PLUS_ENUMS::DataType_S16]        = "S16",
-        [ROC_PLUS_ENUMS::DataType_U32]        = "U32",
-        [ROC_PLUS_ENUMS::DataType_S32]        = "S32",
-        [ROC_PLUS_ENUMS::DataType_FLOAT]      = "FLOAT",
-        [ROC_PLUS_ENUMS::DataType_DOUBLE]     = "DOUBLE",
-        [ROC_PLUS_ENUMS::DataType_STRING3]    = "STRING3",
-        [ROC_PLUS_ENUMS::DataType_STRING7]    = "STRING7",
-        [ROC_PLUS_ENUMS::DataType_STRING10]   = "STRING10",
-        [ROC_PLUS_ENUMS::DataType_STRING20]   = "STRING20",
-        [ROC_PLUS_ENUMS::DataType_STRING30]   = "STRING30",
-        [ROC_PLUS_ENUMS::DataType_T_STRING40] = "T_STRING40",
-        [ROC_PLUS_ENUMS::DataType_BINARY]     = "BINARY", # 1 byte
-        [ROC_PLUS_ENUMS::DataType_TLP]        = "TLP",    # 3 bytes
-        [ROC_PLUS_ENUMS::DataType_TIME]       = "TIME"    # 4 bytes
+    const READ_TRANSACTION_DATA_TYPE = {
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_U8]         = "U8",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_S8]         = "S8",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_U16]        = "U16",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_S16]        = "S16",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_U32]        = "U32",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_S32]        = "S32",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_FLOAT]      = "FLOAT",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_DOUBLE]     = "DOUBLE",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_STRING3]    = "STRING3",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_STRING7]    = "STRING7",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_STRING10]   = "STRING10",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_STRING20]   = "STRING20",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_STRING30]   = "STRING30",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_T_STRING40] = "T_STRING40",
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_BINARY]     = "BINARY", # 1 byte
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_TLP]        = "TLP",    # 3 bytes
+        [ROC_PLUS_ENUMS::ReadTransactionDataType_DATA_TYPE_TIME]       = "TIME"    # 4 bytes
     } &default="Unknown";
 
     const TRANSACTION_HISTORY_COMMAND = {
         [ROC_PLUS_ENUMS::TransactionHistoryCommand_LIST_TRANSACTION] = "List",
         [ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION] = "Read"
+    } &default="Unknown";
+
+    const HISTORY_TYPE = {
+        [ROC_PLUS_ENUMS::HistoryType_MINUTE]              = "Minute",
+        [ROC_PLUS_ENUMS::HistoryType_PERIODIC]            = "Periodic",
+        [ROC_PLUS_ENUMS::HistoryType_DAILY]               = "Daily",
+        [ROC_PLUS_ENUMS::HistoryType_PERIODIC_TIMESTAMPS] = "Periodic Time Stamps",
+        [ROC_PLUS_ENUMS::HistoryType_DAILY_TIMESTAMPS]    = "Daily Time Stamps"
+    } &default="Unknown";
+    # function(i: ROCPLUS_ENUM::historyTypeEnums):string{return fmt("unknown-0x%x", i); } &redef;
+
+    const HISTORY_SUB_COMMANDS = {
+        [ROC_PLUS_ENUMS::HistorySubCommands_REQUEST_CONFIGURED_POINTS]    = "Request Configured Points",
+        [ROC_PLUS_ENUMS::HistorySubCommands_REQUEST_SPECIFIED_POINT_DATA] = "Request Specified Point Data"
     } &default="Unknown";
 
     const ERROR_CODE = {

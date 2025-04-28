@@ -3,31 +3,27 @@ module ROC_PLUS_OPCODE_118;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
-
-type RequestAlarmData_AlarmData = unit {
+import ROC_PLUS_GLOBALS;
+type AlarmData = unit {
     data : bytes &size=23 &convert=ROC_PLUS_FUNCTIONS::bytesToHexString($$);
 };
 
-type RequestAlarmData = unit(packetType: ROC_PLUS_ENUMS::PacketType, dataLength : uint8) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestAlarmData_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestAlarmData_Response(dataLength);
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestAlarmData_Unknown();
+type RequestAlarmData = unit {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestAlarmDataRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestAlarmDataResponse();
     };
 };
 
-type RequestAlarmData_Unknown = unit {
-    # This opcode should always be a request or a response
-};
 
-type RequestAlarmData_Request = unit {
+type RequestAlarmDataRequest = unit {
     numAlarmsRequested     : uint8;
     startingAlarmIndexReq  : uint16;
 };
 
-type RequestAlarmData_Response = unit(dataLength: uint8) {
+type RequestAlarmDataResponse = unit() {
     numAlarmsSent          : uint8;
     startingAlarmIndexRes  : uint16;
     currentAlarmIndex      : uint16;
-    alarmData              : RequestAlarmData_AlarmData[(dataLength - 5)];
+    alarmData              : AlarmData[self.numAlarmsSent];
 };

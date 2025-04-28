@@ -1,6 +1,6 @@
 module ROC_PLUS;
 
-    function process_message_data(c: connection, opcode: ROC_PLUS_ENUMS::Opcode, data: ROC_PLUS::DataBytes, roc_plus_link_id: string): string {
+    function process_message_data(c: connection, opcode: ROC_PLUS_ENUMS::Opcode, data: ROC_PLUS::DataBytes, roc_plus_link_id: string) {
         switch(opcode) {
             case ROC_PLUS_ENUMS::Opcode_SYSTEM_CONFIG:
                 process_system_config(c, data, roc_plus_link_id);
@@ -42,10 +42,10 @@ module ROC_PLUS;
                 process_event_data(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_SINGLE_HISTORY_POINT_DATA:
-# RESERVED
+                process_single_history_point_data(c, data, roc_plus_link_id);  
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_MULTIPLE_HISTORY_POINT_DATA:
-# RESERVED
+                process_multiple_history_point_data(c, data, roc_plus_link_id); 
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_HISTORY_INDEX:
                 process_history_index(c, data, roc_plus_link_id);
@@ -54,7 +54,7 @@ module ROC_PLUS;
                 process_periodic_history(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_HISTORY_INFORMATION_DATA:
-# RESERVED
+                process_history_information(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_SET_SINGLE_POINT_PARAMETERS:
                 process_set_single_point_parameters(c, data, roc_plus_link_id);
@@ -63,58 +63,64 @@ module ROC_PLUS;
                 process_request_single_point_parameters(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_REQUEST_PARAMETERS:
-                # process_request_parameters(c, data, roc_plus_link_id);
+                process_request_parameters(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_WRITE_PARAMETERS:
+                process_write_parameters(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_GENERAL_FILE_TRANSFER:
                 process_file_transfer(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_PEER_TO_PEER_NETWORK_MESSAGES:
+                process_peer_to_peer_network_messages(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_READ_TRANSACTION_HISTORY_DATA:
                 process_transaction_history(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_SRBX_SIGNAL:
-# RESERVED
+                process_srbx_signal(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_ACKNOWLEDGE_SRBX:
-# RESERVED
+                process_acknowledge_srbx(c, data, roc_plus_link_id);
                 break;
             case ROC_PLUS_ENUMS::Opcode_ERROR_INDICATOR:
                 process_error_codes(c, data, roc_plus_link_id);
                 break;
+            default:
+                print "Unknown opcode: ", opcode;
+                break;
         }
     }
 
-    function process_message_udp(c: connection, info_roc_plus_log: roc_plus_log, rocMessage: ROC_PLUS::ROC_Message) : connection {
+    function process_message(c: connection, log: roc_plus_log, rocMessage: ROC_PLUS::ROC_Message) : connection {
         local opcode : ROC_PLUS_ENUMS::Opcode;
         opcode = rocMessage$opcode;
 
-        info_roc_plus_log$roc_plus_link_id  = rocMessage$rocPlusLinkId;
+        log$roc_plus_link_id  = rocMessage$rocPlusLinkId;
 
-        info_roc_plus_log$packet_type       = ROC_PLUS_ENUMS::PACKET_TYPE[rocMessage$dataBytes$packetType];
-        info_roc_plus_log$destination_unit  = rocMessage$destinationUnit;
-        info_roc_plus_log$destination_group = rocMessage$destinationGroup;
-        info_roc_plus_log$source_unit       = rocMessage$sourceUnit;
-        info_roc_plus_log$source_group      = rocMessage$sourceGroup;
-        info_roc_plus_log$opcode            = ROC_PLUS_ENUMS::OPCODE[opcode];
-        info_roc_plus_log$data_length       = rocMessage$dataLength;
+        log$packet_type       = ROC_PLUS_ENUMS::PACKET_TYPE[rocMessage$dataBytes$packetType];
+        log$destination_unit  = rocMessage$destinationUnit;
+        log$destination_group = rocMessage$destinationGroup;
+        log$source_unit       = rocMessage$sourceUnit;
+        log$source_group      = rocMessage$sourceGroup;
+        log$opcode            = ROC_PLUS_ENUMS::OPCODE[opcode];
+        log$data_length       = rocMessage$dataLength;
 
-        info_roc_plus_log$lsb_crc           = rocMessage$lsbCRC; # least significant byte
-        info_roc_plus_log$msb_crc           = rocMessage$msbCRC; # most signfiicant byte
+        log$lsb_crc           = rocMessage$lsbCRC; # least significant byte
+        log$msb_crc           = rocMessage$msbCRC; # most signfiicant byte
 
         # Process the command details
-        process_message_data(c, opcode, rocMessage$dataBytes, info_roc_plus_log$roc_plus_link_id);
+        process_message_data(c, opcode, rocMessage$dataBytes, log$roc_plus_link_id);
 
         # Return the connection
         return c;
     }
 
-    # function process_message_tcp(c: connection, info_roc_plus_log: roc_plus_log, rocMessage: ROC_PLUS::ROC_Message) : connection {
+    function process_message_tcp(c: connection, log: roc_plus_log, rocMessageTCP: ROC_PLUS::ROC_Message_TCP) : connection {
 
-    #     # TODO: figure this out
+        # Process the UDP msg
+        c = process_message(c, c$roc_plus_log, rocMessageTCP$rocMessage);
 
-    #     # Return the connection
-    #     return c;
-    # }
+        # Return the connection
+        return c;
+    }

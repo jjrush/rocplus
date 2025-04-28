@@ -3,28 +3,24 @@ module ROC_PLUS_OPCODE_105;
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
 
 #
 # Opcode 105 - Request Today's and Yesterday's Min/Max Values
 #
-type RequestTodayYesterdayMinMaxValues = unit(packetType: ROC_PLUS_ENUMS::PacketType) {
-    switch(packetType) {
-        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestTodayYesterdayMinMaxVals_Request();
-        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestTodayYesterdayMinMaxVals_Response();
-        ROC_PLUS_ENUMS::PacketType::UNKNOWN  -> unknown  : RequestTodayYesterdayMinMaxVals_Unknown();
+type RequestTodayYesterdayMinMaxValues = unit {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : RequestTodayYesterdayMinMaxValsRequest();
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : RequestTodayYesterdayMinMaxValsResponse();
     };
 };
 
-type RequestTodayYesterdayMinMaxVals_Unknown = unit {
-    # This opcode should always be a request or a response
-};
-
-type RequestTodayYesterdayMinMaxVals_Request = unit {
+type RequestTodayYesterdayMinMaxValsRequest = unit {
     historySegment        : uint8;
     historicalPointNumber : uint8;
 };
 
-type RequestTodayYesterdayMinMaxVals_Response = unit {
+type RequestTodayYesterdayMinMaxValsResponse = unit {
     historySegment                 : uint8;
     historicalPointNumber          : uint8;
     historicalArchivalMethod       : uint8;
@@ -34,15 +30,19 @@ type RequestTodayYesterdayMinMaxVals_Response = unit {
     currentValue                   : uint32;
     minimumValueSinceContract      : uint32;
     maximumValueSinceContract      : uint32;
-    timeOfMinValueOccurrence       : bytes &size=5;
-    timeOfMaxValueOccurrence       : bytes &size=5;
+
+    temp1                          : uint8; # See Table 2-14
+    timeOfMinValueOccurrence       : uint32;
+    temp2                          : uint8;
+    timeOfMaxValueOccurrence       : uint32;
+
     minimumValueYesterday          : uint32;
     maximumValueYesterday          : uint32;
-    timeOfYesterdayMinValue        : bytes &size=5;
-    timeOfYesterdayMaxValue        : bytes &size=5;
-    valueDuringLastCompletedPeriod : uint32;
 
-    # on %done {
-    #     print self;
-    # }
+    temp3                          : uint8;
+    timeOfYesterdayMinValue        : uint32;
+    temp4                          : uint8;
+    timeOfYesterdayMaxValue        : uint32;
+
+    valueDuringLastCompletedPeriod : uint32;
 };

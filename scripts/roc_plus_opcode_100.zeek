@@ -17,9 +17,11 @@ module ROC_PLUS;
             log$command     = data$accessUserDefinedInfo$response$command;
             log$start_point = data$accessUserDefinedInfo$response$startPoint;
             log$num_points  = data$accessUserDefinedInfo$response$numPoints;
-            for (index, pointType in data$accessUserDefinedInfo$response$pointTypes) 
+            
+            log$point_types = vector();
+            for (index in data$accessUserDefinedInfo$response$pointTypes) 
             {
-                log$point_types[index] = ROC_PLUS_ENUMS::POINT_TYPE[pointType$pointType] + ", ";
+                log$point_types += ROC_PLUS_ENUMS::POINT_TYPE[data$accessUserDefinedInfo$response$pointTypes[index]$pointType];
             }
         }
 

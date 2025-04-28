@@ -22,12 +22,12 @@ module ROC_PLUS;
             log$current_value                      = data$requestTodayYesterdayMinMaxVals$response$currentValue;
             log$minimum_value_since_contract       = data$requestTodayYesterdayMinMaxVals$response$minimumValueSinceContract;
             log$maximum_value_since_contract       = data$requestTodayYesterdayMinMaxVals$response$maximumValueSinceContract;
-            log$time_of_min_value_occurrence       = data$requestTodayYesterdayMinMaxVals$response$timeOfMinValueOccurrence;
-            log$time_of_max_value_occurrence       = data$requestTodayYesterdayMinMaxVals$response$timeOfMaxValueOccurrence;
+            log$time_of_min_value_occurrence       = double_to_time(count_to_double((data$requestTodayYesterdayMinMaxVals$response$temp1 << 32) | data$requestTodayYesterdayMinMaxVals$response$timeOfMinValueOccurrence));
+            log$time_of_max_value_occurrence       = double_to_time(count_to_double((data$requestTodayYesterdayMinMaxVals$response$temp2 << 32) | data$requestTodayYesterdayMinMaxVals$response$timeOfMaxValueOccurrence));
             log$minimum_value_yesterday            = data$requestTodayYesterdayMinMaxVals$response$minimumValueYesterday;
             log$maximum_value_yesterday            = data$requestTodayYesterdayMinMaxVals$response$maximumValueYesterday;
-            log$time_of_yesterday_min_value        = data$requestTodayYesterdayMinMaxVals$response$timeOfYesterdayMinValue;
-            log$time_of_yesterday_max_value        = data$requestTodayYesterdayMinMaxVals$response$timeOfYesterdayMaxValue;
+            log$time_of_yesterday_min_value        = double_to_time(count_to_double((data$requestTodayYesterdayMinMaxVals$response$temp3 << 32) | data$requestTodayYesterdayMinMaxVals$response$timeOfYesterdayMinValue));
+            log$time_of_yesterday_max_value        = double_to_time(count_to_double((data$requestTodayYesterdayMinMaxVals$response$temp4 << 32) | data$requestTodayYesterdayMinMaxVals$response$timeOfYesterdayMaxValue));
             log$value_during_last_completed_period = data$requestTodayYesterdayMinMaxVals$response$valueDuringLastCompletedPeriod;
         }
 

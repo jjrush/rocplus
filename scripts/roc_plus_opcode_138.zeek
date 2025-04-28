@@ -4,6 +4,8 @@ module ROC_PLUS;
         c = set_data_request_log(c);
         local log = c$roc_plus_data_request_log;
 
+        log$roc_plus_link_id = link_id;
+
         if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST)
         {
             log$history_segment = data$requestDailyAndPeriodicHistory$request$historySegment;
@@ -20,14 +22,13 @@ module ROC_PLUS;
             log$num_periodic_entries = data$requestDailyAndPeriodicHistory$response$numPeriodicEntries;
             log$num_daily_entries    = data$requestDailyAndPeriodicHistory$response$numDailyEntries;
 
-            for (index in data$requestDailyAndPeriodicHistory$response$periodicValues)
-            {
-                log$periodic_values[index] = data$requestDailyAndPeriodicHistory$response$periodicValues[index];
+            log$periodic_values = vector();
+            for (_, value in data$requestDailyAndPeriodicHistory$response$periodicValues) {
+                log$periodic_values += value;
             }
-
-            for (index in data$requestDailyAndPeriodicHistory$response$dailyValues)
-            {
-                log$daily_dalues[index] = data$requestDailyAndPeriodicHistory$response$dailyValues[index];
+            log$daily_values = vector();
+            for (_, value in data$requestDailyAndPeriodicHistory$response$dailyValues) {
+                log$daily_values += value;
             }
         }
 

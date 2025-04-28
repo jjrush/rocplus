@@ -1,0 +1,44 @@
+module ROC_PLUS_OPCODE_136;
+
+import spicy;
+import ROC_PLUS_ENUMS;
+import ROC_PLUS_FUNCTIONS;
+import ROC_PLUS_GLOBALS;
+
+type MultipleHistoryPointData = unit {
+    switch(ROC_PLUS_GLOBALS::PACKET_TYPE_GLOBAL) {
+        ROC_PLUS_ENUMS::PacketType::REQUEST  -> request  : MultipleHistoryPointDataRequest;
+        ROC_PLUS_ENUMS::PacketType::RESPONSE -> response : MultipleHistoryPointDataResponse;
+        *                                    ->          : void;
+    };
+};
+
+type HistoryValues = unit {
+    timestamp : uint32;
+    value     : uint32;
+};
+
+# Body for opcode 136
+type MultipleHistoryPointDataRequest = unit {
+    historySegment           : uint8;
+    # History segment index {Minute 0 - 59, Periodic 0 - (#periodic entries in history point - 1), or Daily 0 - (#daily entries in history point - 1)}
+    historySegmentIndex      : uint16;
+    typeOfHistory            : uint8 &convert=ROC_PLUS_ENUMS::HistoryType($$);
+    # Starting history point (0 - (# of history points for history segment - 1))
+    historyPoint             : uint8;
+    numHistoryPoints         : uint8;
+    # ((# history points + 1) * # time periods) must not be greater than 60
+    numTimePeriods           : uint8;
+};
+
+# ROC Plus Protocol Specifications Manual 2-33
+type MultipleHistoryPointDataResponse = unit {
+    # 0 - 10
+    historySegment                   : uint8;
+    # History segment index {Minute 0 - 59, Periodic 0 - (#periodic entries in history point - 1), or Daily 0 - (#daily entries in history point - 1)}
+    historySegmentIndex              : uint16;
+    currentHistorySegmentIndex       : uint16;
+    # # of data elements being sent ((# history points + 1) *# time periods). Value is 0 if the request is invalid.
+    numDataElementsSent              : uint8;
+    historyValues                    : HistoryValues[(self.numDataElementsSent / 2)];
+};
