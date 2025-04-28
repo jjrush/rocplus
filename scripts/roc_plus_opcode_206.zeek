@@ -98,7 +98,7 @@ module ROC_PLUS;
             if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_LIST_TRANSACTION) {
                 # List Transaction Response
                 log_response$num_transactions = data$readTransactionHistory$response$listt$numTransactions;
-                log_response$more_data        = (data$readTransactionHistory$response$listt$moreData == T) ? "Yes" : "No";
+                log_response$more_data        = data$readTransactionHistory$response$listt$moreData;
                 log_response$description      = data$readTransactionHistory$response$listt$description;
                 log_response$payload_size     = data$readTransactionHistory$response$listt$payloadSize;
 
@@ -115,7 +115,7 @@ module ROC_PLUS;
             else if (data$readTransactionHistory$command == ROC_PLUS_ENUMS::TransactionHistoryCommand_READ_TRANSACTION) {
                 # Read Transaction Response
                 log_response$msg_data_size = data$readTransactionHistory$response$read$messageDataSize;
-                log_response$more_data     = (data$readTransactionHistory$response$read$moreData == T) ? "Yes" : "No";
+                log_response$more_data     = data$readTransactionHistory$response$read$moreData;
 
                 log_response$data_type = vector();
                 log_response$data = vector();

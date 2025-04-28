@@ -301,7 +301,7 @@ export {
         # List Response
         # command            : string &log &optional;
         num_transactions   : count &log &optional;
-        more_data          : string &log &optional; # Re-use
+        more_data          : bool &log &optional; # Re-use
         description        : string &log &optional;
         payload_size       : count &log &optional;
         transaction_num    : vector of count &log &optional;

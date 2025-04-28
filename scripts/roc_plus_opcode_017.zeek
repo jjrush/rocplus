@@ -11,14 +11,11 @@ module ROC_PLUS;
         
         log$roc_plus_link_id = link_id;
 
-        local emit_log = F;
-
         if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST) 
         {
             if (data$login$request?$sessionKeyReq) 
             {
                 log$session_key_string = data$login$request$sessionKeyReq$sessionKeyString;
-                emit_log = T;
             } 
             else if(data$login$request?$standardLogin)
             {
@@ -30,7 +27,6 @@ module ROC_PLUS;
                     log$password     = cat(data$login$request$standardLogin$password);
                 }
                 log$access_level = data$login$request$standardLogin$accessLevel;
-                emit_log = T;
             }
             else if(data$login$request?$enhancedLogin) 
             {
@@ -42,7 +38,6 @@ module ROC_PLUS;
                     log$password     = data$login$request$enhancedLogin$password;
                 }
                 log$access_level = data$login$request$enhancedLogin$accessLevel;
-                emit_log = T;
             }
             else if(data$login$request?$standardLogout)
             {
@@ -54,7 +49,6 @@ module ROC_PLUS;
                     log$password      = cat(data$login$request$standardLogout$password);
                 }
                 log$logout_string = data$login$request$standardLogout$logoutString;
-                emit_log = T;
             }
             else if(data$login$request?$enhancedLogout)
             {
@@ -66,13 +60,9 @@ module ROC_PLUS;
                     log$password      = data$login$request$enhancedLogout$password;
                 }
                 log$logout_string = data$login$request$enhancedLogout$logoutString;
-                emit_log = T;
             }
-
-            if (emit_log) {
-                ROC_PLUS::emit_roc_plus_login_log(c);
-                delete c$roc_plus_login_log;
-            } 
+            ROC_PLUS::emit_roc_plus_login_log(c);
+            delete c$roc_plus_login_log;
         } 
         else if(data$packetType == ROC_PLUS_ENUMS::PacketType_RESPONSE) 
         {
