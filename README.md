@@ -14,7 +14,7 @@ This script is available as a package for [Zeek Package Manager](https://docs.ze
 
 ```bash
 $ zkg refresh
-$ zkg install icsnpp-omron-fins
+$ zkg install icsnpp-roc-plus
 ```
 
 If this package is installed from ZKG, it will be added to the available plugins. This can be tested by running zeek -NN. If installed correctly, users will see `ANALYZER_ROC_PLUS_TCP` and `ANALYZER_ROC_PLUS_UDP` under the list of `Zeek::Spicy` analyzers.
