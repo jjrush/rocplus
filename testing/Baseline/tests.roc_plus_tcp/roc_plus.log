@@ -76,8 +76,8 @@
 192.168.1.100	32107	192.168.1.200	4000	tcp	Request	1	2	3	4	General File Transfer (203)	126	22	16	-	-
 192.168.1.100	32107	192.168.1.200	4000	tcp	Request	1	2	3	4	General File Transfer (203)	102	84	151	-	-
 192.168.1.100	32107	192.168.1.200	4000	tcp	Request	1	2	3	4	General File Transfer (203)	102	21	80	-	-
-192.168.1.100	32107	192.168.1.200	4000	tcp	Response	1	2	3	4	General File Transfer (203)	103	250	19	-	-
-192.168.1.100	32107	192.168.1.200	4000	tcp	Response	1	2	3	4	General File Transfer (203)	103	187	212	-	-
+192.168.1.100	32107	192.168.1.200	4000	tcp	Request	1	2	3	4	General File Transfer (203)	103	133	213	-	-
+192.168.1.100	32107	192.168.1.200	4000	tcp	Request	1	2	3	4	General File Transfer (203)	103	196	18	-	-
 192.168.1.100	32107	192.168.1.200	4000	tcp	Response	1	2	3	4	General File Transfer (203)	5	241	136	-	-
 192.168.1.100	32107	192.168.1.200	4000	tcp	Response	1	2	3	4	General File Transfer (203)	18	80	205	-	-
 192.168.1.100	32107	192.168.1.200	4000	tcp	Response	1	2	3	4	General File Transfer (203)	244	29	72	-	-
