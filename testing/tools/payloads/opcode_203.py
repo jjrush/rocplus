@@ -119,14 +119,14 @@ PAYLOAD = {
         },
         "read_dir_64_single": {  # Version 3.10 or greater
             "payload": {
-                "command": 6,
+                "command": 64,
                 "path": "/flash/data/",
                 "total_num_files": 1  # 2 bytes for version 3.10+
             }
         },
         "read_dir_64_max": {  # Version 3.10 or greater
             "payload": {
-                "command": 6,
+                "command": 64,
                 "path": "/flash/data/",
                 "total_num_files": 10  # 2 bytes for version 3.10+
             }
