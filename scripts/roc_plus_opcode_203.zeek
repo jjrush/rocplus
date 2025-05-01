@@ -6,8 +6,9 @@ module ROC_PLUS;
 
         log$roc_plus_link_id = link_id;
 
+        log$command = ROC_PLUS_ENUMS::FILE_TRANSFER[data$generalFileTransfer$command];
         if (data$packetType == ROC_PLUS_ENUMS::PacketType_REQUEST) {
-            log$command = ROC_PLUS_ENUMS::FILE_TRANSFER[data$generalFileTransfer$command];
+
 
             switch (data$generalFileTransfer$command) {
                 case ROC_PLUS_ENUMS::FileTransfer_OPEN:
@@ -50,7 +51,6 @@ module ROC_PLUS;
             }
         }
         else if (data$packetType == ROC_PLUS_ENUMS::PacketType_RESPONSE) {
-            log$command = ROC_PLUS_ENUMS::FILE_TRANSFER[data$generalFileTransfer$command];
 
             switch (data$generalFileTransfer$command) {
                 case ROC_PLUS_ENUMS::FileTransfer_OPEN:
@@ -71,11 +71,22 @@ module ROC_PLUS;
                     break;
 
                 case ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY:
-                    fallthrough;
-                case ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY_64:
                     log$additional_files = data$generalFileTransfer$response$readDirResp$additionalFiles;
                     log$total_num_files  = data$generalFileTransfer$response$readDirResp$totalNumFiles;
-                    log$file_names       = data$generalFileTransfer$response$readDirResp$fileNames;
+
+                    log$file_names = vector();
+                    for (_, file_name in data$generalFileTransfer$response$readDirResp$fileNames) {
+                        log$file_names += file_name;
+                    }
+                    break;
+                case ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY_64:
+                    log$additional_files = data$generalFileTransfer$response$readDir64Resp$additionalFiles;
+                    log$total_num_files  = data$generalFileTransfer$response$readDir64Resp$totalNumFiles;
+
+                    log$file_names = vector();
+                    for (_, file_name in data$generalFileTransfer$response$readDir64Resp$fileNames) {
+                        log$file_names += file_name;
+                    }
                     break;
             }
         }
