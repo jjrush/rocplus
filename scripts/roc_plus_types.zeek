@@ -277,7 +277,7 @@ export {
         # Read Directory fields
         additional_files : count  &log &optional;
         total_num_files  : count  &log &optional;
-        file_names       : string &log &optional;
+        file_names       : vector of string &log &optional;
     };
 
     # Opcode 206
