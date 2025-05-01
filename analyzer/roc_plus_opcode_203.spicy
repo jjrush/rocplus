@@ -5,10 +5,42 @@ import ROC_PLUS_ENUMS;
 import ROC_PLUS_FUNCTIONS;
 import ROC_PLUS_GLOBALS;
 
+function removeTrailingEmptyStrings(v: vector<bytes>): vector<bytes> {
+    local local_vector : vector<bytes> = v;
+    while ( |local_vector| > 0 && local_vector.back() == b"" ) {
+        local_vector.pop_back();
+    }
+    return local_vector;
+}
+
 type OpenRequest = unit {
     options  : uint8 &convert=ROC_PLUS_ENUMS::FileOpenOptions($$);
-    path     : bytes &size=100;
-    filename : bytes &size=25;
+
+    var pathBytes : vector<bytes>;
+    var path      : bytes;
+    pathRaw       : bytes &size=100;
+
+    on pathRaw {
+        self.pathBytes = self.pathRaw.split(b"\x00");
+        self.pathBytes = removeTrailingEmptyStrings(self.pathBytes);
+
+        for (byte in self.pathBytes) {
+            self.path = self.path + byte;
+        }
+    }
+
+
+    var filenameBytes : vector<bytes>;
+    var filename      : bytes;
+    filenameRaw       : bytes &size=25;
+    on filenameRaw {
+        self.filenameBytes = self.filenameRaw.split(b"\x00");
+        self.filenameBytes = removeTrailingEmptyStrings(self.filenameBytes);
+
+        for (byte in self.filenameBytes) {
+            self.filename = self.filename + byte;
+        }
+    }
 };
 
 type OpenResponse = unit {
@@ -46,24 +78,93 @@ type CloseRequest = unit {
 };
 
 type DeleteRequest = unit {
-    path     : bytes &size=100;
-    filename : bytes &size=25;
+    var pathBytes : vector<bytes>;
+    var path      : bytes;
+    pathRaw       : bytes &size=100;
+
+    on pathRaw {
+        self.pathBytes = self.pathRaw.split(b"\x00");
+        self.pathBytes = removeTrailingEmptyStrings(self.pathBytes);
+
+        for (byte in self.pathBytes) {
+            self.path = self.path + byte;
+        }
+    }
+
+    var filenameBytes : vector<bytes>;
+    var filename      : bytes;
+    filenameRaw       : bytes &size=25;
+
+    on filenameRaw {
+        self.filenameBytes = self.filenameRaw.split(b"\x00");
+        self.filenameBytes = removeTrailingEmptyStrings(self.filenameBytes);
+
+        for (byte in self.filenameBytes) {
+            self.filename = self.filename + byte;
+        }
+    }
 };
 
 type ReadDirRequest = unit {
-    path          : bytes &size=100;
+    var pathBytes : vector<bytes>;
+    var path      : bytes;
+    pathRaw       : bytes &size=100;
+
+    on pathRaw {
+        self.pathBytes = self.pathRaw.split(b"\x00");
+        self.pathBytes = removeTrailingEmptyStrings(self.pathBytes);
+
+        for (byte in self.pathBytes) {
+            self.path = self.path + byte;
+        }
+    }
+
     totalNumFiles : uint8;
 };
 
 type ReadDir64Request = unit {
-    path          : bytes &size=100;
+    var pathBytes : vector<bytes>;
+    var path      : bytes;
+    pathRaw       : bytes &size=100;
+
+    on pathRaw {
+        self.pathBytes = self.pathRaw.split(b"\x00");
+        self.pathBytes = removeTrailingEmptyStrings(self.pathBytes);
+
+        for (byte in self.pathBytes) {
+            self.path = self.path + byte;
+        }
+    }
+
     totalNumFiles : uint16;
 };
 
 type ReadDirResponse = unit(dataLength: uint8) {
+    var fileNames   : vector<bytes>;
+
     additionalFiles : uint8;
     totalNumFiles   : uint8;
-    fileNames       : bytes &size=(dataLength - 3); # Command byte + additionalFiles + totalNumFiles
+    fileNamesRaw    : bytes &size=(dataLength - 3); # "3" == Command byte + additionalFiles + totalNumFiles
+
+    on fileNamesRaw {
+        # Split bytes by null terminator store in vector
+        self.fileNames = self.fileNamesRaw.split(b"\x00");
+        self.fileNames = removeTrailingEmptyStrings(self.fileNames);
+    }
+};
+
+type ReadDir64Response = unit(dataLength: uint8) {
+    var fileNames   : vector<bytes>;
+
+    additionalFiles : uint8;
+    totalNumFiles   : uint16;
+    fileNamesRaw    : bytes &size=(dataLength - 4); # "4" == Command byte + additionalFiles + totalNumFiles
+
+    on fileNamesRaw {
+        # Split bytes by null terminator store in vector
+        self.fileNames = self.fileNamesRaw.split(b"\x00");
+        self.fileNames = removeTrailingEmptyStrings(self.fileNames);
+    }
 };
 
 type GeneralFileTransfer = unit(dataLength: uint8) {
@@ -95,11 +196,11 @@ type GeneralFileTransferRequest = unit(dataLength: uint8, command: ROC_PLUS_ENUM
 
 type GeneralFileTransferResponse = unit(dataLength: uint8, command: ROC_PLUS_ENUMS::FileTransfer) {
     switch(command) {
-        ROC_PLUS_ENUMS::FileTransfer::OPEN  -> openResp  : OpenResponse;
-        ROC_PLUS_ENUMS::FileTransfer::READ  -> readResp  : ReadResponse(dataLength);
-        ROC_PLUS_ENUMS::FileTransfer::WRITE -> writeResp : WriteResponse;
-        ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY,
-        ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY_64 -> readDirResp : ReadDirResponse(dataLength);
+        ROC_PLUS_ENUMS::FileTransfer::OPEN              -> openResp      : OpenResponse;
+        ROC_PLUS_ENUMS::FileTransfer::READ              -> readResp      : ReadResponse(dataLength);
+        ROC_PLUS_ENUMS::FileTransfer::WRITE             -> writeResp     : WriteResponse;
+        ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY    -> readDirResp   : ReadDirResponse(dataLength);
+        ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY_64 -> readDir64Resp : ReadDir64Response(dataLength);
         *  -> : bytes &size=(dataLength - 1);  # For CLOSE and DELETE, consume remaining data
     };
 };
