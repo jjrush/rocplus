@@ -143,10 +143,10 @@ public function determineOpcode203PacketType(dataLength: uint8, command_raw: uin
     if (dataLength == OPCODE_203_REQ_DELETE_DATA_LENGTH && command_raw == 6) {
         command = ROC_PLUS_ENUMS::FileTransfer::DELETE;
     }
-    else if (dataLength == OPCODE_203_REQ_READ_DIR_V305_DATA_LENGTH && command_raw == cast<uint8>(ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY)) {
+    else if (dataLength == OPCODE_203_REQ_READ_DIR_V305_DATA_LENGTH) {
         command = ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY;
     }
-    else if (dataLength == OPCODE_203_REQ_READ_DIR_V310_DATA_LENGTH && command_raw == cast<uint8>(ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY_64)) {
+    else if (dataLength == OPCODE_203_REQ_READ_DIR_V310_DATA_LENGTH) {
         command = ROC_PLUS_ENUMS::FileTransfer::READ_DIRECTORY_64;
     }
     else {

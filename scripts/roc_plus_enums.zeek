@@ -126,8 +126,8 @@ export{
         [ROC_PLUS_ENUMS::FileTransfer_WRITE]             = "Write",
         [ROC_PLUS_ENUMS::FileTransfer_CLOSE]             = "Close", 
         [ROC_PLUS_ENUMS::FileTransfer_DELETE]            = "Delete",
-        [ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY]    = "Read Directory",
-        [ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY_64] = "Read Directory 64"
+        [ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY]    = "Read Directory <= v3.05",
+        [ROC_PLUS_ENUMS::FileTransfer_READ_DIRECTORY_64] = "Read Directory >= v3.10"
     } &default="Unknown";
 
     const FILE_OPEN_OPTIONS = {
