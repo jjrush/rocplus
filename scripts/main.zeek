@@ -1,12 +1,23 @@
-## main.zeek
-##
-## ICSNPP-ROC_PLUS
-##
-## Zeek script type/record definitions describing the information
-## that will be written to the log files.
-##
-
 module ROC_PLUS;
+
+# Copyright 2025 Battelle Energy Alliance, LLC
+
+################################################################################
+##
+## ICSNPP - ROC Plus
+##
+## This file defines the ROC Plus Zeek parser as defined in the
+## October 2022 revision of the ROC Plus Protocol Specifications Manual.
+## The manual that was targeted for this parser has been provided as part of this repository.
+##
+## Jason Rush, Idaho National Lab, April 2025
+## jason.rush@inl.gov
+##
+################################################################################
+
+
+## This Zeek script contains type/record definitions describing the information
+## that will be written to the log files.
 
 export {
     const roc_plus_ports_udp: set[port] = { 4000/udp } &redef;
