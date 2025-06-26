@@ -8,9 +8,10 @@ ROC Plus is a protocol created by Emerson for communication between Emerson devi
 
 This parser targets the ROC Plus commands specified in the publicly available 2022 version of the spec.
 
-## Installation
+## Installation (via zkg)
+
 ### Package Manager
-This script is available as a package for [Zeek Package Manager](https://docs.zeek.org/projects/package-manager/en/stable/index.html). It requires [Spicy](https://docs.zeek.org/projects/spicy/en/latest/) and the [Zeek Spicy plugin](https://docs.zeek.org/projects/spicy/en/latest/zeek.html).
+This script is available as a package for [Zeek Package Manager](https://docs.zeek.org/projects/package-manager/en/stable/index.html). Zeek includes Spicy support by default as of [v6.0.0](https://github.com/zeek/zeek/releases/tag/v6.0.0).
 
 ```bash
 $ zkg refresh
@@ -20,6 +21,19 @@ $ zkg install icsnpp-roc-plus
 If this package is installed from ZKG, it will be added to the available plugins. This can be tested by running zeek -NN. If installed correctly, users will see `ANALYZER_ROC_PLUS_TCP` and `ANALYZER_ROC_PLUS_UDP` under the list of `Zeek::Spicy` analyzers.
 
 If users have ZKG configured to load packages (see `@load packages` in the [ZKG Quickstart Guide](https://docs.zeek.org/projects/package-manager/en/stable/quickstart.html)), this plugin and these scripts will automatically be loaded and ready to go.
+
+## Installation (via git clone)
+
+```bash
+git clone https://github.com/cisagov/icsnpp-roc-plus.git
+cd icsnpp-roc-plus
+mkdir build && cd build && cmake .. && make && cd ..
+```
+
+From here you can install the locally built files through `zkg install ./icsnpp-roc-plus` and run it like you would normally.
+
+Or you can manually run the parser without installing it: `zeek ./build/roc_plus.hlto ./scripts/__load__.zeek  -Cr <pcap>`
+
 
 ## Log Files
 The ROC Plus analyzer generates several log files based on the type of ROC Plus traffic observed. 
@@ -97,7 +111,7 @@ This log captures various data request operations and logs it to `roc_plus_data_
 
 * See the `ROC_PLUS::roc_plus_data_request_log: record` in file `scripts/roc_plus_types.zeek` for a list of the fields logged.
 * This log is associated with ROC Plus Opcodes:
-- 50 (I/O DATA REQUEST)
+  - 50 (I/O DATA REQUEST)
   - 108 (HISTORICAL DATABASE READ)
   - 118 (READ ALARM LOG)
   - 119 (READ EVENT LOG)
