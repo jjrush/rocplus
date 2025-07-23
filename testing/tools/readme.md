@@ -4,14 +4,11 @@ A utility script for generating PCAP files containing ROC Plus protocol packets 
 
 ## Installation
 
-Dependencies can be installed using either pip or apt:
+Dependencies can be installed using pip:
 
 ```bash
 # Using pip
 pip install -r requirements.txt
-
-# Using apt
-sudo apt-get install $(cat apt-requirements.txt)
 ```
 
 ## Usage

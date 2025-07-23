@@ -1,5 +1,20 @@
 module ROC_PLUS;
 
+# Copyright 2025 Battelle Energy Alliance, LLC
+
+################################################################################
+##
+## ICSNPP - ROC Plus
+##
+## This file defines the ROC Plus Zeek parser as defined in the
+## October 2022 revision of the ROC Plus Protocol Specifications Manual.
+## The manual that was targeted for this parser has been provided as part of this repository.
+##
+## Jason Rush, Idaho National Lab, April 2025
+## jason.rush@inl.gov
+##
+################################################################################
+
 import spicy;
 import ROC_PLUS_ENUMS;
 import ROC_PLUS_GLOBALS;
